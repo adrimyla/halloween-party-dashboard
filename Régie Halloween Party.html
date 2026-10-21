@@ -122,15 +122,6 @@ h2{font-family:var(--f-display);font-weight:400;font-size:1.35rem;letter-spacing
 .timeline .when{font-family:var(--f-code);font-size:.78rem;color:var(--muted);padding-top:2px}
 .timeline li.past{opacity:.5}
 .timeline li.now .when{color:var(--lamp)}
-.checklist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
-.checklist button{
-  width:100%;text-align:left;background:transparent;border:0;border-radius:6px;
-  padding:7px 6px;display:grid;grid-template-columns:20px minmax(0,1fr);gap:10px;align-items:start;
-}
-.checklist button:hover{background:var(--panel-2)}
-.box{width:18px;height:18px;border:1.5px solid var(--muted);border-radius:4px;margin-top:1px;display:grid;place-items:center;font-size:12px;line-height:1}
-.checked .box{background:var(--fog);border-color:var(--fog);color:var(--night)}
-.checked .lbl{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
 
 /* ---------- Plan ---------- */
 .plan{display:grid;grid-template-columns:44px repeat(5,minmax(0,1fr));gap:6px;align-items:stretch}
@@ -163,17 +154,43 @@ h2{font-family:var(--f-display);font-weight:400;font-size:1.35rem;letter-spacing
 .elements{display:flex;flex-direction:column;gap:10px}
 .el{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:6px}
 .el:first-child{border-top:0;padding-top:0}
-.el-head{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.el-head{width:100%;display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:transparent;border:0;border-radius:6px;padding:4px 2px;text-align:left}
+.el-head:hover{background:var(--panel-2)}
+.el-meta{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}
+.el-body{display:flex;flex-direction:column;gap:6px}
+.chev{color:var(--muted);display:inline-block;width:1em;flex:0 0 auto}
+.sub{border:1px solid var(--lamp);border-radius:7px;padding:8px;display:flex;flex-direction:column;gap:5px;margin-top:2px}
+
+/* ---------- Texte des scripts ---------- */
+.say{margin:0;font-size:.95rem;line-height:1.5;padding:6px 10px;border-left:3px solid var(--lamp);background:rgba(243,177,74,.07);border-radius:0 6px 6px 0}
+.mj{margin:0;font-size:.8rem;color:var(--muted);font-style:italic}
+.txt{margin:0;font-size:.88rem}
+.li{margin:0;font-size:.88rem;padding-left:14px;position:relative}
+.li::before{content:"•";position:absolute;left:2px;color:var(--muted)}
+mark.todo{background:var(--warn-soft);color:var(--warn);border:1px dashed var(--warn);border-radius:4px;padding:0 3px;font-style:normal}
+.scene{border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:8px}
+.scene.read:not(.open){opacity:.6}
+.scene-head{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.scene-head .fold{background:transparent;border:0;padding:2px 0;text-align:left;font-weight:700;display:flex;gap:6px;flex:1;min-width:0}
+.scene-body{display:flex;flex-direction:column;gap:6px}
+.scenes{display:flex;flex-direction:column;gap:8px}
+.timeline .say{font-size:.86rem;padding:4px 8px}
+.timeline .cell{display:flex;flex-direction:column;gap:4px}
 .chip{font-family:var(--f-code);font-size:.74rem;font-weight:700;padding:2px 6px;border-radius:5px;background:var(--panel-2);border:1px solid var(--line)}
 .chip.lamp{border-color:var(--lamp);color:var(--lamp)}
 .chip.fog{border-color:var(--fog);color:var(--fog)}
 .chip.ok{border-color:var(--ok);color:var(--ok)}
-.act{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:6px 8px;border-radius:7px;background:var(--panel-2)}
-.act .t{font-size:.9rem}
-.act .r{font-size:.78rem;color:var(--muted);grid-column:1/-1}
+.act{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;padding:6px 8px;border-radius:7px;background:var(--panel-2)}
+.act .t{font-size:.9rem;flex:1 1 11em;min-width:0}
+.act .r{font-size:.78rem;color:var(--muted);flex-basis:100%;display:flex;flex-direction:column;gap:4px}
+.act .r .say,.act .r .txt,.act .r .li{color:var(--ink)}
+.act.free{background:transparent;border:1px dashed var(--line)}
 .act.done{background:transparent;border:1px solid var(--line)}
 .act.done .t{color:var(--muted)}
-.act .btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.act .btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;margin-left:auto}
+.act.cap{background:var(--fog-soft);border:1px solid var(--fog)}
+.act .by{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--fog);margin-right:6px}
+.room-caps{display:flex;flex-direction:column;gap:6px}
 .cost{font-family:var(--f-code);font-size:.72rem;color:var(--lamp)}
 .cost.free{color:var(--ok)}
 
@@ -193,6 +210,7 @@ h2{font-family:var(--f-display);font-weight:400;font-size:1.35rem;letter-spacing
 .pill{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:3px 8px;border-radius:999px}
 .pill.on{background:var(--ok-soft);color:var(--ok)}
 .pill.off{background:var(--panel-2);color:var(--muted)}
+.pill.here{background:var(--fog-soft);color:var(--fog)}
 .capc .rule{font-size:.82rem}
 
 /* ---------- Enquête ---------- */
@@ -353,34 +371,272 @@ const FACTS = {
   3:{t:"Seules les cheminées au-dessus du Laboratoire sont truquées", elim:"Élimine le Hall"}
 };
 
-const NIGHT_CHECKS = {
+/* ================= Scripts (copiés des pages Notion le 21/10) =================
+   Une ligne par paragraphe : "> " texte à lire, "~ " note du MJ, "- " puce, sinon texte simple.
+   **gras**, *italique*, et [passages à compléter] surlignés. */
+const ENTRIES = {
+  A:[`> « Le Grand Hall est plongé dans la pénombre, les volets clos. Par la porte d'entrée entrouverte, le jardinier vous observe sans oser entrer. Un escalier monte vers l'étage. Une lourde porte fermée à clé mène à la cave. Au-dessus d'une cheminée de pierre, le portrait d'une silhouette masquée semble vous fixer. »`,
+     `~ Le jardinier n'est là que le jour : il rentre chez lui au coucher du soleil.`],
+  B:[`> « Le salon où vous avez dormi : des fauteuils usés, des couvertures en bataille. Z1 fixe un grand rideau de velours. Une horloge comtoise fait entendre son tic-tac. Dans un coin, une vieille télé grésille. Au fond, une porte fermée à clé mène à la cuisine. »`],
+  C:[`> « Des étagères de livres montent jusqu'au plafond. Sur la plus proche, des titres étranges : *La Créature augmentée*, *Transhumanisme pour les débutants*. Dans un coin, une grande cheminée de pierre, éteinte. Z2 trône sur un énorme grimoire. Au centre, une partie de Scrabble abandonnée sur une table. Et sur un pupitre, un journal relié de cuir. »`],
+  D:[`> « Une serre aux vitres embuées, envahie de plantes. Dans un coin, des feuilles bougent toutes seules. Un vieil établi de jardinier croule sous les pots. Et au centre, une énorme plante carnivore semble vous suivre du regard. »`],
+  E:[`> « Vous entrez dans la chambre. Quelques bougies éclairent une grande cheminée éteinte. Vous remarquez une belle collection de vinyles avec un tourne-disque. Cependant, un drôle de bruit provient du placard, comme une respiration inquiétante. »`],
+  F:[`> « Une cuisine à l'abandon. Des casseroles pendent au plafond. Au fond, la porte entrouverte d'un garde-manger. Sur la table, les restes d'un repas à moitié mangé. »`],
+  H:[`> « Un sous-sol humide, éclairé par une ampoule qui grésille. Au mur, un grand plan technique du manoir, couvert d'annotations, et un vieux tableau électrique. Sur un établi traînent des outils, des boulons et une pince robotique… de la taille d'une petite patte. Au fond, une lourde porte en métal, verrouillée. »`]
+};
+
+/* Options d'un élément : act = action suivie par la régie, cap = capacité, sub = sous-script révélé une fois l'action faite. */
+const RIEN = `**Rien.**`;
+const ES = {
+  A1:{d:[`> « Le jardinier se tient sur le perron, bien à l'abri derrière le seuil. "Alors ? Vous avez trouvé quelque chose ? Faites vite, la nuit tombe tôt en cette saison…" »`,
+         `~ [Lore sur le manoir et son maître, à compléter]`],
+    opts:[
+      {t:`Lui demander qui est le maître`, r:[`> « "Très discret. Toujours masqué. Il me payait par courrier. En vingt ans, je n'ai jamais vu son visage." Il frissonne. »`]},
+      {act:"a1c", r:[`> « "Personne ne descend jamais à la cave. Seul le maître avait la clé… Mais l'ancienne gouvernante cachait toujours des doubles quelque part." »`]},
+      {t:`L'inviter à entrer`, r:[`> « "Jamais de la vie !" Il recule de trois pas. »`]},
+      {act:"a1f", r:[RIEN, `> « "Hé ! Qu'est-ce que vous faites ?!" Il proteste, mais se laisse faire. Un marteau, des sachets de graines, trois bonbons à la menthe et une photo de lui-même. »`]}
+    ]},
+  A1b:{d:[`> « Le jardinier fait les cent pas sur le perron. "Alors, cette liane ? Et vous savez où la tendre ?" »`],
+    opts:[
+      {act:"a1l", r:[`> « "Au fond de la serre. Elles ne sortent que quand on arrose… et je n'ose plus y entrer." »`]},
+      {act:"a1c", r:[`~ Même réponse qu'en A1.`, `> « "Personne ne descend jamais à la cave. Seul le maître avait la clé… Mais l'ancienne gouvernante cachait toujours des doubles quelque part." »`]},
+      {act:"a1f", r:[`~ Reste disponible si elle n'a pas été fouillée le jour 1.`, RIEN, `> « "Hé ! Qu'est-ce que vous faites ?!" Il proteste, mais se laisse faire. Un marteau, des sachets de graines, trois bonbons à la menthe et une photo de lui-même. »`]}
+    ]},
+  A2:{d:[`> « Une lourde porte en chêne, fermée à clé. Un courant d'air froid passe dessous. Sur le sol, des traces de pas mènent jusqu'à elle. Par la serrure, des bruits étranges montent d'en bas. »`,
+         `~ La fausse piste : les joueurs doivent penser que l'Ombre vient de là.`],
+    opts:[
+      {t:`Frapper`, r:[`> « Trois coups. Les bruits s'arrêtent… puis reprennent. Personne ne répond. »`]},
+      {t:`Écouter`, r:[`> « En collant l'oreille, vous entendez quelque chose qui ressemble à un grognement étrange. »`]},
+      {act:"a2k", r:[`> « La clé tourne avec un grincement. La porte s'ouvre sur un escalier qui descend dans le noir. »`, `→ **H**, le sous-sol.`]},
+      {cap:"forceH", r:[`> « Costaud fonce dans la porte : "En force !" Elle s'ouvre sur un escalier qui descend dans le noir. »`, `→ **H**, le sous-sol.`]}
+    ]},
+  A3:{d:[`> « Une cheminée de pierre, l'âtre vide et propre. Au-dessus, un grand portrait : le maître des lieux, en habit de soirée, le visage caché derrière un masque. Sur le manteau, une plaque : [nom ou titre à compléter], et une pile de courrier. »`,
+         `~ Prépare la révélation finale.`],
+    opts:[
+      {t:`Regarder le portrait de près`, r:[`> « Les yeux du portrait semblent vous suivre. Vous vous déplacez. Ils vous suivent encore. »`]},
+      {t:`Redresser le cadre`, r:[`> « Vous le redressez. Il se remet de travers tout seul. »`]},
+      {act:"a3c", r:[`Parmi les factures, une vieille note du jardinier adressée au maître :`, `> « Tous les jours je retrouve des lianes au fond de la serre et je suis obligé de les couper. Qui s'amuse à faire ça ?? »`, `~ Indice anodin : la liane.`]},
+      {act:"a3e", r:[`> « Vous inspectez le sol devant l'âtre, puis le conduit. Rien : pas une trace, pas une rayure. C'est une cheminée tout à fait normale. »`, `**Fait 3** (le Hall s'élimine quand on compare avec les deux autres cheminées).`]}
+    ]},
+  B1:{d:[`> « Z1 est roulé en boule sur un fauteuil. Il ne dort que d'un œil : il fixe intensément le grand rideau de velours. Quand vous approchez, il vous regarde, regarde le rideau, puis vous regarde à nouveau. »`,
+         `~ Z1 ne bouge pas tant qu'on ne lui donne rien. [Gag à compléter]`],
+    opts:[
+      {t:`Le caresser`, r:[`> « Il se laisse faire, sans quitter le rideau des yeux. »`]},
+      {t:`Regarder le rideau`, r:[`> « Un lourd rideau de velours rouge. Z1 le fixe avec encore plus d'intensité. »`]},
+      {t:`Regarder le tapis`, r:[`> « Sur le tapis, des traces de chaussures… à talons. Elles partent du canapé où vous dormiez et filent vers le Hall. Un fantôme… en talons ? »`, `~ Ambiance : prépare le démasquage.`]},
+      {cap:"z1", sub:"B1b", r:[`→ **B1b**, la pièce cachée.`]},
+      {act:"b1f", r:[RIEN, `> « Vous trouvez des poils. Beaucoup de poils. »`, `~ Derrière le rideau sans Z1, il n'y a qu'un mur : seul Z1 sait où se cache la porte.`]}
+    ]},
+  B2:{d:[`> « Une grande horloge comtoise, bien plus vieille que le manoir. Son balancier oscille lentement. Les aiguilles avancent vers minuit… »`,
+         `~ Elle sonne à « Dernière chance ! » et les douze coups de minuit chaque nuit. [Lore ou clin d'œil à compléter]`],
+    opts:[
+      {t:`Avancer les aiguilles`, r:[`> « Vous essayez. Les aiguilles reviennent toutes seules à leur place. Z1 crache dans votre direction. »`]},
+      {act:"b2o", r:[RIEN, `> « Un coucou en jaillit et vous hurle dessus. Ce n'était même pas une horloge à coucou. »`]}
+    ]},
+  B3:{d:[`> « Une vieille télé cathodique, allumée toute seule. Sur l'écran, de la neige… puis une image apparaît. »`],
+    opts:[
+      {act:"b3t", r:[`Le MJ montre sur la tablette l'extrait de V où C. et B. forment des mots au Scrabble, dont le mot secret.`, `~ C'est la clé de l'énigme du Scrabble (C2), mais rien ne le dit.`]},
+      {t:`Zapper`, r:[`> « Toutes les chaînes diffusent la même émission. Inquiétant. »`]},
+      {act:"b3d", r:[RIEN, `> « Un nid de câbles et une télécommande sans piles. »`]}
+    ]},
+  B4:{d:[`> « Une porte en bois, fermée à clé. Une odeur sucrée de biscuits passe dessous. Par le trou de la serrure, vous apercevez des étagères et une boîte en fer. »`,
+         `~ Flaireur, devant cette porte : « Ça sent les biscuits ! »`],
+    opts:[
+      {t:`Frapper`, r:[`> « Pas de réponse. L'odeur de biscuits se fait plus forte. Flaireur salive. »`]},
+      {cap:"forceF", r:[`> « Costaud prend son élan : "En force !" La porte de la cuisine cède dans un grand fracas. »`, `→ **F**, la Cuisine. C'est la seule façon d'y entrer.`]}
+    ]},
+  C1:{d:[`> « Z2 est installée sur le grimoire comme sur un trône. Quand vous tendez la main, elle vous fixe avec un mépris royal. Elle ne bougera pas. »`,
+         `~ [Gag ou clin d'œil à compléter]`],
+    opts:[
+      {t:`Essayer de la pousser`, r:[`> « Elle feule. Vous reculez. »`]},
+      {t:`Lire le titre du grimoire`, r:[`> « Impossible, elle est couchée dessus. On devine juste un mot : "…MÉCANISMES…" »`]},
+      {cap:"z2", sub:"C1b", r:[`→ Le grimoire.`]}
+    ]},
+  C2:{d:[`> « Une partie de Scrabble abandonnée. Sous le plateau, un tiroir. Il est verrouillé. »`,
+         `**L'énigme :** le groupe doit poser le mot secret sur le plateau. Le MJ demande simplement : « Quel mot formez-vous ? » (réponse à voix haute, gratuite, sans limite d'essais).`,
+         `~ La clé est à la télé du Salon (B3), mais rien ne l'indique : les joueurs doivent tomber dessus et faire le lien eux-mêmes. L'extrait de V montre plusieurs mots, dont le mot secret. Le groupe peut tâtonner, et M. saura lequel c'est.`],
+    opts:[
+      {t:`Former un mauvais mot`, r:[`> « Vous posez les lettres. Le plateau grince. Rien d'autre. »`]},
+      {act:"c2w", t:`Former le mot secret`, sub:"C2b", r:[`→ **C2b**, le tiroir.`]}
+    ]},
+  C3:{d:[`> « Un journal épais, rempli d'une écriture nerveuse. À côté, un catalogue glissé sous le pupitre. »`],
+    opts:[
+      {act:"c3l", r:[`Une entrée parle des Habitants :`, `> « Aujourd'hui, j'ai vu d'étranges créatures dans la serre, [description physique des Habitants]. Elles sont sorties quand j'ai arrosé les plantes. »`, `~ La clé pour faire sortir les Habitants et obtenir la liane.`]},
+      {t:`Feuilleter le catalogue`, r:[`Un catalogue de prothèses articulées, une page cornée : *modèle G*.`, `~ Ambiance : G et le transhumanisme.`]},
+      {act:"c3f", r:[`> « Vous remarquez une page coincée à la fin, presque déchirée : "Le monte-charge de la bibliothèque est encore bloqué. Rappeler l'artisan." »`, `**Fait 2 : la cheminée de la Bibliothèque est hors service.**`]}
+    ]},
+  C4:{d:[`> « Une grande cheminée en pierre, éteinte. Les briques sont noircies par les années. Sur le manteau, [objet ou clin d'œil à compléter]. »`],
+    opts:[
+      {t:`Tisonner les cendres`, r:[`> « Un nuage de cendres s'envole. Flaireur éternue. »`]},
+      {act:"c4e", r:[`> « Sur le sol devant l'âtre, une longue trace en arc de cercle, comme si un pan de la cheminée pivotait. »`, `**Fait 3** (même résultat que dans la Chambre : c'est le fait 2 qui départage).`]}
+    ]},
+  D1:{d:[`> « Vous vous approchez des feuilles qui bougent. Des petits rires étouffés, puis plus rien. Quelque chose se cache là-dedans, mais refuse de se montrer. Les plantes autour ont l'air assoiffées. »`],
+    opts:[
+      {t:`Secouer les plantes`, r:[`> « Les rires s'arrêtent net. Vous avez vexé quelque chose. »`]},
+      {act:"d1a", sub:"D1b", r:[`→ **D1b**, les Habitants.`]}
+    ]},
+  D2:{d:[`> « Un vieil établi couvert de terre, de sachets de graines, d'outils rouillés, de vieux papiers et d'un arrosoir cabossé. On dirait que personne n'y a touché depuis des mois. »`],
+    opts:[
+      {t:`Lire les sachets de graines`, r:[`> « "Tomates géantes", "Citrouilles qui hurlent", "Haricots qui ne poussent que le mardi". [À compléter] »`]},
+      {t:`Prendre un outil`, r:[`> « Vous saisissez un sécateur. La lame vous reste dans la main. Le manche, lui, reste sur l'établi. »`]},
+      {act:"d2f", r:[`> « Sous une pile de pots, un petit trousseau rouillé. Sur l'étiquette, l'écriture de la gouvernante : *Cave (double)*. »`, `**La clé de la cave** : elle ouvre A2 sans utiliser le Costaud.`]}
+    ]},
+  D3:{d:[`> « Une plante carnivore géante, haute comme un homme. Sa mâchoire s'ouvre et se referme lentement. Elle a l'air d'avoir faim. »`],
+    opts:[
+      {t:`La nourrir`, r:[`> « Vous lui tendez… quoi, au juste ? Elle avale votre lacet. Elle a l'air satisfaite. »`]},
+      {t:`La caresser`, r:[`> « Elle ronronne. Les plantes ne devraient pas ronronner. »`]},
+      {act:"d3f", r:[RIEN, `> « Vous trouvez… une mouche morte. C'est tout. »`]}
+    ]},
+  E1:{d:[`> « Sur le tourne-disque, un vinyle sans pochette. Sur l'étiquette, quelqu'un a griffonné : *Ma playlist secrète*. »`],
+    opts:[
+      {t:`Écouter le vinyle`, r:[`Le MJ lance « Finale » de *Babylon* (Justin Hurwitz).`, `~ Un moment de danse et de gag, en référence à SL. Pas d'énigme.`]},
+      {t:`Regarder les pochettes`, r:[`> « Toutes les pochettes sont vides, sauf une, dédicacée : [dédicace absurde à compléter]. »`]},
+      {act:"e1r", r:[RIEN, `> « Dans la dernière, vous trouvez… un autre vinyle, identique au premier. »`]}
+    ]},
+  E2:{d:[`> « Une grande cheminée en pierre, éteinte. Les briques sont noircies par les années. Sur le manteau, quelques bougies et [objet ou clin d'œil à compléter]. »`],
+    opts:[
+      {t:`Tisonner les cendres`, r:[`> « Un nuage de cendres s'envole. Flaireur éternue. »`]},
+      {act:"e2e", r:[`> « Sur le sol devant l'âtre, une longue trace en arc de cercle, comme si un pan de la cheminée pivotait. »`, `**Fait 3** (même résultat que dans la Bibliothèque : volontairement, rien ne désigne la Chambre).`]}
+    ]},
+  E3:{d:[`~ Son : respiration bruyante qui s'intensifie.`,
+         `> « La respiration devient de plus en plus forte à mesure que vous approchez. Vous ouvrez la porte d'un coup… Z3 est assise sur une pile de linge. Elle respire très fort et vous fixe sans cligner des yeux. »`,
+         `~ Z3 ne bouge pas, quoi qu'on fasse. [Gags ou répliques à compléter]`],
+    opts:[
+      {t:`Lui parler`, r:[`> « Vous lui posez une question. Elle respire plus fort. Vous prenez ça pour un non. »`]},
+      {t:`Regarder la pile de linge`, r:[`> « Sous Z3, au milieu des draps, dépassent des morceaux de tissu noir et violet, découpés grossièrement… comme pour coudre une cape. »`, `~ Ambiance : prépare le démasquage.`]},
+      {t:`Refermer doucement la porte`, r:[`> « La respiration continue derrière la porte. Vous n'êtes pas rassurés. »`]},
+      {act:"e3f", r:[RIEN, `> « Vous essayez de fouiller derrière Z3. Elle vous regarde. Vous abandonnez. »`]}
+    ]},
+  F1:{d:[`> « Des étagères de bocaux poussiéreux. Tout en haut, une boîte en fer avec une étiquette : *Biscuits*. En bas, un gros sac de granulés : *Croquettes premium pour G*. »`],
+    opts:[
+      {act:"f1t", r:[`Le Gourmand retourne sa carte capacité face visible. Il peut à nouveau donner un biscuit.`]},
+      {t:`Regarder le sac de granulés`, r:[`> « "Enrichi en circuits imprimés." Hein ? »`, `~ Ambiance : G et le transhumanisme.`]},
+      {act:"f1b", r:[RIEN, `> « Un bocal de cornichons qui vous regarde. »`]}
+    ]},
+  F2:{d:[`> « Une assiette de [plat à compléter] encore tiède. Quelqu'un a mangé ici il y a peu… »`, `~ Ambiance : un fantôme qui mange ?`],
+    opts:[
+      {t:`Goûter`, r:[`> « [Gag à compléter] »`]},
+      {act:"f2s", r:[RIEN, `> « Une serviette en papier où quelqu'un a griffonné : "7/10, manque de sel." [Gag à compléter] »`]}
+    ]},
+  H1:{d:[`> « Un plan des circuits du manoir, étage par étage : électricité, eau, chauffage. Dans la bibliothèque, la cheminée est entourée en rouge, avec une mention griffonnée : *KO*. »`,
+         `~ Tant que le fait 1 n'est pas connu, ce détail semble anodin.`],
+    opts:[
+      {act:"h1p", r:[`**Fait 2 :** la cheminée de la Bibliothèque est hors service (gratuit une fois sur place).`]},
+      {t:`Lire les annotations`, r:[`> « [Annotations drôles à compléter] »`]}
+    ]},
+  H2:{d:[`> « Un vieux tableau électrique couvert de poussière… sauf le disjoncteur général. »`],
+    opts:[
+      {t:`Regarder le disjoncteur`, r:[`> « Il est baissé. À la main : on voit encore des traces de doigts dans la poussière. Quelqu'un coupe le courant… Un fantôme qui baisse un disjoncteur ? »`, `~ Ambiance : prépare le démasquage.`]},
+      {t:`Le remonter`, r:[`> « Les lumières se rallument dans tout le manoir. Pour combien de temps ? »`]}
+    ]},
+  H3:{d:[`> « Une porte en métal, verrouillée de l'intérieur. Derrière, vous entendez des pas… et un grognement étrange ? »`,
+         `~ Teaser de G et du Laboratoire. La porte ne s'ouvre qu'à l'épilogue. Aucune action.`]}
+};
+
+const SUBS = {
+  B1b:{t:`La pièce cachée`, d:[`> « Z1 croque le biscuit, s'étire longuement, puis bondit sur le rideau et s'y accroche de toutes ses griffes. Le rideau s'effondre… et révèle une petite porte cachée. Derrière, un minuscule bureau poussiéreux. Sur la table, deux documents agrafés : un devis pour l'installation d'un monte-charge vertical dans les conduits de cheminée du manoir, et le bon de commande qui va avec : "Mécanisme de monte-charge pour conduit de cheminée, quantité : 2." Dans un coin, une caisse de fumigènes violets. »`,
+    `**Fait 1 : l'Ombre passe par une cheminée.** La quantité (2 pour 3 cheminées) prépare le fait 3. Les fumigènes : ambiance « faux fantôme ».`,
+    `~ Entrer dans la pièce cachée ne coûte pas de cran. Le MJ pose sa tuile.`]},
+  C1b:{t:`Avec le biscuit`, d:[`> « Z2 renifle le biscuit, le prend délicatement, puis descend du grimoire avec une lenteur calculée. Le grimoire s'intitule *Mécanismes et automates de salon*. Une page est cornée, annotée à la main : "Les passages ne s'ouvrent qu'à minuit pile, quand l'horloge du salon sonne le douzième coup." [Lore à compléter] »`,
+    `**Lore : pourquoi l'Ombre sort à minuit pile.**`,
+    `~ À confirmer : pour l'instant le biscuit sur Z2 ne donne que du lore.`]},
+  C2b:{t:`Le tiroir`, d:[`> « Dès que vous posez les lettres du mot secret sur le plateau, un mécanisme se déclenche et le tiroir s'ouvre avec un déclic. À l'intérieur, un plan roulé : le schéma d'un monte-charge. Une cabine monte à la verticale depuis une grande pièce du sous-sol, jusque dans les conduits des cheminées situées juste au-dessus. Dans un coin, une annotation soignée : "À l'attention de Madame." »`,
+    `**Fait 3 :** seules les cheminées au-dessus du Laboratoire sont truquées. Avec le plan des étages, ça élimine le Hall.`,
+    `~ « Madame » prépare le démasquage (et fait écho aux traces de talons du Salon).`]},
+  D1b:{t:`Les Habitants`, d:[`> « Dès que l'eau touche les feuilles, trois petites créatures sortent timidement en s'ébrouant. [Lore et clins d'œil à compléter.] Pour vous remercier, elles vous tendent une longue liane, solide comme un câble. "Ça pourra toujours vous servir !" »`,
+    `**Objet : la liane (le piège).** Le groupe prend le jeton liane.`]}
+};
+
+/* Scènes des nuits et des matins : chacune se coche « Lu » ; la première non lue s'ouvre toute seule. */
+const SCENES = {
   n1:[
-    "Règles présentées, personnages répartis",
-    "Plan vierge du manoir donné (3 niveaux, sans cheminées)",
-    "Avertissement : « La partie dure deux jours : réfléchissez bien avant d'utiliser vos capacités à usage unique. »",
-    "Orage, le van tombe en panne devant la grille",
-    "Le groupe dort au Salon",
-    "Dans la nuit : un rire, une porte qui grince, des pas. Personne ne voit rien."
+    ["s-n1-1",{t:`1. Arrivée`, p:[
+      `> « Il est 21h. L'orage gronde. Votre van tousse, crache… et s'arrête net devant la grille d'un manoir. Pas une lumière à des kilomètres. Vous poussez la grande porte : elle n'est pas fermée. Elle grince. »`,
+      `~ Son : orage, porte qui grince.`,
+      `> « Personne ne répond. La poussière recouvre tout, comme si personne n'avait vécu ici depuis des années. Vous trouvez un salon avec de vieux canapés : parfait pour attendre le matin. »`]}],
+    ["s-n1-2",{t:`2. Minuit`, p:[
+      `> « Vous finissez par vous endormir. Quelque part, une horloge sonne les douze coups de minuit. Les lumières vacillent, puis s'éteignent. Dans le noir, un rire glaçant. Une porte grince. Des pas, lents, dans le couloir… puis plus rien. Quand vous parvenez enfin à allumer une bougie, il n'y a personne. Vous ne fermez plus l'œil de la nuit. »`,
+      `~ Son : rire, porte qui grince, pas. Personne ne voit l'Ombre : sa première apparition, c'est la nuit 2. Aucun indice sur son chemin. Le courant reste coupé (le disjoncteur du sous-sol, H2).`]}]
+  ],
+  j1:[
+    ["s-j1-1",{t:`Matin : le jardinier`, p:[
+      `> « Au petit matin, l'orage n'est plus qu'une pluie fine. On frappe à la porte d'entrée. Sur le perron, un vieil homme en ciré, un sécateur à la main, refuse de franchir le seuil. "Vous avez dormi ICI ? Vous êtes fous ! Je suis le voisin. Je m'occupais du jardin et de la serre pour le maître, avant qu'il disparaisse. Depuis, quelque chose rôde la nuit dans ce manoir. Ça revient chaque nuit, à minuit pile. Moi, je ne mets plus un pied dans cette maison." »`,
+      `> « Il jette un œil à votre van. "Je peux vous le réparer, mais la pièce n'arrivera pas avant deux jours. D'ici là… vous allez devoir tenir. Si on savait par où ça entre, on pourrait peut-être l'arrêter…" »`,
+      `~ Si les joueurs demandent à dormir chez lui : « "Chez moi ? Ma femme ne veut pas d'un Flaireur qui parle." »`]}],
+    ["s-j1-2",{t:`Les règles (hors histoire)`, p:[
+      `- **Le sablier :** 4 crans le jour 1, 6 crans le jour 2. Une action payante (examiner, fouiller, arroser…) ou aller dans une pièce voisine (le Hall se traverse sans payer) fait avancer le temps d'un cran. Choisir un élément, les actions gratuites, les énigmes et les capacités sont gratuits. Quand le dernier jeton tombe, la nuit tombe.`,
+      `- **Les codes :** sur chaque tuile, les éléments ont un code (A1, A2…). Les joueurs annoncent le code, le MJ lit le script. Chaque action annonce son coût.`,
+      `- **Les capacités :** chacune s'utilise une seule fois dans toute la partie, pendant une journée. On retourne la carte après usage. Insister : « La partie dure deux jours : réfléchissez bien avant d'utiliser vos capacités à usage unique. »`,
+      `- Le MJ donne le plan vierge du manoir et pose les tuiles du Hall (A) et du Salon (B). Le groupe commence dans le Hall.`]}]
+  ],
+  j2:[
+    ["s-j2-1",{t:`Matin du jour 2`, p:[
+      `> « Le jardinier est de retour sur le perron. "Alors, vous l'avez vue ? … Et vous êtes encore vivants ?!" Vous lui expliquez le plan du Meneur : une liane tendue en travers de son chemin. "Une liane ? Celles de la serre sont solides comme des câbles, je passe mes journées à les couper… Enfin, je passais. Elles doivent mourir de soif, depuis que je n'ose plus y entrer." »`,
+      `~ Le jardinier passe en A1b.`]}]
   ],
   n2:[
-    "Le groupe se barricade au Salon",
-    "Un raclement dans les murs",
-    "L'Ombre surgit : course-poursuite",
-    "Le Meneur la braque avec sa lampe de poche, elle s'enfuit",
-    "Meneur : « Les gars, j'ai un plan ! »"
+    ["s-n2-1",{t:`1. La tombée de la nuit`, p:[
+      `> « Le soleil disparaît derrière les arbres. Le jardinier est rentré chez lui. Vous vous barricadez dans le salon, les couvertures jusqu'au menton. Flaireur et Gourmand ont poussé un fauteuil contre la porte. »`]}],
+    ["s-n2-2",{t:`2. Minuit`, p:[
+      `~ Son : carillon de l'horloge (douze coups).`,
+      `> « L'horloge sonne les douze coups. Au douzième, un raclement résonne dans les murs, quelque part au-dessus de vous… comme quelque chose qui glisse dans un conduit. Puis des pas dans l'escalier. Le fauteuil glisse tout seul. La porte s'ouvre. Pour la première fois, vous la voyez : l'Ombre est là. "PARTEZ D'ICI !" »`,
+      `~ Visuel : l'Ombre (première apparition). Son : rire. Le raclement à l'étage est une petite piste vers la Chambre.`]}],
+    ["s-n2-3",{t:`3. La course-poursuite`, p:[
+      `~ Musique : poursuite (code S).`,
+      `> « Vous détalez ! Vous entrez dans une pièce par une porte, l'Ombre en ressort par une autre. Vous faites demi-tour : elle est déjà là. Flaireur et Gourmand font semblant d'être des statues. Ça ne marche pas. »`,
+      `~ Mini-jeu : à trouver. Version provisoire : les joueurs lancent un dé à tour de rôle pour obtenir le chiffre donné par le MJ, et ne passent le dé qu'une fois le chiffre obtenu. Il faut finir un tour de table dans le temps imparti.`]}],
+    "chrono",
+    ["s-n2-4",{t:`4. La lampe de poche`, p:[
+      `> « Acculés dans un coin, vous n'avez plus nulle part où fuir. Le Meneur fouille ses poches, sort sa lampe de poche et la braque droit sur l'Ombre. Elle pousse un cri, se cache le visage derrière sa cape… et s'enfuit dans le noir. "Vous ne m'aurez pas !" Silence. »`,
+      `~ L'explication rationnelle : elle ne veut surtout pas être vue. Prépare le démasquage.`]}],
+    ["s-n2-5",{t:`5. Le plan du Meneur`, p:[
+      `~ Si possible, le joueur du Meneur lit sa réplique, et celui de l'Enquêtrice la sienne.`,
+      `> **Meneur :** « Les gars, j'ai un plan ! Elle est trop rapide pour nous… alors on va la faire tomber. Une liane tendue en travers de son chemin, elle trébuche… et on la ficelle ! »`,
+      `> **Enquêtrice :** « Encore faut-il savoir par où elle passe… »`]}]
   ],
   n3:[
-    "« Où tendez-vous la liane ? »",
-    "Le groupe se cache à côté",
-    "L'Ombre est capturée"
+    ["s-n3-1",{t:`1. La tombée de la nuit`, p:[
+      `> « Le soleil se couche. Le jardinier vous a souhaité bonne chance de loin. Cette fois, vous êtes prêts. »`,
+      `- **Le MJ :** « Où tendez-vous la liane ? » Le groupe choisit une pièce du plan (même jamais visitée) et y pose le jeton liane.`,
+      `- **Le groupe se cache** dans cette pièce (dans la Chambre : le placard de Z3).`,
+      `> « Vous tendez la liane en travers de la pièce, à hauteur de cheville. Puis vous vous cachez… et vous attendez. »`,
+      `~ Son : carillon. « L'horloge sonne les douze coups. Au douzième… »`,
+      `**Règle :** la liane ne l'arrête que si elle est devant la sortie, ou si le groupe l'y attire pendant une poursuite.`]}]
+  ],
+  n3good:[
+    ["s-n3-2a",{t:`2. Capture directe (la Chambre)`, p:[
+      `> « Dans le placard, vous êtes serrés comme des sardines. Z3 respire fort. Très fort. "Chut, Z3 !" »`,
+      `> « Un raclement dans la cheminée. Un pan de pierre pivote dans un grincement. L'Ombre sort du conduit à quatre pattes, toussant, aveuglée par la suie… Elle se relève, fait un pas… et se prend les pieds dans la liane ! Elle s'étale de tout son long. Vous jaillissez du placard et la ficelez avant qu'elle se relève. »`,
+      `→ **Capture.** Passer au démasquage.`]}]
+  ],
+  n3bad:[
+    ["s-n3-2b",{t:`2. La liane est ailleurs`, p:[
+      `> « Un raclement, quelque part dans les murs. Des pas. »`,
+      `- **Si la liane est sur son chemin (Hall, escalier) :** « Une silhouette passe, voit la liane… et l'enjambe avec élégance. "Pas si vite !" »`,
+      `> « La porte s'ouvre à la volée : l'Ombre vous a trouvés ! »`,
+      `~ Musique : poursuite (code S). Mini-jeu de la course-poursuite, le même que la nuit 2.`]}],
+    "chrono",
+    ["s-n3-3b",{t:`3. La capture`, p:[
+      `> « Vous revenez en courant vers votre liane et sautez par-dessus. L'Ombre, lancée à toute vitesse derrière vous, ne regarde pas où elle met les pieds… et se prend les pieds dedans ! Elle s'étale de tout son long. À l'attaque ! »`,
+      `> « Meneur noue le dernier nœud. L'Ombre est ficelée comme un saucisson. Vous l'avez eue ! »`]}]
   ],
   fin:[
-    "Démasquage : X, la propriétaire",
-    "Mobile : protéger ses essais, G est le cobaye",
-    "Descente au Laboratoire pour libérer G",
-    "Le lendemain, le jardinier répare le van"
+    ["s-fin-1",{t:`Le démasquage`, p:[
+      `- Un joueur retire le masque (au choix du groupe).`,
+      `> « Vous tirez sur le masque… C'est… X ?! »`,
+      `~ Tablette : l'image du visage.`,
+      `> « "Oui, c'est moi, la propriétaire de ce manoir ! Depuis des années, je mène en secret mes essais sur le transhumanisme. J'ai inventé l'Ombre pour faire fuir les curieux… et j'aurais réussi sans vous et votre fichu Flaireur !" [Mobile détaillé et inside jokes à compléter] »`,
+      `> « Dans sa poche, un trousseau : la clé de la cave… et celle du Laboratoire. »`]}],
+    ["s-fin-2",{t:`Le Laboratoire`, p:[
+      `> « Vous descendez au sous-sol et ouvrez la lourde porte en métal. Un laboratoire plein d'écrans, de tubes et de câbles. Au plafond, la cabine d'un monte-charge. Sur les murs, des schémas de pattes mécaniques. Dans une cage, une créature équipée d'un bras robotique lève une pince pour vous saluer. C'est G. »`,
+      `- [Répliques de G à compléter]`,
+      `> « Vous ouvrez la cage. G sort… et vous serre la main. Avec sa pince. »`]}],
+    ["s-fin-3",{t:`Le lendemain`, p:[
+      `> « Au petit matin, le jardinier a réparé votre van. "Vous nous avez débarrassés de ce fantôme… C'est cadeau !" Vous montez à bord. G est assis sur la banquette arrière. Personne ne sait comment il est arrivé là. »`,
+      `~ Musique : générique (code S). **FIN.**`]}]
   ]
 };
+const HINT = `~ Groupe bloqué, le jardinier : « Je ne suis sûr de rien, mais… [indice adapté à ce qui manque au groupe]. »`;
 
 /* ================= État ================= */
 const KEY = "regie-halloween-mj-v1";
@@ -412,6 +668,22 @@ function commit(fn){
 /* ================= Utilitaires ================= */
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt = s => esc(s)
+  .replace(/\[([^\]]+)\]/g, '<mark class="todo">[$1]</mark>')
+  .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+  .replace(/\*(.+?)\*/g, "<i>$1</i>");
+function parts(arr){
+  return [].concat(arr||[]).map(p=>{
+    const m=p.slice(0,2), t=fmt(p.slice(2));
+    if(m==="> ") return `<p class="say">${t}</p>`;
+    if(m==="~ ") return `<p class="mj">${t}</p>`;
+    if(m==="- ") return `<p class="li">${t}</p>`;
+    return `<p class="txt">${fmt(p)}</p>`;
+  }).join("");
+}
+/* Ce qui est déplié ou replié : affichage seulement, ni sauvegardé ni annulable. */
+const ui = {open:{}};
+const isOpen = (k, def) => k in ui.open ? ui.open[k] : def;
 const P = () => PHASES[S.phase];
 const isDay = () => !!P().crans;
 const dayNum = () => P().id==="j1" ? 1 : P().id==="j2" ? 2 : 0;
@@ -442,6 +714,12 @@ function cost(from,to){
     }
   }
   return dist[to] ?? Infinity;
+}
+const capOk = k => isDay() && S.crans>0 && !S.caps[k].used;
+function loupeRes(r){
+  if(r==="E") return "« Quelqu'un est passé par ici, et récemment. »";
+  if(r==="C") return "« Ce mécanisme n'a pas bougé depuis longtemps. » (fait 2)";
+  return "Rien de particulier ici.";
 }
 function addFact(n, src){ if(!S.facts[n].includes(src)) S.facts[n].push(src); }
 function addHint1(src){ if(!S.hints1.includes(src)) S.hints1.push(src); }
@@ -500,6 +778,7 @@ const handlers = {
                      : "La cave est fermée à clé : double de la clé (établi de la Serre) ou Costaud, depuis le Hall (A2).");
       return;
     }
+    for(const x in ui.open) if(x.startsWith("el-")) delete ui.open[x];
     commit(()=>{
       let note="";
       if(S.joker==="move" && c>0){ c=0; S.joker=null; note=" (déplacement gratuit de l'Élégante)"; }
@@ -507,7 +786,7 @@ const handlers = {
       spend(c);
       S.room=to; S.visited[to]=true;
       log(`Le groupe va dans ${ROOMS[to].name}${c?` (${c} cran${c>1?"s":""})`:" (gratuit)"}${note}.`);
-      if(first) toast(`Première visite : lire l'entrée de ${ROOMS[to].name} et poser la tuile ${to}.`);
+      if(first) toast(`Première visite : lire l'entrée (${ROOMS[to].name}) et poser la tuile ${to}.`);
     });
   },
   act(d){
@@ -516,7 +795,8 @@ const handlers = {
     commit(()=>{
       let note="";
       if(a.cost){
-        if(S.joker==="action"){ S.joker=null; note=" (gratuit grâce à l'Élégante)"; }
+        if(d.eleg && !S.caps.elegante.used){ S.caps.elegante.used=true; note=` (gratuit : ${who("elegante")}, « Un jeu d'enfant ! »)`; }
+        else if(S.joker==="action"){ S.joker=null; note=" (gratuit grâce à l'Élégante)"; }
         else spend(a.cost);
       }
       S.done[a.id]=true;
@@ -526,7 +806,7 @@ const handlers = {
       if(a.key) S.key=true;
       if(a.box){ S.box=true; S.caps.gourmand.used=false; }
       if(a.needKey) S.unlocked.H=true;
-      log(`${a.el} · ${a.t}${a.cost?" (1 cran)":""}${note} → ${a.r}`);
+      log(`${a.el} · ${a.t}${a.cost&&!note?" (1 cran)":""}${note} → ${a.r}`);
       toast(`${a.el} → ${a.r}`);
     });
   },
@@ -536,7 +816,7 @@ const handlers = {
   },
   cap(d){
     const k=d.k, opt=d.o;
-    if(S.caps[k].used && k!=="meneur") return;
+    if(S.caps[k].used) return;
     commit(()=>{
       if(k==="meneur"){
         S.caps[opt].used=false; S.caps.meneur.used=true;
@@ -550,9 +830,8 @@ const handlers = {
       }
       if(k==="enquetrice"){
         S.caps.enquetrice.used=true;
-        let res="Rien de particulier ici.";
-        if(S.room==="E") res="« Quelqu'un est passé par ici, et récemment. »";
-        if(S.room==="C"){ res="« Ce mécanisme n'a pas bougé depuis longtemps. » (fait 2)"; addFact(2,"Loupe"); }
+        const res=loupeRes(S.room);
+        if(S.room==="C") addFact(2,"Loupe");
         S.loupe={room:S.room, res};
         log(`${who("enquetrice")} : Œil de lynx dans ${ROOMS[S.room].name}. ${res}`);
         toast(`Œil de lynx : ${res}`);
@@ -570,7 +849,12 @@ const handlers = {
   },
   cancelJoker(){ commit(()=>{ S.joker=null; S.caps.elegante.used=false; log("Joker de l'Élégante annulé."); }); },
   lianeGift(){ commit(()=>{ S.liane.found="Habitants"; log("« Dernière chance ! » Les Habitants passent la liane par une fenêtre du Hall."); }); },
-  check(d){ commit(()=>{ S.checks[d.c]=!S.checks[d.c]; }); },
+  check(d){ delete ui.open[d.c]; commit(()=>{ S.checks[d.c]=!S.checks[d.c]; }); },
+  fold(d){
+    const k=d.k, open=d.open!=="true";
+    if(open && k.startsWith("el-")) for(const x in ui.open) if(x.startsWith("el-")) ui.open[x]=false;
+    ui.open[k]=open; render();
+  },
   chaseFail(d){ commit(()=>{ S.chase[d.n]++; log(`Course-poursuite ratée (essai ${S.chase[d.n]}).`); }); stopChrono(true); },
   chaseWin(d){ commit(()=>{ S.chaseOk[d.n]=true; log("Course-poursuite réussie."); }); stopChrono(false); },
   chaseRefuge(d){ commit(()=>{ S.chaseOk[d.n]=true; log("Deuxième échec : le groupe se réfugie quelque part malgré tout."); }); stopChrono(false); },
@@ -694,11 +978,20 @@ function glass(c,max,idle){
   </div>`;
 }
 
-function checklist(id){
-  return `<ul class="checklist">${NIGHT_CHECKS[id].map((t,i)=>{
-    const key=`${id}-${i}`, on=!!S.checks[key];
-    return `<li><button class="${on?"checked":""}" data-act="check" data-c="${key}" aria-pressed="${on}"><span class="box">${on?"✓":""}</span><span class="lbl">${esc(t)}</span></button></li>`;
-  }).join("")}</ul>`;
+function scene(key, sc, def){
+  const read=!!S.checks[key], open=isOpen(key, def);
+  return `<div class="scene ${read?"read":""} ${open?"open":""}">
+    <div class="scene-head">
+      <button class="fold" data-act="fold" data-k="${key}" data-open="${open}" aria-expanded="${open}"><span class="chev">${open?"▾":"▸"}</span><span>${fmt(sc.t)}</span></button>
+      <button class="btn sm ${read?"":"ghost"}" data-act="check" data-c="${key}" aria-pressed="${read}">${read?"Lu ✓":"Marquer lu"}</button>
+    </div>
+    ${open?`<div class="scene-body">${parts(sc.p)}</div>`:""}
+  </div>`;
+}
+/* Liste de scènes : des [clé, scène] ou du HTML déjà rendu (le chrono). La première scène non lue s'ouvre. */
+function sceneList(items){
+  const first=items.find(x=>Array.isArray(x) && !S.checks[x[0]]);
+  return `<div class="scenes">${items.map(x=>Array.isArray(x) ? scene(x[0], x[1], x===first) : x).join("")}</div>`;
 }
 function chronoBlock(n){
   const fails=S.chase[n], ok=S.chaseOk[n];
@@ -731,44 +1024,46 @@ function renderPhase(){
   if(p.id==="j1"||p.id==="j2"){
     const c=S.crans, max=p.crans;
     const ev = p.id==="j1" ? [
-      [max,"Début","Le jardinier à la porte du Hall (A1) : quelque chose rôde la nuit, il réparera le van dans deux jours. « Si on savait par où ça entre… »"],
-      [1,"1 cran","L'horloge sonne 21h, le soleil va bientôt se coucher."],
-      [0,"0 cran","La nuit tombe : Nuit 2."]
+      [max,"Début",[`Le jardinier à la porte du Hall (A1) : script « Matin : le jardinier » ci-dessus.`]],
+      [1,"1 cran",[`~ Il tapote à une fenêtre. L'horloge du Salon sonne 21h.`, `> « Le soleil va bientôt se coucher ! Toujours vivants ? Bien, bien. »`]],
+      [0,"0 cran",[`> « Le soleil se couche ! Je rentre chez moi. Bonne chance… vous en aurez besoin. »`, `La nuit tombe : Nuit 2.`]]
     ] : [
-      [max,"Début","Le jardinier revient (A1b). L'équipe lui raconte la nuit : seul un piège l'arrêtera. Il parle des lianes de la serre."],
-      [1,"1 cran","« Dernière chance ! » Dernier moment pour les capacités. Liane apportée si besoin."],
-      [0,"0 cran","La nuit tombe : Nuit 3."]
+      [max,"Début",[`Le jardinier revient (A1b) : script « Matin du jour 2 » ci-dessus.`]],
+      [1,"1 cran",[`> « Le soleil se couche ! Si vous avez encore un tour dans votre sac, c'est maintenant ou jamais ! »`, `~ Dernier moment pour les capacités. Sans liane : toc toc à la fenêtre du Hall, les Habitants y passent une longue liane : « Ça pourra vous servir ! » Puis le jardinier rentre chez lui.`]],
+      [0,"0 cran",[`La nuit tombe : Nuit 3.`]]
     ];
     body = `
       <div class="panel-head"><h2>${p.label}</h2><span class="eyebrow">Objectif</span></div>
       <p style="margin:0">${p.id==="j1"?"Découvrir d'où vient l'Ombre.":"Trouver la liane et finir de trouver où la tendre."}</p>
+      ${sceneList(SCENES[p.id])}
       <ul class="timeline">${ev.map(([at,w,t])=>{
         const st = c<at ? "past" : c===at ? "now" : "";
-        return `<li class="${st}"><span class="when">${w}</span><span>${esc(t)}</span></li>`;
-      }).join("")}</ul>`;
+        return `<li class="${st}"><span class="when">${w}</span><span class="cell">${parts(t)}</span></li>`;
+      }).join("")}</ul>
+      ${parts(HINT)}`;
   } else if(p.id==="n1"){
     body = `<div class="panel-head"><h2>Nuit 1 : l'arrivée</h2><span class="eyebrow">Racontée</span></div>
-      <span class="muted" style="font-size:.85rem">Script du Hall. Aucune action, aucun indice sur le chemin de l'Ombre.</span>
-      ${checklist("n1")}
+      <span class="muted" style="font-size:.85rem">Aucune action, aucun indice sur le chemin de l'Ombre.</span>
+      ${sceneList(SCENES.n1)}
       <div class="row"><button class="btn lamp" data-act="next">Le jour se lève : Jour 1</button></div>`;
   } else if(p.id==="n2"){
     body = `<div class="panel-head"><h2>Nuit 2 : la première apparition</h2><span class="eyebrow">Salon</span></div>
-      ${checklist("n2")}
-      ${chronoBlock("n2")}
+      ${sceneList(SCENES.n2.map(x=>x==="chrono"?chronoBlock("n2"):x))}
       <div class="row"><button class="btn lamp" data-act="next">Le jour se lève : Jour 2</button></div>`;
   } else if(p.id==="n3"){
     const pl=S.liane.placed;
     let res=`<div class="alert night"><b>« Où tendez-vous la liane ? »</b><span>Touchez la pièce choisie sur le plan.</span>${S.liane.found?"":`<span class="muted">Attention : le journal dit que le groupe n'a pas encore la liane.</span>`}</div>`;
     if(pl==="E") res=`<div class="alert"><b>Bon endroit : la Chambre.</b><span>L'Ombre sort du conduit et trébuche dans la liane : capturée directement.</span></div>`;
-    else if(pl) res=`<div class="alert warn"><b>Mauvais endroit : ${ROOMS[pl].name}.</b><span>Elle enjambe la liane si elle la croise et trouve le groupe. Course-poursuite, puis les joueurs l'attirent vers la liane : capturée.</span></div>${chronoBlock("n3")}`;
+    else if(pl) res=`<div class="alert warn"><b>Mauvais endroit : ${ROOMS[pl].name}.</b><span>Elle enjambe la liane si elle la croise et trouve le groupe. Course-poursuite, puis les joueurs l'attirent vers la liane : capturée.</span></div>`;
+    const after = pl==="E" ? SCENES.n3good : pl ? SCENES.n3bad.map(x=>x==="chrono"?chronoBlock("n3"):x) : [];
     body = `<div class="panel-head"><h2>Nuit 3 : le piège</h2><span class="eyebrow">Le final</span></div>
-      ${res}${checklist("n3")}
+      ${res}${sceneList([...SCENES.n3, ...after])}
       <div class="row"><button class="btn lamp" data-act="next" ${pl?"":"disabled"}>Démasquer l'Ombre</button></div>`;
   } else {
     const used=CAPS.filter(c=>S.caps[c.k].used).length;
     const seen=Object.keys(ROOMS).filter(r=>S.visited[r]).length;
     body = `<div class="panel-head"><h2>Fin : le démasquage</h2><span class="eyebrow">Épilogue</span></div>
-      ${checklist("fin")}
+      ${sceneList(SCENES.fin)}
       <dl class="kv">
         <dt>Pièces visitées</dt><dd>${seen} sur 7${S.hidden?", plus la pièce cachée":""}</dd>
         <dt>Capacités utilisées</dt><dd>${used} sur 6 (état final)</dd>
@@ -787,7 +1082,7 @@ function renderPlan(){
     if(n3){ meta = S.liane.placed===r ? "liane tendue" : "tendre ici"; }
     else if(here) meta="le groupe est ici";
     else if(locked) meta="fermée à clé";
-    else if(day){ const c=cost(S.room,r); meta = c===0 ? "gratuit" : `${c} cran${c>1?"s":""}`; }
+    else if(day){ const c=cost(S.room,r); meta = c===0 ? "gratuit" : S.joker==="move" ? "gratuit (Élégante)" : `${c} cran${c>1?"s":""}`; }
     else meta = vis ? "tuile posée" : "pas visitée";
     const cls=["tile", vis?"visited":"", here?"here":"", locked&&!n3?"locked":"", n3&&S.liane.placed===r?"trap":""].join(" ");
     const dis = n3 ? false : !day;
@@ -798,8 +1093,11 @@ function renderPlan(){
       <span class="meta">${meta}</span>
     </button>`;
   };
+  const moveCap = capOk("elegante") && !S.joker
+    ? `<div class="act cap"><span class="t"><span class="by">${esc(who("elegante"))}</span>Le prochain déplacement est gratuit</span><span class="btns"><button class="btn fog sm" data-act="cap" data-k="elegante" data-o="move">Un jeu d'enfant !</button></span></div>` : "";
   el.innerHTML = `
     <div class="panel-head"><h2>Le manoir</h2><span class="eyebrow">${n3?"Où tendre la liane ?":day?"Toucher une pièce pour s'y rendre":"Déplacements le jour seulement"}</span></div>
+    ${moveCap}
     <div class="plan" role="group" aria-label="Plan du manoir">
       <span class="lvl">Étage 1</span>
       <span class="sealed" title="Pièces condamnées"></span><span class="sealed"></span><span class="sealed"></span>${tile("E")}<span class="sealed"></span>
@@ -826,55 +1124,111 @@ function renderRoom(){
     return;
   }
   const r=S.room, d=dayNum();
-  const flairOk = !S.caps.flaireur.used && S.crans>0;
+  const flairOk = capOk("flaireur"), elegOk = capOk("elegante") && !S.joker;
+  const note = t => `<span class="muted" style="font-size:.8rem">${t}</span>`;
+  const capRow = (k, t, res, btns) => `<div class="act cap"><span class="t"><span class="by">${esc(who(k))}</span>${esc(t)}</span><span class="btns">${btns}</span><span class="r">${esc(res)}</span></div>`;
+  const capBtn = (k, label, o) => `<button class="btn fog sm" data-act="cap" data-k="${k}"${o?` data-o="${o}"`:""}>${label}</button>`;
+  const spent = k => `capacité du ${CAPNAME[k]} déjà utilisée${capOk("meneur")?" (le Meneur peut la lui rendre)":""}`;
+  const roomCaps = [];
+  if(capOk("enquetrice")) roomCaps.push(capRow("enquetrice", `Œil de lynx sur ${ROOMS[r].name}`, loupeRes(r), capBtn("enquetrice","Utiliser")));
+  if(capOk("meneur")){
+    const targets=CAPS.filter(x=>x.k!=="meneur" && S.caps[x.k].used);
+    if(targets.length) roomCaps.push(capRow("meneur", "« Les gars, j'ai un plan ! »", "Rend son usage à une capacité déjà utilisée.", targets.map(x=>capBtn("meneur",`Rendre à ${x.role}`,x.k)).join("")));
+  }
+  /* Capacités rattachées à un élément du script */
+  const CAPOPT = {
+    z1:{k:"gourmand", t:"Lui donner un biscuit", btn:"Donner un biscuit", o:"z1", done:()=>S.gave.z1,
+        off:()=>`Biscuit à Z1 : ${spent("gourmand")}. Recharge : boîte de la Cuisine (F1).`},
+    z2:{k:"gourmand", t:"Lui donner un biscuit", btn:"Donner un biscuit", o:"z2", done:()=>S.gave.z2,
+        off:()=>`Bloqué. Biscuit à Z2 : ${spent("gourmand")}. Recharge : boîte de la Cuisine (F1).`},
+    forceF:{k:"costaud", t:"Forcer la porte", btn:"En force !", o:"F", done:()=>S.unlocked.F,
+        off:()=>`Fermée à clé : ${spent("costaud")}.`},
+    forceH:{k:"costaud", t:"Forcer la porte", btn:"En force !", o:"H", done:()=>S.unlocked.H && !S.done.a2k, hide:()=>!!S.done.a2k,
+        off:()=>`Fermée à clé : ${S.key?"le groupe a le double de la clé.":`double de la clé (D2), ${spent("costaud")}.`}`}
+  };
+  const capLive = o => { const c=CAPOPT[o.cap]; return !c.done() && !(c.hide&&c.hide()) && capOk(c.k); };
+  const visible = a => a && (!a.day || a.day===d) && (!a.needKey || S.done[a.id] || (S.key && !S.unlocked.H));
+  const subBlock = k => `<div class="sub"><span><span class="chip lamp">${k}</span> <b>${esc(SUBS[k].t)}</b></span>${parts(SUBS[k].d)}</div>`;
+  const actRow = (a, o={}) => {
+    const done=!!S.done[a.id], free=!a.cost || S.joker==="action";
+    return `<div class="act ${done?"done":""}">
+      <span class="t">${fmt(o.t||a.t)} <span class="cost ${a.cost?"":"free"}">${a.cost?"1 cran":"gratuit"}</span></span>
+      <span class="btns">
+        ${done ? `<span class="cost free">fait</span>` : `
+          ${a.cost && flairOk ? `<button class="btn fog sm" data-act="sniff" data-id="${a.id}" title="Capacité du Flaireur">Renifler</button>`:""}
+          ${a.cost && elegOk ? `<button class="btn fog sm" data-act="act" data-id="${a.id}" data-eleg="1" title="Capacité de l'Élégante : action payante gratuite">Élégante : gratuit</button>`:""}
+          <button class="btn ${a.cost?"lamp":""} sm" data-act="act" data-id="${a.id}" ${a.cost&&S.crans===0?"disabled":""}>${a.cost?(free?"Faire (gratuit)":"Faire · 1 cran"):"Noter"}</button>`}
+      </span>
+      <div class="r">${o.r ? parts(o.r) : `<p class="txt">${esc(a.r)}</p>`}${o.sub&&done?subBlock(o.sub):""}</div>
+    </div>`;
+  };
+  const freeRow = o => `<div class="act free"><span class="t">${fmt(o.t)} <span class="cost free">gratuit</span></span><div class="r">${parts(o.r)}</div></div>`;
+  const capOpt = o => {
+    const c=CAPOPT[o.cap], done=c.done();
+    if(c.hide && c.hide()) return "";
+    if(!done && !capOk(c.k)) return note(c.off());
+    return `<div class="act cap ${done?"done":""}">
+      <span class="t"><span class="by">${esc(who(c.k))}</span>${esc(c.t)}</span>
+      <span class="btns">${done?`<span class="cost free">fait</span>`:capBtn(c.k, c.btn, c.o)}</span>
+      <div class="r">${parts(o.r)}${o.sub&&done?subBlock(o.sub):""}</div>
+    </div>`;
+  };
   const els = ELEMENTS[r].map(([code,name])=>{
-    const acts = ACTIONS.filter(a=>a.el===code && (!a.day || a.day===d) && (!a.needKey || S.key || S.done[a.id]));
-    const variant = (code==="A1" && d===2) ? ` <span class="chip fog">script A1b</span>` : "";
-    const extra = [];
-    if(code==="B1"){ extra.push(S.gave.z1 ? `<div class="act done"><span class="t">Biscuit donné à Z1</span><span class="cost free">fait</span><span class="r">→ B1b : la pièce cachée, fait 1, fumigènes</span></div>` : `<span class="muted" style="font-size:.8rem">Biscuit à Z1 : carte du Gourmand.</span>`); }
-    if(code==="C1"){ extra.push(S.gave.z2 ? `<div class="act done"><span class="t">Biscuit donné à Z2</span><span class="cost free">fait</span><span class="r">Lore : les passages ne s'ouvrent qu'à minuit pile</span></div>` : `<span class="muted" style="font-size:.8rem">Bloqué. Biscuit à Z2 : carte du Gourmand.</span>`); }
-    if(code==="B4" && !S.unlocked.F) extra.push(`<span class="muted" style="font-size:.8rem">Fermée à clé : carte du Costaud.</span>`);
-    if(code==="A2" && !S.unlocked.H) extra.push(`<span class="muted" style="font-size:.8rem">Fermée à clé : ${S.key?"le groupe a le double de la clé.":"double de la clé (D2) ou carte du Costaud."}</span>`);
-    if(code==="A2" && S.unlocked.H) extra.push(`<span class="chip ok" style="align-self:flex-start">Cave ouverte</span>`);
-    if(code==="B4" && S.unlocked.F) extra.push(`<span class="chip ok" style="align-self:flex-start">Cuisine ouverte</span>`);
-    if(code==="H3") extra.push(`<span class="muted" style="font-size:.8rem">Bloquée. Teaser de G.</span>`);
-    const rows = acts.map(a=>{
-      const done=!!S.done[a.id];
-      const free = !a.cost || S.joker==="action";
-      return `<div class="act ${done?"done":""}">
-        <span class="t">${esc(a.t)}</span>
-        <span class="btns">
-          ${done ? `<span class="cost free">fait</span>` : `
-            ${a.cost && flairOk ? `<button class="btn ghost sm" data-act="sniff" data-id="${a.id}">Renifler</button>`:""}
-            <button class="btn ${a.cost?"lamp":""} sm" data-act="act" data-id="${a.id}" ${a.cost&&S.crans===0?"disabled":""}>${a.cost?(free?"Faire (gratuit)":"Faire · 1 cran"):"Noter"}</button>`}
-        </span>
-        <span class="r">${esc(a.r)}</span>
-      </div>`;
-    }).join("");
-    return `<div class="el"><div class="el-head"><span class="chip lamp">${code}</span><b>${esc(name)}</b>${variant}</div>${rows}${extra.join("")}</div>`;
+    const key = (code==="A1" && d===2) ? "A1b" : code;
+    const sc = ES[key] || {d:[]}, opts = sc.opts || [];
+    const fk = `el-${code}`, open = isOpen(fk, false);
+    // Actions de la régie absentes du script : affichées quand même, pour ne rien perdre
+    const orphans = ACTIONS.filter(a=>a.el===code && visible(a) && !opts.some(o=>o.act===a.id));
+    const shown = [...opts.filter(o=>o.act).map(o=>ACT[o.act]), ...orphans].filter(visible);
+    const paid = shown.filter(a=>a.cost && !S.done[a.id]).length;
+    const meta = [
+      paid ? `<span class="chip">${paid} payante${paid>1?"s":""}</span>` : "",
+      opts.some(o=>o.cap && capLive(o)) ? `<span class="chip fog">capacité</span>` : "",
+      code==="A2" && S.unlocked.H ? `<span class="chip ok">Cave ouverte</span>` : "",
+      code==="B4" && S.unlocked.F ? `<span class="chip ok">Cuisine ouverte</span>` : ""
+    ].join("");
+    const body = open ? `<div class="el-body">${parts(sc.d)}${opts.map(o=>
+        o.cap ? capOpt(o) : o.act ? (visible(ACT[o.act]) ? actRow(ACT[o.act], o) : "") : freeRow(o)
+      ).join("")}${orphans.map(a=>actRow(a)).join("")}</div>` : "";
+    return `<div class="el ${open?"open":""}">
+      <button class="el-head" data-act="fold" data-k="${fk}" data-open="${open}" aria-expanded="${open}">
+        <span class="chev">${open?"▾":"▸"}</span><span class="chip lamp">${key}</span><b>${esc(name)}</b><span class="el-meta">${meta}</span>
+      </button>${body}</div>`;
   }).join("");
+  const ek = `entry-${r}`;
   el.innerHTML = `
     <div class="panel-head"><h2>${ROOMS[r].name}</h2><span class="eyebrow">Tuile ${r}</span></div>
-    <span class="muted" style="font-size:.8rem">Seules les actions qui comptent sont listées. Les gags et descriptions restent dans les scripts.</span>
+    ${scene(ek, {t:`Entrée (${r})`, p:ENTRIES[r]}, !S.checks[ek])}
+    ${roomCaps.length?`<div class="room-caps">${roomCaps.join("")}</div>`:""}
+    <span class="muted" style="font-size:.8rem">Toucher le code annoncé par les joueurs pour ouvrir son script.</span>
     <div class="elements">${els}</div>`;
 }
 
 function renderCaps(){
-  const day=isDay() && S.crans>0, r=S.room;
+  const r=S.room;
+  const targets=CAPS.filter(x=>x.k!=="meneur" && S.caps[x.k].used);
+  const paidHere=ACTIONS.some(a=>a.cost && !S.done[a.id] && ELEMENTS[r].some(([code])=>code===a.el));
+  const usableHere={
+    meneur: targets.length>0,
+    elegante: !S.joker,
+    enquetrice: true,
+    gourmand: (r==="B" && !S.gave.z1) || (r==="C" && !S.gave.z2),
+    flaireur: paidHere,
+    costaud: (r==="B" && !S.unlocked.F) || (r==="A" && !S.unlocked.H)
+  };
+  const where={
+    meneur: targets.length ? "Bouton en haut de la pièce." : "Aucune autre capacité utilisée pour l'instant.",
+    elegante: "Boutons sur le plan (déplacement) et sur chaque action payante.",
+    enquetrice: "Bouton en haut de la pièce.",
+    gourmand: "Bouton sur Z1 (B1, Salon) et Z2 (C1, Bibliothèque).",
+    flaireur: "Bouton « Renifler » sur les actions payantes de la pièce.",
+    costaud: "Bouton sur la porte de la Cuisine (B4, Salon) et de la cave (A2, Hall)."
+  };
   const cards = CAPS.map(c=>{
-    const used=S.caps[c.k].used;
+    const used=S.caps[c.k].used, here=!used && capOk(c.k) && usableHere[c.k];
     let btns="";
     if(!used){
-      if(c.k==="meneur"){
-        const targets=CAPS.filter(x=>x.k!=="meneur" && S.caps[x.k].used);
-        btns = targets.length ? targets.map(x=>`<button class="btn sm" data-act="cap" data-k="meneur" data-o="${x.k}" ${day?"":"disabled"}>Rendre à ${x.role}</button>`).join("")
-                              : `<span class="muted" style="font-size:.8rem">Aucune autre capacité utilisée pour l'instant.</span>`;
-      }
-      if(c.k==="elegante") btns = `<button class="btn sm" data-act="cap" data-k="elegante" data-o="move" ${day?"":"disabled"}>Déplacement gratuit</button><button class="btn sm" data-act="cap" data-k="elegante" data-o="action" ${day?"":"disabled"}>Action payante gratuite</button>`;
-      if(c.k==="enquetrice") btns = `<button class="btn sm" data-act="cap" data-k="enquetrice" ${day?"":"disabled"}>Œil de lynx : ${day?ROOMS[r].name:"…"}</button>`;
-      if(c.k==="gourmand") btns = `<button class="btn sm" data-act="cap" data-k="gourmand" data-o="z1" ${day&&r==="B"&&!S.gave.z1?"":"disabled"}>Biscuit à Z1 (Salon)</button><button class="btn sm" data-act="cap" data-k="gourmand" data-o="z2" ${day&&r==="C"&&!S.gave.z2?"":"disabled"}>Biscuit à Z2 (Biblio.)</button>`;
-      if(c.k==="flaireur") btns = `<span class="muted" style="font-size:.8rem">Bouton « Renifler » sur les actions payantes de la pièce.</span>`;
-      if(c.k==="costaud") btns = `<button class="btn sm" data-act="cap" data-k="costaud" data-o="F" ${day&&r==="B"&&!S.unlocked.F?"":"disabled"}>Forcer la Cuisine (B4)</button><button class="btn sm" data-act="cap" data-k="costaud" data-o="H" ${day&&r==="A"&&!S.unlocked.H?"":"disabled"}>Forcer la cave (A2)</button>`;
+      btns=`<span class="muted" style="font-size:.8rem">${where[c.k]}</span>`;
     } else {
       if(c.k==="gourmand" && !S.box) btns=`<span class="muted" style="font-size:.8rem">Rechargeable avec la boîte de la Cuisine (F1).</span>`;
       if(c.k==="enquetrice" && S.loupe) btns=`<span class="muted" style="font-size:.8rem">${ROOMS[S.loupe.room].name} : ${esc(S.loupe.res)}</span>`;
@@ -882,7 +1236,7 @@ function renderCaps(){
     return `<div class="capc ${used?"used":""}">
       <div class="h">
         <span class="who"><span class="role">${c.role}</span><input id="name-${c.k}" data-name="${c.k}" value="${esc(S.names[c.k]||"")}" placeholder="joueur" aria-label="Joueur qui incarne ${c.role}"></span>
-        <span class="pill ${used?"off":"on"}">${used?"Utilisée":"Disponible"}</span>
+        <span class="pill ${used?"off":here?"here":"on"}">${used?"Utilisée":here?"Utilisable ici":"Disponible"}</span>
       </div>
       <span class="q">${c.q}</span>
       ${used?"":`<span class="rule">${c.rule}</span>`}
