@@ -1,0 +1,940 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Régie Halloween Party</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=IM+Fell+English+SC&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Régie en trois colonnes : le temps, le manoir, l'équipe. Un seul thème sombre, choisi exprès : l'écran sert dans la pénombre de la soirée. */
+:root{
+  --night:#16111d;
+  --panel:#1f1828;
+  --panel-2:#2a2136;
+  --line:#3c3149;
+  --ink:#efe6d4;
+  --muted:#a999b9;
+  --lamp:#f3b14a;
+  --lamp-ink:#2b1a04;
+  --lamp-soft:rgba(243,177,74,.14);
+  --fog:#a588dd;
+  --fog-soft:rgba(165,136,221,.16);
+  --ok:#88c9a1;
+  --ok-soft:rgba(136,201,161,.14);
+  --warn:#ec8d5c;
+  --warn-soft:rgba(236,141,92,.15);
+  --f-display:"IM Fell English SC", "Iowan Old Style", Georgia, serif;
+  --f-body:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-code:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:10px;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--night);
+  color:var(--ink);
+  font-family:var(--f-body);
+  font-size:15px;
+  line-height:1.45;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:0 40px;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top, 0px);z-index:10;background:var(--night)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:disabled{cursor:not-allowed;opacity:.42}
+:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
+.code{font-family:var(--f-code);font-weight:700;letter-spacing:.02em}
+.muted{color:var(--muted)}
+h1,h2,h3{margin:0;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:400;font-size:1.35rem;letter-spacing:.02em}
+.eyebrow{font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700}
+
+/* ---------- Barre du haut ---------- */
+.top{
+  position:sticky;top:env(safe-area-inset-top, 0px);z-index:5;
+  background:var(--night);
+  padding-block:12px 10px;
+  border-bottom:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;
+}
+.brand{display:flex;flex-direction:column;gap:0;min-width:0}
+.brand h1{font-family:var(--f-display);font-weight:400;font-size:1.55rem;line-height:1.05}
+.rail{display:flex;gap:4px;flex:1 1 520px;min-width:0;overflow-x:auto;padding-bottom:2px}
+.step{
+  flex:1 0 auto;min-width:92px;
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  padding:6px 10px;text-align:left;display:flex;flex-direction:column;gap:1px;
+}
+.step b{font-size:.92rem}
+.step span{font-size:.72rem;color:var(--muted)}
+.step.past{opacity:.55}
+.step.now{border-color:var(--lamp);background:var(--lamp-soft)}
+.step.now.isnight{border-color:var(--fog);background:var(--fog-soft)}
+.tools{display:flex;gap:8px;align-items:center}
+.btn{
+  background:var(--panel-2);border:1px solid var(--line);border-radius:8px;
+  padding:8px 12px;font-weight:700;font-size:.9rem;line-height:1.1;
+}
+.btn:hover:not(:disabled){border-color:var(--muted)}
+.btn.lamp{background:var(--lamp);color:var(--lamp-ink);border-color:var(--lamp)}
+.btn.lamp:hover:not(:disabled){filter:brightness(1.07)}
+.btn.fog{background:var(--fog-soft);border-color:var(--fog)}
+.btn.ghost{background:transparent}
+.btn.sm{padding:5px 9px;font-size:.8rem}
+.confirm{
+  width:100%;display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+  background:var(--warn-soft);border:1px solid var(--warn);border-radius:8px;padding:8px 12px;
+}
+
+/* ---------- Grille ---------- */
+.grid{display:grid;gap:16px;margin-top:16px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:760px){.grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+@media (min-width:1180px){.grid{grid-template-columns:minmax(0,.9fr) minmax(0,1.25fr) minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+
+/* ---------- Sablier ---------- */
+.glass-wrap{display:flex;gap:18px;align-items:center}
+.glass{width:116px;flex:0 0 116px;display:flex;flex-direction:column;align-items:center}
+.bulb{
+  width:116px;height:78px;background:var(--panel-2);
+  display:flex;flex-wrap:wrap;justify-content:center;align-content:flex-start;gap:5px;padding:10px 22px;
+}
+.bulb.top{clip-path:polygon(0 0,100% 0,62% 100%,38% 100%);align-content:flex-start}
+.bulb.bottom{clip-path:polygon(38% 0,62% 0,100% 100%,0 100%);align-content:flex-end;flex-wrap:wrap-reverse}
+.cap-bar{width:128px;height:6px;background:var(--line);border-radius:3px}
+.tok{width:16px;height:16px;border-radius:50%;background:var(--lamp);box-shadow:0 0 10px rgba(243,177,74,.45)}
+.tok.fallen{background:var(--line);box-shadow:none}
+.count{display:flex;flex-direction:column;gap:2px}
+.count .big{font-family:var(--f-display);font-size:3.2rem;line-height:.9;font-variant-numeric:tabular-nums}
+.count .big small{font-size:1.3rem;color:var(--muted)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.alert{border-radius:8px;padding:10px 12px;border:1px solid var(--lamp);background:var(--lamp-soft);display:flex;flex-direction:column;gap:6px}
+.alert.night{border-color:var(--fog);background:var(--fog-soft)}
+.alert.warn{border-color:var(--warn);background:var(--warn-soft)}
+.alert b{font-size:.98rem}
+.joker{border:1px dashed var(--lamp);border-radius:8px;padding:8px 12px;font-size:.88rem;display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+
+.timeline{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.timeline li{display:grid;grid-template-columns:62px minmax(0,1fr);gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.timeline li:first-child{border-top:0}
+.timeline .when{font-family:var(--f-code);font-size:.78rem;color:var(--muted);padding-top:2px}
+.timeline li.past{opacity:.5}
+.timeline li.now .when{color:var(--lamp)}
+.checklist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.checklist button{
+  width:100%;text-align:left;background:transparent;border:0;border-radius:6px;
+  padding:7px 6px;display:grid;grid-template-columns:20px minmax(0,1fr);gap:10px;align-items:start;
+}
+.checklist button:hover{background:var(--panel-2)}
+.box{width:18px;height:18px;border:1.5px solid var(--muted);border-radius:4px;margin-top:1px;display:grid;place-items:center;font-size:12px;line-height:1}
+.checked .box{background:var(--fog);border-color:var(--fog);color:var(--night)}
+.checked .lbl{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+
+/* ---------- Plan ---------- */
+.plan{display:grid;grid-template-columns:44px repeat(5,minmax(0,1fr));gap:6px;align-items:stretch}
+.lvl{font-family:var(--f-code);font-size:.72rem;color:var(--muted);writing-mode:vertical-rl;transform:rotate(180deg);display:grid;place-items:center;border-right:1px solid var(--line)}
+.void{border-radius:8px}
+.sealed{border-radius:8px;background:repeating-linear-gradient(-45deg,var(--panel) 0 6px,var(--panel-2) 6px 8px);border:1px solid var(--line);min-height:64px}
+.tile{
+  min-height:84px;border-radius:8px;border:1.5px dashed var(--line);background:transparent;
+  padding:7px 8px;text-align:left;display:flex;flex-direction:column;gap:2px;position:relative;min-width:0;
+}
+.tile .letter{font-family:var(--f-code);font-weight:700;font-size:1.05rem}
+.tile .nm{font-size:.82rem;line-height:1.15;overflow-wrap:anywhere}
+.tile .meta{margin-top:auto;font-size:.7rem;color:var(--muted);font-family:var(--f-code)}
+.tile.visited{border-style:solid;background:var(--panel-2)}
+.tile.here{border-color:var(--lamp);background:radial-gradient(120% 90% at 50% 0%, rgba(243,177,74,.28), var(--panel-2) 70%)}
+.tile.here .meta{color:var(--lamp)}
+.tile.locked .meta{color:var(--warn)}
+.tile.trap{border-color:var(--fog);background:var(--fog-soft)}
+.tile:hover:not(:disabled){border-color:var(--muted)}
+.tile.here:hover:not(:disabled){border-color:var(--lamp)}
+.tile.lab{border:1.5px solid var(--fog);background:transparent;cursor:default}
+.tile.lab .letter{color:var(--fog)}
+.chem{position:absolute;top:7px;right:8px;width:10px;height:12px;border:1.5px solid var(--muted);border-bottom:0;border-radius:2px 2px 0 0;opacity:.7}
+.chem::after{content:"";position:absolute;left:1.5px;right:1.5px;bottom:0;height:5px;background:var(--muted);opacity:.4}
+.hidden-room{font-size:.68rem;color:var(--fog);font-family:var(--f-code)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.76rem;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:5px;border:1.5px solid var(--line)}
+
+/* ---------- Pièce ---------- */
+.elements{display:flex;flex-direction:column;gap:10px}
+.el{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:6px}
+.el:first-child{border-top:0;padding-top:0}
+.el-head{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.chip{font-family:var(--f-code);font-size:.74rem;font-weight:700;padding:2px 6px;border-radius:5px;background:var(--panel-2);border:1px solid var(--line)}
+.chip.lamp{border-color:var(--lamp);color:var(--lamp)}
+.chip.fog{border-color:var(--fog);color:var(--fog)}
+.chip.ok{border-color:var(--ok);color:var(--ok)}
+.act{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:6px 8px;border-radius:7px;background:var(--panel-2)}
+.act .t{font-size:.9rem}
+.act .r{font-size:.78rem;color:var(--muted);grid-column:1/-1}
+.act.done{background:transparent;border:1px solid var(--line)}
+.act.done .t{color:var(--muted)}
+.act .btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.cost{font-family:var(--f-code);font-size:.72rem;color:var(--lamp)}
+.cost.free{color:var(--ok)}
+
+/* ---------- Capacités ---------- */
+.caps{display:flex;flex-direction:column;gap:8px}
+.capc{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:7px}
+.capc.used{background:transparent;opacity:.72}
+.capc .h{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.capc .who{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;min-width:0}
+.capc .role{font-weight:700}
+.capc .q{font-size:.82rem;color:var(--muted);font-style:italic}
+.capc input{
+  background:transparent;border:0;border-bottom:1px dashed var(--line);color:var(--ink);
+  font:inherit;font-size:.85rem;width:9em;padding:1px 2px;
+}
+.capc input::placeholder{color:var(--muted);opacity:.7}
+.pill{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:3px 8px;border-radius:999px}
+.pill.on{background:var(--ok-soft);color:var(--ok)}
+.pill.off{background:var(--panel-2);color:var(--muted)}
+.capc .rule{font-size:.82rem}
+
+/* ---------- Enquête ---------- */
+.facts{display:flex;flex-direction:column;gap:8px}
+.fact{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:start}
+.fact .n{font-family:var(--f-display);font-size:1.5rem;line-height:1;color:var(--muted);text-align:center}
+.fact.got .n{color:var(--ok)}
+.fact.part .n{color:var(--lamp)}
+.fact .txt{font-size:.88rem}
+.fact .srcs{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 12px;font-size:.88rem}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0}
+
+.log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;max-height:300px;overflow:auto}
+.log li{display:grid;grid-template-columns:64px minmax(0,1fr);gap:8px;padding:6px 0;border-top:1px solid var(--line);font-size:.84rem}
+.log li:first-child{border-top:0}
+.log .w{font-family:var(--f-code);font-size:.7rem;color:var(--muted);padding-top:2px}
+
+/* ---------- Chrono ---------- */
+.chrono{border:1px solid var(--fog);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--fog-soft)}
+.chrono .disp{font-family:var(--f-code);font-size:2.4rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.chrono .disp.low{color:var(--warn)}
+.chrono select{background:var(--panel-2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:5px 6px;font:inherit;font-size:.85rem}
+
+.toast{
+  position:fixed;left:50%;transform:translateX(-50%);
+  bottom:calc(16px + env(safe-area-inset-bottom, 0px));
+  max-width:min(560px, calc(100% - 32px));
+  background:var(--panel-2);border:1px solid var(--lamp);border-radius:10px;
+  padding:10px 14px;font-size:.92rem;box-shadow:0 10px 30px rgba(0,0,0,.45);z-index:20;
+}
+@media (max-width:520px){
+  .plan{grid-template-columns:22px repeat(5,minmax(0,1fr));gap:4px}
+  .tile{min-height:74px;padding:5px}
+  .tile .nm{font-size:.7rem}
+  .tile .meta{font-size:.62rem}
+  .count .big{font-size:2.6rem}
+}
+@media (prefers-reduced-motion:no-preference){
+  .tok{transition:background .3s, box-shadow .3s}
+  .tile{transition:border-color .15s, background .2s}
+}
+</style>
+
+<header class="top" id="top">
+  <div class="brand">
+    <span class="eyebrow">Halloween Party</span>
+    <h1>Régie du MJ</h1>
+  </div>
+  <nav class="rail" id="rail" aria-label="Phases de la partie"></nav>
+  <div class="tools">
+    <button class="btn" id="undo" data-act="undo" title="Annuler la dernière action">Annuler</button>
+    <button class="btn ghost" data-act="askReset">Nouvelle partie</button>
+  </div>
+  <div class="confirm" id="confirm" hidden>
+    <span>Effacer la partie en cours et revenir à la Nuit 1 ?</span>
+    <button class="btn lamp sm" data-act="reset">Oui, recommencer</button>
+    <button class="btn sm" data-act="cancelReset">Garder la partie</button>
+  </div>
+</header>
+
+<main class="grid">
+  <div class="col">
+    <section class="panel" id="time"></section>
+    <section class="panel" id="phase"></section>
+  </div>
+  <div class="col">
+    <section class="panel" id="plan"></section>
+    <section class="panel" id="room"></section>
+  </div>
+  <div class="col">
+    <section class="panel" id="caps"></section>
+    <section class="panel" id="inquiry"></section>
+    <section class="panel" id="journal"></section>
+  </div>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ================= Données du jeu ================= */
+const PHASES = [
+  {id:"n1", label:"Nuit 1", sub:"L'arrivée", night:true},
+  {id:"j1", label:"Jour 1", sub:"4 crans", crans:4},
+  {id:"n2", label:"Nuit 2", sub:"Première apparition", night:true},
+  {id:"j2", label:"Jour 2", sub:"6 crans", crans:6},
+  {id:"n3", label:"Nuit 3", sub:"Le piège", night:true},
+  {id:"fin", label:"Fin", sub:"Démasquage", night:true}
+];
+
+const ROOMS = {
+  A:{name:"Grand Hall", chem:true},
+  B:{name:"Salon"},
+  C:{name:"Bibliothèque", chem:true},
+  D:{name:"Serre"},
+  E:{name:"Chambre", chem:true},
+  F:{name:"Cuisine"},
+  H:{name:"Sous-sol"}
+};
+const ADJ = {A:["B","C","D","E","H"], B:["A","F"], C:["A"], D:["A"], E:["A"], F:["B"], H:["A"]};
+
+const ELEMENTS = {
+  A:[["A1","Le jardinier"],["A2","La porte de la cave"],["A3","La cheminée et le portrait"]],
+  B:[["B1","Z1 et le rideau"],["B2","L'horloge"],["B3","La télé"],["B4","La porte de la cuisine"]],
+  C:[["C1","Z2 et le grimoire"],["C2","Le Scrabble"],["C3","Le journal"],["C4","La cheminée"]],
+  D:[["D1","Les feuilles qui bougent"],["D2","L'établi"],["D3","La plante carnivore"]],
+  E:[["E1","Le tourne-disque"],["E2","La cheminée"],["E3","Le placard de Z3"]],
+  F:[["F1","Le garde-manger"],["F2","Le repas abandonné"]],
+  H:[["H1","Le plan technique"],["H2","Le tableau électrique"],["H3","La porte du Laboratoire"]]
+};
+
+const BAILLE = "il bâille (rien)";
+const REMUE = "il remue la queue (quelque chose)";
+const ACTIONS = [
+  {id:"a1f", el:"A1", t:"Fouiller sa caisse à outils", cost:1, r:"Rien", sniff:BAILLE},
+  {id:"a1c", el:"A1", t:"Lui demander pour la cave", cost:0, r:"Piste du double de la clé"},
+  {id:"a1l", el:"A1", t:"Lui demander pour les lianes", cost:0, r:"Piste de la liane", day:2},
+  {id:"a2k", el:"A2", t:"Utiliser le double de la clé", cost:0, r:"Ouvre le sous-sol (H)", needKey:true},
+  {id:"a3c", el:"A3", t:"Lire le courrier", cost:0, r:"Indice anodin : la liane"},
+  {id:"a3e", el:"A3", t:"Examiner la cheminée", cost:1, r:"Fait 3 : cheminée normale, aucune trace", sniff:REMUE, fact:[3,"A3"]},
+  {id:"b1f", el:"B1", t:"Fouiller autour du fauteuil", cost:1, r:"Rien", sniff:"il s'excite (le rideau : la pièce cachée)"},
+  {id:"b2o", el:"B2", t:"Ouvrir la porte du balancier", cost:1, r:"Rien", sniff:BAILLE},
+  {id:"b3t", el:"B3", t:"Regarder la télé", cost:0, r:"Clé de l'énigme du Scrabble (extrait V)"},
+  {id:"b3d", el:"B3", t:"Regarder derrière la télé", cost:1, r:"Rien", sniff:BAILLE},
+  {id:"c2w", el:"C2", t:"Former le mot sur le plateau", cost:0, r:"→ C2b : plan du monte-charge, « À l'attention de Madame »", fact:[3,"C2b"], hint:"C2b"},
+  {id:"c3l", el:"C3", t:"Lire le journal", cost:0, r:"Clé des Habitants : arroser les fait sortir"},
+  {id:"c3f", el:"C3", t:"Fouiller le journal page par page", cost:1, r:"Fait 2 : la cheminée de la Bibliothèque est hors service", sniff:REMUE, fact:[2,"C3"]},
+  {id:"c4e", el:"C4", t:"Examiner la cheminée", cost:1, r:"Fait 3 : trace en arc au sol", sniff:REMUE, fact:[3,"C4"], hint:"C4"},
+  {id:"d1a", el:"D1", t:"Arroser les plantes", cost:1, r:"→ D1b : les Habitants donnent la liane", sniff:"il s'excite (très important)", liane:true},
+  {id:"d2f", el:"D2", t:"Fouiller l'établi", cost:1, r:"Double de la clé de la cave", sniff:REMUE, key:true},
+  {id:"d3f", el:"D3", t:"Fouiller son pot", cost:1, r:"Rien (mouche morte)", sniff:BAILLE},
+  {id:"e1r", el:"E1", t:"Retourner les pochettes une par une", cost:1, r:"Rien", sniff:BAILLE},
+  {id:"e2e", el:"E2", t:"Examiner la cheminée", cost:1, r:"Fait 3 : trace en arc au sol", sniff:REMUE, fact:[3,"E2"], hint:"E2"},
+  {id:"e3f", el:"E3", t:"Fouiller derrière Z3", cost:1, r:"Rien", sniff:"il s'excite (pour Z3, pas pour un indice)"},
+  {id:"f1t", el:"F1", t:"Prendre la boîte de biscuits", cost:0, r:"Le Gourmand récupère sa capacité", box:true},
+  {id:"f1b", el:"F1", t:"Fouiller derrière les bocaux", cost:1, r:"Rien", sniff:BAILLE},
+  {id:"f2s", el:"F2", t:"Soulever l'assiette", cost:1, r:"Rien (gag)", sniff:BAILLE},
+  {id:"h1p", el:"H1", t:"Regarder le plan technique", cost:0, r:"Fait 2 : la Bibliothèque est marquée « KO »", fact:[2,"H1"]}
+];
+const ACT = Object.fromEntries(ACTIONS.map(a=>[a.id,a]));
+
+const CAPS = [
+  {k:"meneur", role:"Meneur", q:"« Les gars, j'ai un plan ! »", rule:"Rend son usage à la capacité déjà utilisée d'un autre joueur (pas la sienne)."},
+  {k:"elegante", role:"Élégante", q:"« Un jeu d'enfant ! »", rule:"Au choix : un déplacement gratuit, ou une action payante gratuite."},
+  {k:"enquetrice", role:"Enquêtrice", q:"« Œil de lynx »", rule:"Sur la pièce où se trouve le groupe. Utile dans la Chambre et la Bibliothèque."},
+  {k:"gourmand", role:"Gourmand", q:"« Donner un biscuit »", rule:"À Z1 (Salon) : pièce cachée. À Z2 (Bibliothèque) : le grimoire. Rechargeable avec la boîte de la Cuisine."},
+  {k:"flaireur", role:"Flaireur", q:"« Renifler »", rule:"Avant une action payante : bouton « Renifler » sur l'action, dans la pièce."},
+  {k:"costaud", role:"Costaud", q:"« En force ! »", rule:"Force une porte fermée à clé : la Cuisine (depuis le Salon) ou la cave (depuis le Hall)."}
+];
+const CAPNAME = Object.fromEntries(CAPS.map(c=>[c.k,c.role]));
+
+const FACTS = {
+  1:{t:"L'Ombre passe par une cheminée", elim:"Élimine les pièces sans cheminée"},
+  2:{t:"La cheminée de la Bibliothèque est hors service", elim:"Élimine la Bibliothèque"},
+  3:{t:"Seules les cheminées au-dessus du Laboratoire sont truquées", elim:"Élimine le Hall"}
+};
+
+const NIGHT_CHECKS = {
+  n1:[
+    "Règles présentées, personnages répartis",
+    "Plan vierge du manoir donné (3 niveaux, sans cheminées)",
+    "Avertissement : « La partie dure deux jours : réfléchissez bien avant d'utiliser vos capacités à usage unique. »",
+    "Orage, le van tombe en panne devant la grille",
+    "Le groupe dort au Salon",
+    "Dans la nuit : un rire, une porte qui grince, des pas. Personne ne voit rien."
+  ],
+  n2:[
+    "Le groupe se barricade au Salon",
+    "Un raclement dans les murs",
+    "L'Ombre surgit : course-poursuite",
+    "Le Meneur la braque avec sa lampe de poche, elle s'enfuit",
+    "Meneur : « Les gars, j'ai un plan ! »"
+  ],
+  n3:[
+    "« Où tendez-vous la liane ? »",
+    "Le groupe se cache à côté",
+    "L'Ombre est capturée"
+  ],
+  fin:[
+    "Démasquage : X, la propriétaire",
+    "Mobile : protéger ses essais, G est le cobaye",
+    "Descente au Laboratoire pour libérer G",
+    "Le lendemain, le jardinier répare le van"
+  ]
+};
+
+/* ================= État ================= */
+const KEY = "regie-halloween-mj-v1";
+function fresh(){
+  return {
+    phase:0, crans:4, room:"B",
+    visited:{}, unlocked:{F:false,H:false}, key:false, box:false, hidden:false,
+    caps:Object.fromEntries(CAPS.map(c=>[c.k,{used:false}])),
+    names:{}, joker:null, done:{}, gave:{z1:false,z2:false},
+    facts:{1:[],2:[],3:[]}, hints1:[], loupe:null,
+    liane:{found:null, placed:null},
+    chase:{n2:0, n3:0}, chaseOk:{n2:false, n3:false},
+    checks:{}, log:[]
+  };
+}
+let S;
+try{ S = JSON.parse(localStorage.getItem(KEY)) || fresh(); }catch(e){ S = fresh(); }
+S = Object.assign(fresh(), S);
+let hist = [];
+
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function commit(fn){
+  hist.push(JSON.stringify(S));
+  if(hist.length>120) hist.shift();
+  fn();
+  save(); render();
+}
+
+/* ================= Utilitaires ================= */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const P = () => PHASES[S.phase];
+const isDay = () => !!P().crans;
+const dayNum = () => P().id==="j1" ? 1 : P().id==="j2" ? 2 : 0;
+const who = k => S.names[k] ? `${CAPNAME[k]} (${S.names[k]})` : CAPNAME[k];
+
+function log(t){
+  S.log.unshift({p:P().label, c:isDay()?S.crans:null, t});
+  if(S.log.length>200) S.log.length=200;
+}
+let toastTimer;
+function toast(t){
+  const el=$("toast"); el.textContent=t; el.hidden=false;
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.hidden=true, 4200);
+}
+function accessible(r){ return r==="F" ? S.unlocked.F : r==="H" ? S.unlocked.H : true; }
+function cost(from,to){
+  if(from===to) return 0;
+  if(!accessible(to)) return Infinity;
+  const dist={[from]:0}, q=[[from,0]];
+  while(q.length){
+    q.sort((a,b)=>a[1]-b[1]);
+    const [r,d]=q.shift();
+    if(d>dist[r]) continue;
+    for(const n of ADJ[r]){
+      if(!accessible(n)) continue;
+      const nd = d + (n==="A"?0:1);
+      if(dist[n]===undefined || nd<dist[n]){ dist[n]=nd; q.push([n,nd]); }
+    }
+  }
+  return dist[to] ?? Infinity;
+}
+function addFact(n, src){ if(!S.facts[n].includes(src)) S.facts[n].push(src); }
+function addHint1(src){ if(!S.hints1.includes(src)) S.hints1.push(src); }
+
+function spend(n, why){
+  if(n<=0) return;
+  const before=S.crans;
+  S.crans=Math.max(0, S.crans-n);
+  if(before>1 && S.crans===1){
+    if(dayNum()===1) toast("L'horloge sonne 21h : le soleil va bientôt se coucher.");
+    if(dayNum()===2) toast("« Dernière chance ! » L'horloge sonne. Dernier moment pour les capacités.");
+  }
+  if(S.crans===0){ log("Le dernier jeton tombe : la nuit tombe."); toast("Le dernier jeton tombe : la nuit tombe."); }
+}
+
+function setPhase(i){
+  S.phase=i;
+  const p=P();
+  S.joker=null;
+  if(p.crans){
+    S.crans=p.crans; S.room="A"; S.visited.A=true;
+    log(`${p.label} commence dans le Hall, ${p.crans} crans.`);
+  } else {
+    if(p.id==="n1"||p.id==="n2") S.room="B";
+    if(p.id==="n2") addHint1("Nuit 2");
+    log(`${p.label} commence.`);
+  }
+}
+
+/* ================= Actions ================= */
+const handlers = {
+  undo(){
+    if(!hist.length) return;
+    S=JSON.parse(hist.pop()); save(); render(); toast("Dernière action annulée.");
+  },
+  askReset(){ $("confirm").hidden=false; },
+  cancelReset(){ $("confirm").hidden=true; },
+  reset(){
+    hist.push(JSON.stringify(S));
+    S=fresh(); log("Nouvelle partie."); save(); $("confirm").hidden=true; stopChrono(true); render();
+  },
+  phase(d){ const i=+d.i; if(i===S.phase) return; commit(()=>setPhase(i)); stopChrono(true); },
+  next(){ if(S.phase<PHASES.length-1){ commit(()=>setPhase(S.phase+1)); stopChrono(true); } },
+  tick(){ if(S.crans>0) commit(()=>{ spend(1); log("Le temps avance (−1 cran)."); }); },
+  untick(){ const max=P().crans||0; if(S.crans<max) commit(()=>{ S.crans++; log("Un cran rendu (+1)."); }); },
+  nightfall(){ commit(()=>{ S.crans=0; log("Le MJ fait tomber la nuit plus tôt."); }); },
+  room(d){
+    const to=d.r;
+    if(P().id==="n3"){ commit(()=>{ S.liane.placed=to; log(`La liane est tendue : ${ROOMS[to].name}.`); }); return; }
+    if(!isDay()) return;
+    if(to===S.room) return;
+    if(S.crans===0){ toast("Plus de crans : la nuit est tombée."); return; }
+    let c=cost(S.room,to);
+    if(c===Infinity){
+      toast(to==="F" ? "La Cuisine est fermée à clé : seul le Costaud peut forcer la porte, depuis le Salon (B4)."
+                     : "La cave est fermée à clé : double de la clé (établi de la Serre) ou Costaud, depuis le Hall (A2).");
+      return;
+    }
+    commit(()=>{
+      let note="";
+      if(S.joker==="move" && c>0){ c=0; S.joker=null; note=" (déplacement gratuit de l'Élégante)"; }
+      const first=!S.visited[to];
+      spend(c);
+      S.room=to; S.visited[to]=true;
+      log(`Le groupe va dans ${ROOMS[to].name}${c?` (${c} cran${c>1?"s":""})`:" (gratuit)"}${note}.`);
+      if(first) toast(`Première visite : lire l'entrée de ${ROOMS[to].name} et poser la tuile ${to}.`);
+    });
+  },
+  act(d){
+    const a=ACT[d.id]; if(!a || S.done[a.id]) return;
+    if(a.cost && S.crans===0){ toast("Plus de crans : la nuit est tombée."); return; }
+    commit(()=>{
+      let note="";
+      if(a.cost){
+        if(S.joker==="action"){ S.joker=null; note=" (gratuit grâce à l'Élégante)"; }
+        else spend(a.cost);
+      }
+      S.done[a.id]=true;
+      if(a.fact) addFact(a.fact[0], a.fact[1]);
+      if(a.hint) addHint1(a.hint);
+      if(a.liane && !S.liane.found) S.liane.found="D1";
+      if(a.key) S.key=true;
+      if(a.box){ S.box=true; S.caps.gourmand.used=false; }
+      if(a.needKey) S.unlocked.H=true;
+      log(`${a.el} · ${a.t}${a.cost?" (1 cran)":""}${note} → ${a.r}`);
+      toast(`${a.el} → ${a.r}`);
+    });
+  },
+  sniff(d){
+    const a=ACT[d.id]; if(!a || S.caps.flaireur.used) return;
+    commit(()=>{ S.caps.flaireur.used=true; log(`${who("flaireur")} renifle ${a.el} « ${a.t} » : ${a.sniff}.`); toast(`Renifler ${a.el} : ${a.sniff}.`); });
+  },
+  cap(d){
+    const k=d.k, opt=d.o;
+    if(S.caps[k].used && k!=="meneur") return;
+    commit(()=>{
+      if(k==="meneur"){
+        S.caps[opt].used=false; S.caps.meneur.used=true;
+        if(opt==="gourmand") {}
+        log(`${who("meneur")} : « J'ai un plan ! » ${CAPNAME[opt]} récupère sa capacité.`);
+        toast(`${CAPNAME[opt]} peut de nouveau utiliser sa capacité.`);
+      }
+      if(k==="elegante"){
+        S.caps.elegante.used=true; S.joker=opt;
+        log(`${who("elegante")} : « Un jeu d'enfant ! » ${opt==="move"?"Le prochain déplacement":"La prochaine action payante"} est gratuit${opt==="move"?"":"e"}.`);
+      }
+      if(k==="enquetrice"){
+        S.caps.enquetrice.used=true;
+        let res="Rien de particulier ici.";
+        if(S.room==="E") res="« Quelqu'un est passé par ici, et récemment. »";
+        if(S.room==="C"){ res="« Ce mécanisme n'a pas bougé depuis longtemps. » (fait 2)"; addFact(2,"Loupe"); }
+        S.loupe={room:S.room, res};
+        log(`${who("enquetrice")} : Œil de lynx dans ${ROOMS[S.room].name}. ${res}`);
+        toast(`Œil de lynx : ${res}`);
+      }
+      if(k==="gourmand"){
+        S.caps.gourmand.used=true;
+        if(opt==="z1"){ S.gave.z1=true; S.hidden=true; addFact(1,"B1b"); log(`${who("gourmand")} donne un biscuit à Z1 → B1b : la pièce cachée (fait 1, fumigènes).`); toast("B1b : pièce cachée. Poser la tuile de la pièce cachée."); }
+        else { S.gave.z2=true; log(`${who("gourmand")} donne un biscuit à Z2 → le grimoire (lore : minuit pile).`); toast("C1 : le grimoire. Les passages ne s'ouvrent qu'à minuit pile."); }
+      }
+      if(k==="costaud"){
+        S.caps.costaud.used=true; S.unlocked[opt]=true;
+        log(`${who("costaud")} : « En force ! » ${opt==="F"?"La porte de la Cuisine":"La porte de la cave"} cède.`);
+      }
+    });
+  },
+  cancelJoker(){ commit(()=>{ S.joker=null; S.caps.elegante.used=false; log("Joker de l'Élégante annulé."); }); },
+  lianeGift(){ commit(()=>{ S.liane.found="Habitants"; log("« Dernière chance ! » Les Habitants passent la liane par une fenêtre du Hall."); }); },
+  check(d){ commit(()=>{ S.checks[d.c]=!S.checks[d.c]; }); },
+  chaseFail(d){ commit(()=>{ S.chase[d.n]++; log(`Course-poursuite ratée (essai ${S.chase[d.n]}).`); }); stopChrono(true); },
+  chaseWin(d){ commit(()=>{ S.chaseOk[d.n]=true; log("Course-poursuite réussie."); }); stopChrono(false); },
+  chaseRefuge(d){ commit(()=>{ S.chaseOk[d.n]=true; log("Deuxième échec : le groupe se réfugie quelque part malgré tout."); }); stopChrono(false); },
+  chronoStart(){ startChrono(); },
+  chronoPause(){ pauseChrono(); },
+  chronoReset(){ stopChrono(true); }
+};
+
+document.addEventListener("click", e=>{
+  const b=e.target.closest("[data-act]");
+  if(!b || b.disabled) return;
+  wake();
+  const h=handlers[b.dataset.act];
+  if(h) h(b.dataset);
+});
+document.addEventListener("input", e=>{
+  if(e.target.matches("[data-name]")){ S.names[e.target.dataset.name]=e.target.value.trim(); save(); }
+});
+document.addEventListener("change", e=>{
+  if(e.target.id==="chrono-dur"){ chrono.dur=+e.target.value; if(!chrono.running){ chrono.left=chrono.dur; paintChrono(); } }
+});
+document.addEventListener("keydown", e=>{
+  if((e.ctrlKey||e.metaKey) && e.key==="z" && !e.target.matches("input")){ e.preventDefault(); handlers.undo(); }
+});
+
+/* Écran allumé pendant la partie */
+let wakeAsked=false;
+function wake(){
+  if(wakeAsked) return; wakeAsked=true;
+  try{ navigator.wakeLock && navigator.wakeLock.request("screen").catch(()=>{}); }catch(e){}
+}
+
+/* ================= Chrono de la course-poursuite ================= */
+const chrono={dur:60, left:60, running:false, timer:null};
+function paintChrono(){
+  const el=$("chrono-disp"); if(!el) return;
+  const m=Math.floor(chrono.left/60), s=chrono.left%60;
+  el.textContent=`${m}:${String(s).padStart(2,"0")}`;
+  el.classList.toggle("low", chrono.left<=10);
+  const st=$("chrono-start"); if(st) st.textContent = chrono.running ? "En cours…" : (chrono.left<chrono.dur && chrono.left>0 ? "Reprendre" : "Lancer");
+}
+function startChrono(){
+  if(chrono.running) return;
+  if(chrono.left<=0) chrono.left=chrono.dur;
+  chrono.running=true;
+  chrono.timer=setInterval(()=>{
+    chrono.left--;
+    if(chrono.left<=0){ chrono.left=0; clearInterval(chrono.timer); chrono.running=false; toast("Temps écoulé !"); }
+    paintChrono();
+  },1000);
+  paintChrono();
+}
+function pauseChrono(){ clearInterval(chrono.timer); chrono.running=false; paintChrono(); }
+function stopChrono(resetTime){ clearInterval(chrono.timer); chrono.running=false; if(resetTime) chrono.left=chrono.dur; paintChrono(); }
+
+/* ================= Rendu ================= */
+function render(){
+  renderRail(); renderTime(); renderPhase(); renderPlan(); renderRoom(); renderCaps(); renderInquiry(); renderJournal();
+  $("undo").disabled=!hist.length;
+  paintChrono();
+}
+
+function renderRail(){
+  $("rail").innerHTML = PHASES.map((p,i)=>`
+    <button class="step ${i<S.phase?"past":""} ${i===S.phase?"now":""} ${p.night?"isnight":""}" data-act="phase" data-i="${i}" ${i===S.phase?'aria-current="step"':""}>
+      <b>${p.label}</b><span>${p.sub}</span>
+    </button>`).join("");
+}
+
+function renderTime(){
+  const p=P(), el=$("time");
+  if(!p.crans){
+    const nextDay = PHASES.slice(S.phase).find(x=>x.crans);
+    el.innerHTML = `
+      <div class="panel-head"><h2>Le sablier</h2><span class="eyebrow">${p.label}</span></div>
+      <div class="glass-wrap">
+        ${glass(0, nextDay?nextDay.crans:0, true)}
+        <div class="count"><span class="eyebrow">Sablier au repos</span>
+          <span class="muted">${nextDay?`${nextDay.label} : ${nextDay.crans} crans`:"La partie est presque finie."}</span>
+        </div>
+      </div>
+      <div class="alert night"><b>Pas de sablier la nuit.</b><span class="muted">Les capacités ne s'utilisent que le jour.</span></div>`;
+    return;
+  }
+  const max=p.crans, c=S.crans;
+  let alert="";
+  if(c===0){
+    alert=`<div class="alert night"><b>La nuit tombe.</b><span>Passer à ${PHASES[S.phase+1].label}.</span><div class="row"><button class="btn fog" data-act="next">Commencer ${PHASES[S.phase+1].label}</button></div></div>`;
+  } else if(c===1 && dayNum()===1){
+    alert=`<div class="alert"><b>L'horloge sonne 21h.</b><span>Le soleil va bientôt se coucher.</span></div>`;
+  } else if(c===1 && dayNum()===2){
+    alert=`<div class="alert warn"><b>« Dernière chance ! »</b><span>L'horloge sonne. Dernier moment pour utiliser les capacités.</span>
+      ${S.liane.found?`<span class="muted">Le groupe a déjà la liane.</span>`:`<span>Le groupe n'a pas la liane : les Habitants la passent par une fenêtre du Hall.</span><div class="row"><button class="btn lamp sm" data-act="lianeGift">Les Habitants apportent la liane</button></div>`}
+    </div>`;
+  }
+  const joker = S.joker ? `<div class="joker"><span><b>Joker de l'Élégante actif :</b> ${S.joker==="move"?"le prochain déplacement est gratuit":"la prochaine action payante est gratuite"}.</span><button class="btn ghost sm" data-act="cancelJoker">Annuler le joker</button></div>` : "";
+  el.innerHTML = `
+    <div class="panel-head"><h2>Le sablier</h2><span class="eyebrow">${p.label}</span></div>
+    <div class="glass-wrap">
+      ${glass(c,max,false)}
+      <div class="count">
+        <span class="big">${c}<small> / ${max}</small></span>
+        <span class="muted">cran${c>1?"s":""} avant la nuit</span>
+      </div>
+    </div>
+    ${alert}${joker}
+    <div class="row">
+      <button class="btn lamp" data-act="tick" ${c===0?"disabled":""}>Le temps avance (−1)</button>
+      <button class="btn" data-act="untick" ${c>=max?"disabled":""}>Rendre un cran</button>
+      <button class="btn ghost" data-act="nightfall" ${c===0?"disabled":""}>Faire tomber la nuit</button>
+    </div>
+    <p class="muted" style="margin:0;font-size:.8rem">Les déplacements et actions payantes de la pièce retirent les crans tout seuls. Le Hall se traverse sans payer.</p>`;
+}
+function glass(c,max,idle){
+  const toks=(n,cls)=>Array.from({length:n},()=>`<span class="tok ${cls}"></span>`).join("");
+  return `<div class="glass" aria-label="${c} crans restants sur ${max}">
+    <div class="cap-bar"></div>
+    <div class="bulb top">${toks(idle?0:c,"")}</div>
+    <div class="bulb bottom">${toks(idle?max:max-c,"fallen")}</div>
+    <div class="cap-bar"></div>
+  </div>`;
+}
+
+function checklist(id){
+  return `<ul class="checklist">${NIGHT_CHECKS[id].map((t,i)=>{
+    const key=`${id}-${i}`, on=!!S.checks[key];
+    return `<li><button class="${on?"checked":""}" data-act="check" data-c="${key}" aria-pressed="${on}"><span class="box">${on?"✓":""}</span><span class="lbl">${esc(t)}</span></button></li>`;
+  }).join("")}</ul>`;
+}
+function chronoBlock(n){
+  const fails=S.chase[n], ok=S.chaseOk[n];
+  if(ok) return `<div class="alert night"><b>Course-poursuite terminée.</b><span class="muted">${fails?`${fails} échec${fails>1?"s":""} avant de s'en sortir.`:"Réussie du premier coup."}</span></div>`;
+  const durs=[30,45,60,90,120].map(v=>`<option value="${v}" ${v===chrono.dur?"selected":""}>${v} s</option>`).join("");
+  return `<div class="chrono">
+    <div class="panel-head"><b>Course-poursuite</b><span class="eyebrow">Essai ${fails+1}</span></div>
+    <div class="row" style="align-items:center;gap:14px">
+      <span class="disp" id="chrono-disp">1:00</span>
+      <label class="muted" style="font-size:.8rem">Temps imparti <select id="chrono-dur">${durs}</select></label>
+    </div>
+    <div class="row">
+      <button class="btn fog sm" id="chrono-start" data-act="chronoStart">Lancer</button>
+      <button class="btn sm" data-act="chronoPause">Pause</button>
+      <button class="btn ghost sm" data-act="chronoReset">Remettre à zéro</button>
+    </div>
+    <div class="row">
+      <button class="btn lamp sm" data-act="chaseWin" data-n="${n}">Réussi</button>
+      ${fails>=1
+        ? `<button class="btn sm" data-act="chaseRefuge" data-n="${n}">Deuxième échec : ils se réfugient</button>`
+        : `<button class="btn sm" data-act="chaseFail" data-n="${n}">Raté : on recommence</button>`}
+    </div>
+    <span class="muted" style="font-size:.78rem">Le mini-jeu exact reste à choisir. On ne peut pas perdre : au deuxième échec, le groupe se réfugie quelque part malgré tout.</span>
+  </div>`;
+}
+
+function renderPhase(){
+  const p=P(), el=$("phase");
+  let body="";
+  if(p.id==="j1"||p.id==="j2"){
+    const c=S.crans, max=p.crans;
+    const ev = p.id==="j1" ? [
+      [max,"Début","Le jardinier à la porte du Hall (A1) : quelque chose rôde la nuit, il réparera le van dans deux jours. « Si on savait par où ça entre… »"],
+      [1,"1 cran","L'horloge sonne 21h, le soleil va bientôt se coucher."],
+      [0,"0 cran","La nuit tombe : Nuit 2."]
+    ] : [
+      [max,"Début","Le jardinier revient (A1b). L'équipe lui raconte la nuit : seul un piège l'arrêtera. Il parle des lianes de la serre."],
+      [1,"1 cran","« Dernière chance ! » Dernier moment pour les capacités. Liane apportée si besoin."],
+      [0,"0 cran","La nuit tombe : Nuit 3."]
+    ];
+    body = `
+      <div class="panel-head"><h2>${p.label}</h2><span class="eyebrow">Objectif</span></div>
+      <p style="margin:0">${p.id==="j1"?"Découvrir d'où vient l'Ombre.":"Trouver la liane et finir de trouver où la tendre."}</p>
+      <ul class="timeline">${ev.map(([at,w,t])=>{
+        const st = c<at ? "past" : c===at ? "now" : "";
+        return `<li class="${st}"><span class="when">${w}</span><span>${esc(t)}</span></li>`;
+      }).join("")}</ul>`;
+  } else if(p.id==="n1"){
+    body = `<div class="panel-head"><h2>Nuit 1 : l'arrivée</h2><span class="eyebrow">Racontée</span></div>
+      <span class="muted" style="font-size:.85rem">Script du Hall. Aucune action, aucun indice sur le chemin de l'Ombre.</span>
+      ${checklist("n1")}
+      <div class="row"><button class="btn lamp" data-act="next">Le jour se lève : Jour 1</button></div>`;
+  } else if(p.id==="n2"){
+    body = `<div class="panel-head"><h2>Nuit 2 : la première apparition</h2><span class="eyebrow">Salon</span></div>
+      ${checklist("n2")}
+      ${chronoBlock("n2")}
+      <div class="row"><button class="btn lamp" data-act="next">Le jour se lève : Jour 2</button></div>`;
+  } else if(p.id==="n3"){
+    const pl=S.liane.placed;
+    let res=`<div class="alert night"><b>« Où tendez-vous la liane ? »</b><span>Touchez la pièce choisie sur le plan.</span>${S.liane.found?"":`<span class="muted">Attention : le journal dit que le groupe n'a pas encore la liane.</span>`}</div>`;
+    if(pl==="E") res=`<div class="alert"><b>Bon endroit : la Chambre.</b><span>L'Ombre sort du conduit et trébuche dans la liane : capturée directement.</span></div>`;
+    else if(pl) res=`<div class="alert warn"><b>Mauvais endroit : ${ROOMS[pl].name}.</b><span>Elle enjambe la liane si elle la croise et trouve le groupe. Course-poursuite, puis les joueurs l'attirent vers la liane : capturée.</span></div>${chronoBlock("n3")}`;
+    body = `<div class="panel-head"><h2>Nuit 3 : le piège</h2><span class="eyebrow">Le final</span></div>
+      ${res}${checklist("n3")}
+      <div class="row"><button class="btn lamp" data-act="next" ${pl?"":"disabled"}>Démasquer l'Ombre</button></div>`;
+  } else {
+    const used=CAPS.filter(c=>S.caps[c.k].used).length;
+    const seen=Object.keys(ROOMS).filter(r=>S.visited[r]).length;
+    body = `<div class="panel-head"><h2>Fin : le démasquage</h2><span class="eyebrow">Épilogue</span></div>
+      ${checklist("fin")}
+      <dl class="kv">
+        <dt>Pièces visitées</dt><dd>${seen} sur 7${S.hidden?", plus la pièce cachée":""}</dd>
+        <dt>Capacités utilisées</dt><dd>${used} sur 6 (état final)</dd>
+        <dt>Liane</dt><dd>${S.liane.placed?`tendue dans ${ROOMS[S.liane.placed].name}`:"pas tendue"}</dd>
+      </dl>`;
+  }
+  el.innerHTML=body;
+}
+
+function renderPlan(){
+  const el=$("plan"), n3=P().id==="n3", day=isDay();
+  const tile=(r)=>{
+    const R=ROOMS[r], here=S.room===r && !n3 && P().id!=="fin", vis=!!S.visited[r];
+    const locked=!accessible(r);
+    let meta="";
+    if(n3){ meta = S.liane.placed===r ? "liane tendue" : "tendre ici"; }
+    else if(here) meta="le groupe est ici";
+    else if(locked) meta="fermée à clé";
+    else if(day){ const c=cost(S.room,r); meta = c===0 ? "gratuit" : `${c} cran${c>1?"s":""}`; }
+    else meta = vis ? "tuile posée" : "pas visitée";
+    const cls=["tile", vis?"visited":"", here?"here":"", locked&&!n3?"locked":"", n3&&S.liane.placed===r?"trap":""].join(" ");
+    const dis = n3 ? false : !day;
+    return `<button class="${cls}" data-act="room" data-r="${r}" ${dis?"disabled":""} aria-label="${R.name}, ${meta}">
+      ${R.chem?'<span class="chem" title="Cheminée"></span>':""}
+      <span class="letter">${r}</span><span class="nm">${R.name}</span>
+      ${r==="B"&&S.hidden?'<span class="hidden-room">+ pièce cachée</span>':""}
+      <span class="meta">${meta}</span>
+    </button>`;
+  };
+  el.innerHTML = `
+    <div class="panel-head"><h2>Le manoir</h2><span class="eyebrow">${n3?"Où tendre la liane ?":day?"Toucher une pièce pour s'y rendre":"Déplacements le jour seulement"}</span></div>
+    <div class="plan" role="group" aria-label="Plan du manoir">
+      <span class="lvl">Étage 1</span>
+      <span class="sealed" title="Pièces condamnées"></span><span class="sealed"></span><span class="sealed"></span>${tile("E")}<span class="sealed"></span>
+      <span class="lvl">RdC</span>
+      ${tile("F")}${tile("B")}${tile("A")}${tile("C")}${tile("D")}
+      <span class="lvl">−1</span>
+      <span class="void"></span><span class="void"></span>${tile("H")}
+      <div class="tile lab" aria-label="Laboratoire, épilogue"><span class="letter">Lab</span><span class="nm">Laboratoire</span><span class="meta">épilogue</span></div>
+      <span class="void"></span>
+    </div>
+    <div class="legend">
+      <span><i style="border-style:dashed"></i>pas visitée</span>
+      <span><i style="background:var(--panel-2)"></i>tuile posée</span>
+      <span><i style="border-color:var(--lamp)"></i>le groupe</span>
+      <span><i style="background:repeating-linear-gradient(-45deg,var(--panel) 0 3px,var(--panel-2) 3px 4px)"></i>condamnée</span>
+    </div>`;
+}
+
+function renderRoom(){
+  const el=$("room");
+  if(!isDay()){
+    el.innerHTML = `<div class="panel-head"><h2>${P().id==="fin"?"Le Laboratoire":"Le Salon"}</h2><span class="eyebrow">La nuit</span></div>
+      <p class="muted" style="margin:0">${P().id==="fin"?"On descend libérer G.":"Le groupe dort au Salon. Les pièces s'explorent le jour."}</p>`;
+    return;
+  }
+  const r=S.room, d=dayNum();
+  const flairOk = !S.caps.flaireur.used && S.crans>0;
+  const els = ELEMENTS[r].map(([code,name])=>{
+    const acts = ACTIONS.filter(a=>a.el===code && (!a.day || a.day===d) && (!a.needKey || S.key || S.done[a.id]));
+    const variant = (code==="A1" && d===2) ? ` <span class="chip fog">script A1b</span>` : "";
+    const extra = [];
+    if(code==="B1"){ extra.push(S.gave.z1 ? `<div class="act done"><span class="t">Biscuit donné à Z1</span><span class="cost free">fait</span><span class="r">→ B1b : la pièce cachée, fait 1, fumigènes</span></div>` : `<span class="muted" style="font-size:.8rem">Biscuit à Z1 : carte du Gourmand.</span>`); }
+    if(code==="C1"){ extra.push(S.gave.z2 ? `<div class="act done"><span class="t">Biscuit donné à Z2</span><span class="cost free">fait</span><span class="r">Lore : les passages ne s'ouvrent qu'à minuit pile</span></div>` : `<span class="muted" style="font-size:.8rem">Bloqué. Biscuit à Z2 : carte du Gourmand.</span>`); }
+    if(code==="B4" && !S.unlocked.F) extra.push(`<span class="muted" style="font-size:.8rem">Fermée à clé : carte du Costaud.</span>`);
+    if(code==="A2" && !S.unlocked.H) extra.push(`<span class="muted" style="font-size:.8rem">Fermée à clé : ${S.key?"le groupe a le double de la clé.":"double de la clé (D2) ou carte du Costaud."}</span>`);
+    if(code==="A2" && S.unlocked.H) extra.push(`<span class="chip ok" style="align-self:flex-start">Cave ouverte</span>`);
+    if(code==="B4" && S.unlocked.F) extra.push(`<span class="chip ok" style="align-self:flex-start">Cuisine ouverte</span>`);
+    if(code==="H3") extra.push(`<span class="muted" style="font-size:.8rem">Bloquée. Teaser de G.</span>`);
+    const rows = acts.map(a=>{
+      const done=!!S.done[a.id];
+      const free = !a.cost || S.joker==="action";
+      return `<div class="act ${done?"done":""}">
+        <span class="t">${esc(a.t)}</span>
+        <span class="btns">
+          ${done ? `<span class="cost free">fait</span>` : `
+            ${a.cost && flairOk ? `<button class="btn ghost sm" data-act="sniff" data-id="${a.id}">Renifler</button>`:""}
+            <button class="btn ${a.cost?"lamp":""} sm" data-act="act" data-id="${a.id}" ${a.cost&&S.crans===0?"disabled":""}>${a.cost?(free?"Faire (gratuit)":"Faire · 1 cran"):"Noter"}</button>`}
+        </span>
+        <span class="r">${esc(a.r)}</span>
+      </div>`;
+    }).join("");
+    return `<div class="el"><div class="el-head"><span class="chip lamp">${code}</span><b>${esc(name)}</b>${variant}</div>${rows}${extra.join("")}</div>`;
+  }).join("");
+  el.innerHTML = `
+    <div class="panel-head"><h2>${ROOMS[r].name}</h2><span class="eyebrow">Tuile ${r}</span></div>
+    <span class="muted" style="font-size:.8rem">Seules les actions qui comptent sont listées. Les gags et descriptions restent dans les scripts.</span>
+    <div class="elements">${els}</div>`;
+}
+
+function renderCaps(){
+  const day=isDay() && S.crans>0, r=S.room;
+  const cards = CAPS.map(c=>{
+    const used=S.caps[c.k].used;
+    let btns="";
+    if(!used){
+      if(c.k==="meneur"){
+        const targets=CAPS.filter(x=>x.k!=="meneur" && S.caps[x.k].used);
+        btns = targets.length ? targets.map(x=>`<button class="btn sm" data-act="cap" data-k="meneur" data-o="${x.k}" ${day?"":"disabled"}>Rendre à ${x.role}</button>`).join("")
+                              : `<span class="muted" style="font-size:.8rem">Aucune autre capacité utilisée pour l'instant.</span>`;
+      }
+      if(c.k==="elegante") btns = `<button class="btn sm" data-act="cap" data-k="elegante" data-o="move" ${day?"":"disabled"}>Déplacement gratuit</button><button class="btn sm" data-act="cap" data-k="elegante" data-o="action" ${day?"":"disabled"}>Action payante gratuite</button>`;
+      if(c.k==="enquetrice") btns = `<button class="btn sm" data-act="cap" data-k="enquetrice" ${day?"":"disabled"}>Œil de lynx : ${day?ROOMS[r].name:"…"}</button>`;
+      if(c.k==="gourmand") btns = `<button class="btn sm" data-act="cap" data-k="gourmand" data-o="z1" ${day&&r==="B"&&!S.gave.z1?"":"disabled"}>Biscuit à Z1 (Salon)</button><button class="btn sm" data-act="cap" data-k="gourmand" data-o="z2" ${day&&r==="C"&&!S.gave.z2?"":"disabled"}>Biscuit à Z2 (Biblio.)</button>`;
+      if(c.k==="flaireur") btns = `<span class="muted" style="font-size:.8rem">Bouton « Renifler » sur les actions payantes de la pièce.</span>`;
+      if(c.k==="costaud") btns = `<button class="btn sm" data-act="cap" data-k="costaud" data-o="F" ${day&&r==="B"&&!S.unlocked.F?"":"disabled"}>Forcer la Cuisine (B4)</button><button class="btn sm" data-act="cap" data-k="costaud" data-o="H" ${day&&r==="A"&&!S.unlocked.H?"":"disabled"}>Forcer la cave (A2)</button>`;
+    } else {
+      if(c.k==="gourmand" && !S.box) btns=`<span class="muted" style="font-size:.8rem">Rechargeable avec la boîte de la Cuisine (F1).</span>`;
+      if(c.k==="enquetrice" && S.loupe) btns=`<span class="muted" style="font-size:.8rem">${ROOMS[S.loupe.room].name} : ${esc(S.loupe.res)}</span>`;
+    }
+    return `<div class="capc ${used?"used":""}">
+      <div class="h">
+        <span class="who"><span class="role">${c.role}</span><input id="name-${c.k}" data-name="${c.k}" value="${esc(S.names[c.k]||"")}" placeholder="joueur" aria-label="Joueur qui incarne ${c.role}"></span>
+        <span class="pill ${used?"off":"on"}">${used?"Utilisée":"Disponible"}</span>
+      </div>
+      <span class="q">${c.q}</span>
+      ${used?"":`<span class="rule">${c.rule}</span>`}
+      ${btns?`<div class="row">${btns}</div>`:""}
+    </div>`;
+  }).join("");
+  const left=CAPS.filter(c=>!S.caps[c.k].used).length;
+  $("caps").innerHTML = `
+    <div class="panel-head"><h2>Capacités</h2><span class="eyebrow">${left} sur 6 disponibles</span></div>
+    <span class="muted" style="font-size:.8rem">Une seule fois dans toute la partie, pendant une journée, sans coût en temps.</span>
+    <div class="caps">${cards}</div>`;
+}
+
+function renderInquiry(){
+  const srcLabel={B1b:"B1b pièce cachée",C3:"C3 journal",H1:"H1 plan technique",Loupe:"Loupe",A3:"A3 Hall",C4:"C4 Biblio.",E2:"E2 Chambre",C2b:"C2b monte-charge"};
+  const facts=[1,2,3].map(n=>{
+    const got=S.facts[n].length>0;
+    const part = n===1 && !got && S.hints1.length>0;
+    const srcs = S.facts[n].map(s=>`<span class="chip ok">${srcLabel[s]||s}</span>`).join("")
+      + (n===1 ? S.hints1.map(s=>`<span class="chip lamp">${s==="Nuit 2"?"raclement, nuit 2":srcLabel[s]||s}</span>`).join("") : "");
+    const status = got ? "Trouvé" : part ? "À déduire" : "Pas encore";
+    return `<div class="fact ${got?"got":part?"part":""}">
+      <span class="n">${n}</span>
+      <div class="txt"><b>${FACTS[n].t}</b> <span class="muted">· ${status}</span><br><span class="muted" style="font-size:.8rem">${FACTS[n].elim}</span>
+      ${srcs?`<div class="srcs">${srcs}</div>`:""}</div>
+    </div>`;
+  }).join("");
+  const all = [1,2,3].every(n=>S.facts[n].length || (n===1 && S.hints1.length));
+  const lianeTxt = S.liane.found==="D1" ? "Trouvée (D1, les Habitants)" : S.liane.found==="Habitants" ? "Apportée à « Dernière chance ! »" : "Pas encore";
+  $("inquiry").innerHTML = `
+    <div class="panel-head"><h2>L'enquête</h2><span class="eyebrow">Ce que savent les joueurs</span></div>
+    <div class="facts">${facts}</div>
+    ${all?`<div class="alert"><b>Les joueurs ont de quoi déduire la Chambre.</b><span class="muted">Fait 1, puis 2, puis 3 : il ne reste que la Chambre.</span></div>`:""}
+    ${S.loupe&&S.loupe.room==="E"?`<span class="chip fog" style="align-self:flex-start">Bonus : la loupe confirme la Chambre</span>`:""}
+    <dl class="kv">
+      <dt>La liane</dt><dd><b style="color:${S.liane.found?"var(--ok)":"var(--ink)"}">${lianeTxt}</b>${S.liane.placed?` · tendue dans ${ROOMS[S.liane.placed].name}`:""}</dd>
+      <dt>Double de la clé</dt><dd>${S.key?"Trouvé (D2)":"Pas trouvé"}</dd>
+      <dt>Boîte de biscuits</dt><dd>${S.box?"Prise (F1)":"Dans la Cuisine"}</dd>
+      <dt>Portes</dt><dd>Cuisine ${S.unlocked.F?"ouverte":"fermée"} · Cave ${S.unlocked.H?"ouverte":"fermée"}</dd>
+    </dl>`;
+}
+
+function renderJournal(){
+  $("journal").innerHTML = `
+    <div class="panel-head"><h2>Journal</h2><span class="eyebrow">${S.log.length} entrée${S.log.length>1?"s":""}</span></div>
+    ${S.log.length ? `<ul class="log">${S.log.map(l=>`<li><span class="w">${l.p}${l.c!==null?` · ${l.c}`:""}</span><span>${esc(l.t)}</span></li>`).join("")}</ul>`
+      : `<p class="muted" style="margin:0">Chaque déplacement, action et capacité s'inscrit ici. « Annuler » (ou Ctrl+Z) revient en arrière.</p>`}`;
+}
+
+if(!S.log.length) log("Nuit 1 commence. Le groupe dort au Salon.");
+render();
+})();
+</script>
+
+</body></html>
