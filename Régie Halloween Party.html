@@ -906,16 +906,25 @@ function useRows(rows, name, quiet){
 }
 async function importFile(file){
   try{
-    useRows(await readExcel(file), file.name);
-    // Un fichier choisi à la main devient la source : on oublie le lien Google Sheets.
-    try{ localStorage.removeItem(LINK_KEY); }catch(e){}
+    const rows=await readExcel(file);
+    // Un fichier choisi à la main devient la source : plus de lien Google Sheets, même celui par défaut.
+    try{ localStorage.setItem(LINK_KEY, NO_LINK); }catch(e){}
+    useRows(rows, file.name);
   }catch(e){ toast(`Import impossible : ${e.message}.`); }
 }
 
 /* ---------- Google Sheets ----------
    Lien publié (Fichier → Partager → Publier sur le web) : lu en CSV.
    Lien ordinaire d'un tableau partagé « Tous les utilisateurs disposant du lien » : lu par l'export gviz, onglet « Livret ». */
-const getLink = () => { try{ return localStorage.getItem(LINK_KEY) || ""; }catch(e){ return ""; } };
+/* Le tableau du livret, utilisé tant qu'on n'a pas collé un autre lien ou importé un fichier.
+   En mémoire : rien = ce lien par défaut, "aucun" = pas de lien (fichier importé), sinon le lien collé. */
+const DEFAULT_LINK = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQerz1a55uMvP4MkSnBh8B-MgmgLwcVESTnRGc776_PAnu_gpviGabtZYcQnxXHVQ/pubhtml";
+const NO_LINK = "aucun";
+const getLink = () => {
+  let v=null;
+  try{ v=localStorage.getItem(LINK_KEY); }catch(e){}
+  return v===null || v==="" ? DEFAULT_LINK : v===NO_LINK ? "" : v;
+};
 function sheetCsvUrl(link){
   const u=new URL(link.trim());
   if(u.hostname!=="docs.google.com" || !u.pathname.startsWith("/spreadsheets/d/")) throw new Error("ce n'est pas un lien Google Sheets");
@@ -1116,13 +1125,12 @@ const handlers = {
   bookReload(){ const link=getLink(); if(link) loadFromLink(link); else reloadExcel(); },
   bookLink(){
     const v=$("book-url").value.trim();
-    if(!v){
-      try{ localStorage.removeItem(LINK_KEY); }catch(e){}
-      toast("Lien retiré : le livret garde sa dernière version."); render(); return;
-    }
-    try{ sheetCsvUrl(v); }catch(e){ toast(`Lien refusé : ${e.message}.`); return; }
-    try{ localStorage.setItem(LINK_KEY, v); }catch(e){}
-    loadFromLink(v);
+    // Champ vidé : retour au tableau par défaut.
+    const link=v || DEFAULT_LINK;
+    try{ sheetCsvUrl(link); }catch(e){ toast(`Lien refusé : ${e.message}.`); return; }
+    try{ if(link===DEFAULT_LINK) localStorage.removeItem(LINK_KEY); else localStorage.setItem(LINK_KEY, link); }catch(e){}
+    $("book-url").blur();
+    loadFromLink(link);
   },
   chaseFail(d){ commit(()=>{ S.chase[d.n]++; log(`Course-poursuite ratée (essai ${S.chase[d.n]}).`); }); stopChrono(true); },
   chaseWin(d){ commit(()=>{ S.chaseOk[d.n]=true; log("Course-poursuite réussie."); }); stopChrono(false); },
