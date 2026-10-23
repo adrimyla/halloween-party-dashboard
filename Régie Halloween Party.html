@@ -214,7 +214,9 @@ h2{font-family:var(--f-display);font-weight:400;font-size:1.35rem;letter-spacing
 .opt-h{font-size:.92rem}
 .opt-h .n{font-family:var(--f-code);color:var(--muted)}
 .say{margin:0;font-size:.98rem;line-height:1.5;padding:6px 10px;border-left:3px solid var(--lamp);background:rgba(243,177,74,.07);border-radius:0 6px 6px 0}
-.mj{margin:0;font-size:.8rem;color:var(--muted);font-style:italic}
+/* Notes du MJ : bande violette avec l'étiquette « MJ », à part du texte à lire (orange) et du résultat (vert). */
+.mj{margin:0;font-size:.88rem;line-height:1.45;color:var(--ink);padding:6px 10px;border-left:3px solid var(--fog);background:var(--fog-soft);border-radius:0 6px 6px 0}
+.mj::before{content:"MJ";font-size:.66rem;font-weight:700;letter-spacing:.1em;color:var(--fog);margin-right:8px}
 .txt{margin:0;font-size:.9rem}
 .li{margin:0;font-size:.9rem;padding-left:14px;position:relative}
 .li::before{content:"•";position:absolute;left:2px;color:var(--muted)}
