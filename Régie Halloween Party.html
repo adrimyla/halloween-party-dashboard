@@ -87,10 +87,34 @@ h2{font-family:var(--f-display);font-weight:400;font-size:1.35rem;letter-spacing
 }
 
 /* ---------- Grille ---------- */
-.grid{display:grid;gap:16px;margin-top:16px;grid-template-columns:minmax(0,1fr)}
-@media (min-width:760px){.grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
-@media (min-width:1180px){.grid{grid-template-columns:minmax(0,.9fr) minmax(0,1.25fr) minmax(0,1fr)}}
-.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.stack{display:flex;flex-direction:column;gap:16px;margin-top:16px;min-width:0}
+/* Le jour, les actions de la pièce passent avant le panneau de phase ; la nuit, l'inverse. */
+.stack.day #room,.stack.night #phase{order:1}
+.stack.day #phase,.stack.night #room{order:2}
+.stack .fold{order:3}
+.stack #journal{order:4}
+.fold summary{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;cursor:pointer;list-style:none}
+.fold summary::-webkit-details-marker{display:none}
+.fold summary h2::before{content:"▸ ";color:var(--muted);font-family:var(--f-body);font-size:.9rem}
+.fold details[open] summary h2::before{content:"▾ "}
+.fold-body{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.go-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.go{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:5px 9px;font-size:.84rem;text-align:left}
+.go:hover{border-color:var(--muted)}
+.go b{font-family:var(--f-code);font-size:.78rem;margin-right:3px}
+.go small{font-family:var(--f-code);font-size:.7rem;color:var(--muted);margin-left:4px}
+.go.locked small{color:var(--warn)}
+.go.on{border-color:var(--fog);background:var(--fog-soft)}
+
+/* ---------- Livret à droite ----------
+   À partir de 900px, le livret reste ouvert à côté de la régie ; en dessous, il s'ouvre par-dessus. */
+@media (min-width:900px){
+  body{padding:0;height:100vh;overflow:hidden}
+  .app{display:grid;grid-template-columns:clamp(380px,42vw,560px) minmax(0,1fr);height:100vh}
+  .regie{overflow:auto;min-width:0;padding:0 max(16px, env(safe-area-inset-left, 0px)) 40px}
+  .book{position:static;width:auto;height:100vh;box-shadow:none}
+  .book-toggle,.book-close{display:none}
+}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
 .panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
 
@@ -176,6 +200,9 @@ h2{font-family:var(--f-display);font-weight:400;font-size:1.35rem;letter-spacing
 .book-top{padding:calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px;background:var(--panel)}
 .book-top .row{align-items:center}
 .book-src{font-size:.78rem;color:var(--muted)}
+.book-set{display:flex;flex-direction:column;gap:8px}
+.book-set summary{font-size:.78rem;color:var(--muted);cursor:pointer}
+.book-set[open] summary{margin-bottom:8px}
 .book-link input{
   flex:1 1 14em;min-width:0;background:var(--panel-2);color:var(--ink);
   border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:.85rem;
@@ -201,6 +228,8 @@ h2{font-family:var(--f-display);font-weight:400;font-size:1.35rem;letter-spacing
 .txt{margin:0;font-size:.9rem}
 .li{margin:0;font-size:.9rem;padding-left:14px;position:relative}
 .li::before{content:"•";position:absolute;left:2px;color:var(--muted)}
+.res{display:flex;gap:4px 10px;align-items:baseline;flex-wrap:wrap;padding:7px 10px;border:1px solid var(--ok);border-radius:8px;background:var(--ok-soft);font-size:.92rem}
+.res-l{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ok)}
 mark.todo{background:var(--warn-soft);color:var(--warn);border:1px dashed var(--warn);border-radius:4px;padding:0 3px;font-style:normal}
 .chip{font-family:var(--f-code);font-size:.74rem;font-weight:700;padding:2px 6px;border-radius:5px;background:var(--panel-2);border:1px solid var(--line)}
 .chip.lamp{border-color:var(--lamp);color:var(--lamp)}
@@ -281,6 +310,8 @@ mark.todo{background:var(--warn-soft);color:var(--warn);border:1px dashed var(--
 }
 </style>
 
+<div class="app">
+<div class="regie" id="regie">
 <header class="top" id="top">
   <div class="brand">
     <span class="eyebrow">Halloween Party</span>
@@ -288,7 +319,7 @@ mark.todo{background:var(--warn-soft);color:var(--warn);border:1px dashed var(--
   </div>
   <nav class="rail" id="rail" aria-label="Phases de la partie"></nav>
   <div class="tools">
-    <button class="btn lamp" data-act="bookOpen" title="Ouvrir le livret des scripts">📖 Livret</button>
+    <button class="btn lamp book-toggle" data-act="bookOpen" title="Ouvrir le livret des scripts">📖 Livret</button>
     <button class="btn" id="undo" data-act="undo" title="Annuler la dernière action">Annuler</button>
     <button class="btn ghost" data-act="askReset">Nouvelle partie</button>
   </div>
@@ -299,38 +330,37 @@ mark.todo{background:var(--warn-soft);color:var(--warn);border:1px dashed var(--
   </div>
 </header>
 
-<main class="grid">
-  <div class="col">
-    <section class="panel" id="time"></section>
-    <section class="panel" id="phase"></section>
-  </div>
-  <div class="col">
-    <section class="panel" id="plan"></section>
-    <section class="panel" id="room"></section>
-  </div>
-  <div class="col">
-    <section class="panel" id="caps"></section>
-    <section class="panel" id="inquiry"></section>
-    <section class="panel" id="journal"></section>
-  </div>
+<!-- Une seule colonne ; l'ordre jour / nuit se fait en CSS. Manoir, capacités et enquête se replient. -->
+<main class="stack" id="stack">
+  <section class="panel" id="time"></section>
+  <section class="panel" id="phase"></section>
+  <section class="panel" id="room"></section>
+  <section class="panel fold"><details data-fold="plan"><summary id="plan-sum"></summary><div class="fold-body" id="plan"></div></details></section>
+  <section class="panel fold"><details data-fold="caps"><summary id="caps-sum"></summary><div class="fold-body" id="caps"></div></details></section>
+  <section class="panel fold"><details data-fold="inquiry"><summary id="inquiry-sum"></summary><div class="fold-body" id="inquiry"></div></details></section>
+  <section class="panel" id="journal"></section>
 </main>
+</div>
 <aside class="book" id="book" aria-label="Livret des scripts" hidden>
   <div class="book-top">
     <div class="row">
       <h2 style="flex:1">Le livret</h2>
-      <button class="btn sm" data-act="bookImport" title="Choisir le fichier Excel du livret">Importer l'Excel</button>
       <button class="btn sm" id="book-reload" data-act="bookReload" title="Relire la source du livret" hidden>Recharger</button>
-      <button class="btn ghost sm" data-act="bookClose" aria-label="Fermer le livret">Fermer ✕</button>
+      <button class="btn ghost sm book-close" data-act="bookClose" aria-label="Fermer le livret">Fermer ✕</button>
     </div>
-    <div class="row book-link">
-      <input id="book-url" type="url" inputmode="url" placeholder="Lien du Google Sheets publié" aria-label="Lien du Google Sheets publié">
-      <button class="btn sm" data-act="bookLink">Utiliser ce lien</button>
-    </div>
-    <span class="book-src" id="book-src"></span>
+    <details class="book-set">
+      <summary id="book-src"></summary>
+      <div class="row book-link">
+        <input id="book-url" type="url" inputmode="url" placeholder="Lien du Google Sheets publié" aria-label="Lien du Google Sheets publié">
+        <button class="btn sm" data-act="bookLink">Utiliser ce lien</button>
+      </div>
+      <div class="row"><button class="btn sm" data-act="bookImport" title="Choisir le fichier Excel du livret">Importer un fichier Excel</button></div>
+    </details>
     <nav class="book-toc" id="book-toc" aria-label="Sommaire"></nav>
   </div>
   <div class="book-body" id="book-body"></div>
 </aside>
+</div>
 <input type="file" id="book-file" accept=".xlsx,.xls,.xlsm" hidden>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
@@ -820,7 +850,9 @@ function natCmp(a, b){
   }
   return x.length-y.length;
 }
-const TYPES = {lire:"say", mj:"mj", note:"mj", puce:"li", action:"action"};
+const TYPES = {lire:"say", mj:"mj", note:"mj", puce:"li", action:"action", resultat:"res"};
+/* « Résultat : … » en tête du texte vaut le type Résultat, quel que soit le type choisi. */
+const RES_PREFIX = /^\**\s*r[ée]sultat\s*:\s*\**\s*/i;
 /* Lignes [code, titre, type, texte, coût] → scripts triés. Un code vide reprend celui du dessus. */
 function buildBook(rows){
   const m=new Map(); let last="";
@@ -829,7 +861,10 @@ function buildBook(rows){
     if(!m.has(code)) m.set(code, {code, title:"", rows:[]});
     const s=m.get(code), text=String(x??"").trim();
     if(t && !s.title) s.title=String(t).trim();
-    if(text) s.rows.push({type:TYPES[norm(ty).split(/\s/)[0]] || "txt", text, cost:String(cost??"").trim()});
+    if(!text) continue;
+    const row={type:TYPES[norm(ty).split(/\s/)[0]] || "txt", text, cost:String(cost??"").trim()};
+    if(RES_PREFIX.test(text)){ row.type="res"; row.text=text.replace(RES_PREFIX, ""); }
+    s.rows.push(row);
   }
   return new Map([...m.entries()].sort((a,b)=>natCmp(a[0],b[0])));
 }
@@ -949,7 +984,8 @@ async function reloadExcel(){
 /* Lu / pas lu : hors de l'historique d'annulation, effacé par « Nouvelle partie ». */
 function setRead(code, on){ if(on) S.read[code]=true; else delete S.read[code]; save(); render(); }
 function openScript(code){
-  ui.book=true; ui.from=code; render();
+  if(!dock.matches) ui.book=true;
+  ui.from=code; render();
   const el=$(`sc-${code}`); if(el) el.scrollIntoView({block:"start"});
 }
 function readBtn(code, label){
@@ -1072,7 +1108,7 @@ const handlers = {
   bookGo(d){ ui.from=d.c; render(); const el=$(`sc-${d.c}`); if(el) el.scrollIntoView({block:"start"}); },
   bookRead(d){
     const c=d.c, on=!S.read[c];
-    if(on && ui.from===c){ ui.book=false; ui.from=null; }
+    if(on && ui.from===c){ ui.from=null; if(!dock.matches) ui.book=false; }
     setRead(c, on);
   },
   bookImport(){ pickExcel(); },
@@ -1113,7 +1149,7 @@ $("book-file").addEventListener("change", e=>{
   e.target.value="";
 });
 document.addEventListener("keydown", e=>{
-  if(e.key==="Escape" && ui.book){ handlers.bookClose(); return; }
+  if(e.key==="Escape" && ui.book && !dock.matches){ handlers.bookClose(); return; }
   if((e.ctrlKey||e.metaKey) && e.key==="z" && !e.target.matches("input")){ e.preventDefault(); handlers.undo(); }
 });
 
@@ -1148,7 +1184,25 @@ function pauseChrono(){ clearInterval(chrono.timer); chrono.running=false; paint
 function stopChrono(resetTime){ clearInterval(chrono.timer); chrono.running=false; if(resetTime) chrono.left=chrono.dur; paintChrono(); }
 
 /* ================= Rendu ================= */
+/* Livret ouvert en permanence à droite sur les écrans larges (même seuil que le CSS). */
+const dock = matchMedia("(min-width:900px)");
+let renderedDock = null;   // mode du dernier affichage du livret
+addEventListener("resize", ()=>{ if(dock.matches!==renderedDock) render(); });
+/* Manoir, capacités, enquête : dépliés ou repliés, retenu dans ce navigateur. */
+const FOLD_KEY = "regie-halloween-plis";
+try{
+  const folds=JSON.parse(localStorage.getItem(FOLD_KEY)) || {};
+  document.querySelectorAll("details[data-fold]").forEach(d=>{ d.open=!!folds[d.dataset.fold]; });
+}catch(e){}
+document.addEventListener("toggle", e=>{
+  if(!e.target.matches || !e.target.matches("details[data-fold]")) return;
+  const folds={};
+  document.querySelectorAll("details[data-fold]").forEach(d=>{ folds[d.dataset.fold]=d.open; });
+  try{ localStorage.setItem(FOLD_KEY, JSON.stringify(folds)); }catch(err){}
+}, true);
+
 function render(){
+  $("stack").className = `stack ${isDay()?"day":"night"}`;
   renderRail(); renderTime(); renderPhase(); renderPlan(); renderRoom(); renderCaps(); renderInquiry(); renderJournal(); renderBook();
   $("undo").disabled=!hist.length;
   paintChrono();
@@ -1224,20 +1278,23 @@ function scriptCard(s){
       inOpt=true; n++;
       const cls=/gratuit/i.test(r.cost) ? "free" : /capacit/i.test(r.cost) ? "capa" : "";
       body+=`<div class="opt"><div class="opt-h"><span class="n">${n}.</span> <b>${fmt(r.text)}</b>${r.cost?` <span class="cost ${cls}">${esc(r.cost)}</span>`:""}</div>`;
-    } else body+=`<p class="${r.type}">${fmt(r.text)}</p>`;
+    } else if(r.type==="res") body+=`<div class="res"><span class="res-l">Résultat</span><span>${fmt(r.text)}</span></div>`;
+    else body+=`<p class="${r.type}">${fmt(r.text)}</p>`;
   }
   if(inOpt) body+="</div>";
   return `<article class="script ${read?"read":""} ${from?"flash":""}" id="sc-${esc(s.code)}">
     <div class="script-h">
       <span class="chip lamp">${esc(s.code)}</span><h3>${fmt(s.title||s.code)}</h3>
-      <button class="btn sm ${read?"ghost":from?"lamp":""}" data-act="bookRead" data-c="${esc(s.code)}" aria-pressed="${read}">${read?"Lu ✓":from?"Lu, retour à la régie":"Marquer lu"}</button>
+      <button class="btn sm ${read?"ghost":from?"lamp":""}" data-act="bookRead" data-c="${esc(s.code)}" aria-pressed="${read}">${read?"Lu ✓":from&&!dock.matches?"Lu, retour à la régie":"Marquer lu"}</button>
     </div>
     ${body}
   </article>`;
 }
 function renderBook(){
-  $("book").hidden=!ui.book;
-  if(!ui.book) return;
+  renderedDock=dock.matches;
+  const shown=dock.matches || ui.book;
+  $("book").hidden=!shown;
+  if(!shown) return;
   const link=getLink(), when=bookSrc.at && new Date(bookSrc.at).toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"});
   $("book-src").textContent =
       link && ui.offline ? `Google Sheets injoignable : ${when?`dernière version chargée le ${when}`:"livret intégré affiché"}.`
@@ -1312,9 +1369,10 @@ function renderPhase(){
       <div class="row"><button class="btn lamp" data-act="next">Le jour se lève : Jour 2</button></div>`;
   } else if(p.id==="n3"){
     const pl=S.liane.placed;
-    let res=`<div class="alert night"><b>« Où tendez-vous la liane ? »</b><span>Touchez la pièce choisie sur le plan.</span>${S.liane.found?"":`<span class="muted">Attention : le journal dit que le groupe n'a pas encore la liane.</span>`}</div>`;
+    let res=`<div class="alert night"><b>« Où tendez-vous la liane ? »</b><span>Touchez la pièce choisie.</span>${S.liane.found?"":`<span class="muted">Attention : le journal dit que le groupe n'a pas encore la liane.</span>`}</div>`;
     if(pl==="E") res=`<div class="alert"><b>Bon endroit : la Chambre.</b><span>L'Ombre sort du conduit et trébuche dans la liane : capturée directement.</span></div>`;
     else if(pl) res=`<div class="alert warn"><b>Mauvais endroit : ${ROOMS[pl].name}.</b><span>Elle enjambe la liane si elle la croise et trouve le groupe. Course-poursuite, puis les joueurs l'attirent vers la liane : capturée.</span></div>`;
+    res+=`<div class="go-row">${roomChips()}</div>`;
     const after = pl==="E" ? ["N3-2A"] : pl ? ["N3-2B", chronoBlock("n3"), "N3-3B"] : [];
     body = `<div class="panel-head"><h2>Nuit 3 : le piège</h2><span class="eyebrow">Le final</span></div>
       ${res}${scriptList(["N3-1", ...after])}
@@ -1333,6 +1391,17 @@ function renderPhase(){
   el.innerHTML=body;
 }
 
+/* Les pièces en boutons courts : se déplacer (le jour) ou tendre la liane (nuit 3) sans déplier le manoir. */
+function roomChips(){
+  const n3=P().id==="n3";
+  return Object.keys(ROOMS).filter(r=>n3 || r!==S.room).map(r=>{
+    let meta="", cls="";
+    if(n3){ if(S.liane.placed===r){ meta="liane ici"; cls="on"; } }
+    else if(!accessible(r)){ meta="fermée"; cls="locked"; }
+    else { const c=cost(S.room,r); meta = c===0 || S.joker==="move" ? "gratuit" : `${c} cran${c>1?"s":""}`; }
+    return `<button class="go ${cls}" data-act="room" data-r="${r}"><b>${r}</b>${ROOMS[r].name}${meta?`<small>${meta}</small>`:""}</button>`;
+  }).join("");
+}
 function renderPlan(){
   const el=$("plan"), n3=P().id==="n3", day=isDay();
   const tile=(r)=>{
@@ -1355,8 +1424,8 @@ function renderPlan(){
   };
   const moveCap = capOk("elegante") && !S.joker
     ? `<div class="act cap"><span class="t"><span class="by">${esc(who("elegante"))}</span>Le prochain déplacement est gratuit</span><span class="btns"><button class="btn fog sm" data-act="cap" data-k="elegante" data-o="move">Un jeu d'enfant !</button></span></div>` : "";
+  $("plan-sum").innerHTML = `<h2>Le manoir</h2><span class="eyebrow">${n3 ? (S.liane.placed?`Liane : ${ROOMS[S.liane.placed].name}`:"Où tendre la liane ?") : day ? `Groupe : ${ROOMS[S.room].name}` : "Déplacements le jour seulement"}</span>`;
   el.innerHTML = `
-    <div class="panel-head"><h2>Le manoir</h2><span class="eyebrow">${n3?"Où tendre la liane ?":day?"Toucher une pièce pour s'y rendre":"Déplacements le jour seulement"}</span></div>
     ${moveCap}
     <div class="plan" role="group" aria-label="Plan du manoir">
       <span class="lvl">Étage 1</span>
@@ -1430,6 +1499,7 @@ function renderRoom(){
   }).join("");
   el.innerHTML = `
     <div class="panel-head"><h2>${ROOMS[r].name}</h2>${readBtn(r, `Entrée ${r}`)}</div>
+    <div class="go-row"><span class="eyebrow">Aller vers</span>${roomChips()}</div>
     ${roomCaps.length?`<div class="room-caps">${roomCaps.join("")}</div>`:""}
     <span class="muted" style="font-size:.8rem">Seules les actions qui comptent sont listées. 📖 ouvre le script de l'élément dans le livret.</span>
     <div class="elements">${els}</div>`;
@@ -1475,8 +1545,8 @@ function renderCaps(){
     </div>`;
   }).join("");
   const left=CAPS.filter(c=>!S.caps[c.k].used).length;
+  $("caps-sum").innerHTML = `<h2>Capacités</h2><span class="eyebrow">${left} sur 6 disponibles</span>`;
   $("caps").innerHTML = `
-    <div class="panel-head"><h2>Capacités</h2><span class="eyebrow">${left} sur 6 disponibles</span></div>
     <span class="muted" style="font-size:.8rem">Une seule fois dans toute la partie, pendant une journée, sans coût en temps.</span>
     <div class="caps">${cards}</div>`;
 }
@@ -1497,8 +1567,9 @@ function renderInquiry(){
   }).join("");
   const all = [1,2,3].every(n=>S.facts[n].length || (n===1 && S.hints1.length));
   const lianeTxt = S.liane.found==="D1" ? "Trouvée (D1, les Habitants)" : S.liane.found==="Habitants" ? "Apportée à « Dernière chance ! »" : "Pas encore";
+  const found=[1,2,3].filter(n=>S.facts[n].length).length;
+  $("inquiry-sum").innerHTML = `<h2>L'enquête</h2><span class="eyebrow">${found} fait${found>1?"s":""} sur 3 · liane ${S.liane.found?"trouvée":"pas encore"}</span>`;
   $("inquiry").innerHTML = `
-    <div class="panel-head"><h2>L'enquête</h2><span class="eyebrow">Ce que savent les joueurs</span></div>
     <div class="facts">${facts}</div>
     ${all?`<div class="alert"><b>Les joueurs ont de quoi déduire la Chambre.</b><span class="muted">Fait 1, puis 2, puis 3 : il ne reste que la Chambre.</span></div>`:""}
     ${S.loupe&&S.loupe.room==="E"?`<span class="chip fog" style="align-self:flex-start">Bonus : la loupe confirme la Chambre</span>`:""}
