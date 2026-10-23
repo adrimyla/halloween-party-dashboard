@@ -105,16 +105,6 @@ h2{font-family:var(--f-display);font-weight:400;font-size:1.35rem;letter-spacing
 .go small{font-family:var(--f-code);font-size:.7rem;color:var(--muted);margin-left:4px}
 .go.locked small{color:var(--warn)}
 .go.on{border-color:var(--fog);background:var(--fog-soft)}
-
-/* ---------- Livret à droite ----------
-   À partir de 900px, le livret reste ouvert à côté de la régie ; en dessous, il s'ouvre par-dessus. */
-@media (min-width:900px){
-  body{padding:0;height:100vh;overflow:hidden}
-  .app{display:grid;grid-template-columns:clamp(380px,42vw,560px) minmax(0,1fr);height:100vh}
-  .regie{overflow:auto;min-width:0;padding:0 max(16px, env(safe-area-inset-left, 0px)) 40px}
-  .book{position:static;width:auto;height:100vh;box-shadow:none}
-  .book-toggle,.book-close{display:none}
-}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
 .panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
 
@@ -208,9 +198,9 @@ h2{font-family:var(--f-display);font-weight:400;font-size:1.35rem;letter-spacing
   border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:.85rem;
 }
 .book-link input::placeholder{color:var(--muted)}
-.book-toc{display:flex;flex-direction:column;gap:4px;max-height:28vh;overflow:auto}
-.book-toc div{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
-.book-toc span{font-size:.72rem;color:var(--muted);min-width:7.5em}
+.book-toc{display:flex;flex-wrap:wrap;gap:5px 16px;max-height:22vh;overflow:auto}
+.book-toc div{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+.book-toc span{font-size:.7rem;color:var(--muted);margin-right:3px}
 .book-toc button{font-family:var(--f-code);font-size:.72rem;font-weight:700;padding:2px 6px;border-radius:5px;background:var(--panel-2);border:1px solid var(--line)}
 .book-toc button.read{opacity:.45}
 .book-body{flex:1;overflow:auto;padding:12px 16px calc(40px + env(safe-area-inset-bottom, 0px));display:flex;flex-direction:column;gap:14px}
@@ -307,6 +297,17 @@ mark.todo{background:var(--warn-soft);color:var(--warn);border:1px dashed var(--
 @media (prefers-reduced-motion:no-preference){
   .tok{transition:background .3s, box-shadow .3s}
   .tile{transition:border-color .15s, background .2s}
+}
+
+/* ---------- Livret à droite ----------
+   À partir de 900px, le livret reste ouvert à côté de la régie et prend toute la largeur restante ;
+   en dessous, il s'ouvre par-dessus. Placé en dernier pour l'emporter sur les règles du volet. */
+@media (min-width:900px){
+  body{padding:0;height:100vh;overflow:hidden}
+  .app{display:grid;grid-template-columns:clamp(380px,42vw,560px) minmax(0,1fr);height:100vh}
+  .regie{overflow:auto;min-width:0;padding:0 max(16px, env(safe-area-inset-left, 0px)) 40px}
+  .book{position:static;width:auto;height:100vh;box-shadow:none}
+  .book-toggle,.book-close{display:none}
 }
 </style>
 
@@ -1219,15 +1220,10 @@ function renderTime(){
   const p=P(), el=$("time");
   if(!p.crans){
     const nextDay = PHASES.slice(S.phase).find(x=>x.crans);
+    // La nuit, le sablier se réduit à une ligne pour laisser la place aux scènes.
     el.innerHTML = `
-      <div class="panel-head"><h2>Le sablier</h2><span class="eyebrow">${p.label}</span></div>
-      <div class="glass-wrap">
-        ${glass(0, nextDay?nextDay.crans:0, true)}
-        <div class="count"><span class="eyebrow">Sablier au repos</span>
-          <span class="muted">${nextDay?`${nextDay.label} : ${nextDay.crans} crans`:"La partie est presque finie."}</span>
-        </div>
-      </div>
-      <div class="alert night"><b>Pas de sablier la nuit.</b><span class="muted">Les capacités ne s'utilisent que le jour.</span></div>`;
+      <div class="panel-head"><h2>Le sablier</h2><span class="eyebrow">${p.label} · au repos</span></div>
+      <span class="muted" style="font-size:.85rem">${nextDay?`Prochain jour : ${nextDay.label}, ${nextDay.crans} crans.`:"La partie est presque finie."} Pas de sablier la nuit, et les capacités ne s'utilisent que le jour.</span>`;
     return;
   }
   const max=p.crans, c=S.crans;
