@@ -210,9 +210,20 @@ h2{font-family:var(--f-display);font-weight:400;font-size:1.35rem;letter-spacing
 .script.flash{border-color:var(--lamp);box-shadow:0 0 0 2px var(--lamp-soft)}
 .script-h{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .script-h h3{font-family:var(--f-display);font-weight:400;font-size:1.15rem;flex:1;min-width:10em}
-.opt{display:flex;flex-direction:column;gap:5px;padding-left:12px;border-left:2px solid var(--line)}
-.opt-h{font-size:.92rem}
+/* Une action du livret = un menu déroulant : on ouvre celle que les joueurs choisissent. */
+details.opt{padding-left:12px;border-left:2px solid var(--line)}
+details.opt[open]{border-left-color:var(--lamp)}
+.opt-h{font-size:.92rem;cursor:pointer;list-style:none;display:flex;gap:6px;align-items:baseline;flex-wrap:wrap;padding:4px 0}
+.opt-h::-webkit-details-marker{display:none}
+.opt-h::before{content:"▸";color:var(--muted);width:.8em}
+details.opt[open]>.opt-h::before{content:"▾"}
+.opt-h:hover b{text-decoration:underline;text-decoration-color:var(--line)}
 .opt-h .n{font-family:var(--f-code);color:var(--muted)}
+.opt-body{display:flex;flex-direction:column;gap:5px;margin:2px 0 8px}
+.opt-btns{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding-top:2px}
+.opt-btns .muted{font-size:.8rem}
+.opt-rest{display:flex;flex-direction:column;gap:6px;border-top:1px dashed var(--line);padding-top:8px}
+.opt-rest .row{align-items:center;font-size:.88rem}
 .say{margin:0;font-size:.98rem;line-height:1.5;padding:6px 10px;border-left:3px solid var(--lamp);background:rgba(243,177,74,.07);border-radius:0 6px 6px 0}
 /* Notes du MJ : bande violette avec l'étiquette « MJ », à part du texte à lire (orange) et du résultat (vert). */
 .mj{margin:0;font-size:.88rem;line-height:1.45;color:var(--ink);padding:6px 10px;border-left:3px solid var(--fog);background:var(--fog-soft);border-radius:0 6px 6px 0}
@@ -394,10 +405,10 @@ const ADJ = {A:["B","C","D","E","H"], B:["A","F"], C:["A"], D:["A"], E:["A"], F:
 
 const ELEMENTS = {
   A:[["A1","Le jardinier"],["A2","La porte de la cave"],["A3","La cheminée et le portrait"]],
-  B:[["B1","Z1 et le rideau"],["B2","L'horloge"],["B3","La télé"],["B4","La porte de la cuisine"]],
-  C:[["C1","Z2 et le grimoire"],["C2","Le Scrabble"],["C3","Le journal"],["C4","La cheminée"]],
+  B:[["B1","Pazu et le rideau"],["B2","L'horloge"],["B3","La télé"],["B4","La porte de la cuisine"]],
+  C:[["C1","Amaya et le grimoire"],["C2","Le Scrabble"],["C3","Le journal"],["C4","La cheminée"]],
   D:[["D1","Les feuilles qui bougent"],["D2","L'établi"],["D3","La plante carnivore"]],
-  E:[["E1","Le tourne-disque"],["E2","La cheminée"],["E3","Le placard de Z3"]],
+  E:[["E1","Le tourne-disque"],["E2","La cheminée"],["E3","Le placard de Nolad"]],
   F:[["F1","Le garde-manger"],["F2","Le repas abandonné"]],
   H:[["H1","Le plan technique"],["H2","Le tableau électrique"],["H3","La porte du Laboratoire"]]
 };
@@ -424,7 +435,7 @@ const ACTIONS = [
   {id:"d3f", el:"D3", t:"Fouiller son pot", cost:1, r:"Rien (mouche morte)", sniff:BAILLE},
   {id:"e1r", el:"E1", t:"Retourner les pochettes une par une", cost:1, r:"Rien", sniff:BAILLE},
   {id:"e2e", el:"E2", t:"Examiner la cheminée", cost:1, r:"Fait 3 : trace en arc au sol", sniff:REMUE, fact:[3,"E2"], hint:"E2"},
-  {id:"e3f", el:"E3", t:"Fouiller derrière Z3", cost:1, r:"Rien", sniff:"il s'excite (pour Z3, pas pour un indice)"},
+  {id:"e3f", el:"E3", t:"Fouiller derrière Nolad", cost:1, r:"Rien", sniff:"il s'excite (pour Nolad, pas pour un indice)"},
   {id:"f1t", el:"F1", t:"Prendre la boîte de biscuits", cost:0, r:"Sammy récupère sa capacité", box:true},
   {id:"f1b", el:"F1", t:"Fouiller derrière les bocaux", cost:1, r:"Rien", sniff:BAILLE},
   {id:"f2s", el:"F2", t:"Soulever l'assiette", cost:1, r:"Rien (gag)", sniff:BAILLE},
@@ -436,7 +447,7 @@ const CAPS = [
   {k:"meneur", role:"Fred", q:"« Les gars, j'ai un plan ! »", rule:"Rend son usage à la capacité déjà utilisée d'un autre joueur (pas la sienne)."},
   {k:"elegante", role:"Daphné", q:"« Un jeu d'enfant ! »", rule:"Au choix : un déplacement gratuit, ou une action payante gratuite."},
   {k:"enquetrice", role:"Véra", q:"« Œil de lynx »", rule:"Sur la pièce où se trouve le groupe. Utile dans la Chambre et la Bibliothèque."},
-  {k:"gourmand", role:"Sammy", q:"« Donner un biscuit »", rule:"À Z1 (Salon) : pièce cachée. À Z2 (Bibliothèque) : le grimoire. Rechargeable avec la boîte de la Cuisine."},
+  {k:"gourmand", role:"Sammy", q:"« Donner un biscuit »", rule:"À Pazu (Salon) : pièce cachée. À Amaya (Bibliothèque) : le grimoire. Rechargeable avec la boîte de la Cuisine."},
   {k:"flaireur", role:"Scooby", q:"« Renifler »", rule:"Avant une action payante : bouton « Renifler » sur l'action, dans la pièce."},
   {k:"costaud", role:"Scrappy", q:"« En force ! »", rule:"Force une porte fermée à clé : la Cuisine (depuis le Salon) ou la cave (depuis le Hall)."}
 ];
@@ -487,7 +498,7 @@ const BOOK_DEFAULT = [
   ["A2","","Lire","\"On va dire que ça va\" dit Fred, \"Descendons ! \". Le groupe s'aventure dans les escaliers.",""],
   ["A2","","MJ","Aller au script H",""],
   ["A2","","Action","Utiliser le double de la clé","objet : double des clés"],
-  ["A2","","Lire","Vera insère la clé dans la serrure et la tourne lentement. La serrure resiste un peu puis... CLAC ! La porte s'ouvre. Le groupe découvre alors un escalier qui descend dans le noir.",""],
+  ["A2","","Lire","Véra insère la clé dans la serrure et la tourne lentement. La serrure resiste un peu puis... CLAC ! La porte s'ouvre. Le groupe découvre alors un escalier qui descend dans le noir.",""],
   ["A2","","MJ","Aller au script H",""],
   ["A3","La cheminée et le portrait","Lire","Une cheminée de pierre, l'âtre vide et propre. Au-dessus, un grand portrait : le maître des lieux, en habit de soirée, le visage caché derrière un masque. Sur le manteau, une plaque : [nom ou titre à compléter], et une pile de courrier.",""],
   ["A3","","MJ","Prépare la révélation finale.",""],
@@ -502,78 +513,78 @@ const BOOK_DEFAULT = [
   ["A3","","Action","Examiner la cheminée","1 cran"],
   ["A3","","Lire","Vous inspectez le sol devant l'âtre, puis le conduit. Rien : pas une trace, pas une rayure. C'est une cheminée tout à fait normale.",""],
   ["A3","","Texte","**Fait 3** (le Hall s'élimine quand on compare avec les deux autres cheminées).",""],
-  ["B","Salon : l'entrée","Lire","Le salon où vous avez dormi : des fauteuils usés, des couvertures en bataille. Z1 fixe un grand rideau de velours. Une horloge comtoise fait entendre son tic-tac. Dans un coin, une vieille télé grésille. Au fond, une porte fermée à clé mène à la cuisine.",""],
-  ["B1","Z1 et le rideau","Lire","Z1 est roulé en boule sur un fauteuil. Il ne dort que d'un œil : il fixe intensément le grand rideau de velours. Quand vous approchez, il vous regarde, regarde le rideau, puis vous regarde à nouveau.",""],
-  ["B1","","MJ","Z1 ne bouge pas tant qu'on ne lui donne rien. [Gag à compléter]",""],
+  ["B","Salon : l'entrée","Lire","Le salon où vous avez dormi : des fauteuils usés, des couvertures en bataille. Pazu fixe un grand rideau de velours. Une horloge comtoise fait entendre son tic-tac. Dans un coin, une vieille télé grésille. Au fond, une porte fermée à clé mène à la cuisine.",""],
+  ["B1","Pazu et le rideau","Lire","Pazu est roulé en boule sur un fauteuil. Il ne dort que d'un œil : il fixe intensément le grand rideau de velours. Quand vous approchez, il vous regarde, regarde le rideau, puis vous regarde à nouveau.",""],
+  ["B1","","MJ","Pazu ne bouge pas tant qu'on ne lui donne rien. [Gag à compléter]",""],
   ["B1","","Action","Le caresser","gratuit"],
   ["B1","","Lire","Il se laisse faire, sans quitter le rideau des yeux.",""],
   ["B1","","Action","Regarder le rideau","gratuit"],
-  ["B1","","Lire","Un lourd rideau de velours rouge. Z1 le fixe avec encore plus d'intensité.",""],
+  ["B1","","Lire","Un lourd rideau de velours rouge. Pazu le fixe avec encore plus d'intensité.",""],
   ["B1","","Action","Regarder le tapis","gratuit"],
   ["B1","","Lire","Sur le tapis, des traces de chaussures… à talons. Elles partent du canapé où vous dormiez et filent vers le Hall. Un fantôme… en talons ?",""],
   ["B1","","MJ","Ambiance : prépare le démasquage.",""],
-  ["B1","","Action","Lui donner un biscuit","capacité de Sammy"],
+  ["B1","","Action","Lui donner un Scooby-Snack","capacité de Sammy"],
   ["B1","","Texte","→ **B1b**, la pièce cachée.",""],
   ["B1","","Action","Fouiller autour du fauteuil","1 cran"],
   ["B1","","Texte","**Rien.**",""],
   ["B1","","Lire","Vous trouvez des poils. Beaucoup de poils.",""],
-  ["B1","","MJ","Derrière le rideau sans Z1, il n'y a qu'un mur : seul Z1 sait où se cache la porte.",""],
-  ["B1b","La pièce cachée","Lire","Z1 croque le biscuit, s'étire longuement, puis bondit sur le rideau et s'y accroche de toutes ses griffes. Le rideau s'effondre… et révèle une petite porte cachée. Derrière, un minuscule bureau poussiéreux. Sur la table, deux documents agrafés : un devis pour l'installation d'un monte-charge vertical dans les conduits de cheminée du manoir, et le bon de commande qui va avec : \"Mécanisme de monte-charge pour conduit de cheminée, quantité : 2.\" Dans un coin, une caisse de fumigènes violets.",""],
+  ["B1","","MJ","Derrière le rideau sans Pazu, il n'y a qu'un mur : seul Pazu sait où se cache la porte.",""],
+  ["B1b","La pièce cachée","Lire","Pazu croque le Scooby-Snack, s'étire longuement, puis bondit sur le rideau et s'y accroche de toutes ses griffes. Le rideau s'effondre… et révèle une petite porte cachée. Derrière, un minuscule bureau poussiéreux. Sur la table, deux documents agrafés : un devis pour l'installation d'un monte-charge vertical dans les conduits de cheminée du manoir, et le bon de commande qui va avec : \"Mécanisme de monte-charge pour conduit de cheminée, quantité : 2.\" Dans un coin, une caisse de fumigènes violets.",""],
   ["B1b","","Texte","**Fait 1 : l'Ombre passe par une cheminée.** La quantité (2 pour 3 cheminées) prépare le fait 3. Les fumigènes : ambiance faux fantôme.",""],
   ["B1b","","MJ","Entrer dans la pièce cachée ne coûte pas de cran. Le MJ pose sa tuile.",""],
   ["B2","L'horloge","Lire","Une grande horloge comtoise, bien plus vieille que le manoir. Son balancier oscille lentement. Les aiguilles avancent vers minuit…",""],
   ["B2","","MJ","Elle sonne à Dernière chance ! et les douze coups de minuit chaque nuit. [Lore ou clin d'œil à compléter]",""],
   ["B2","","Action","Avancer les aiguilles","gratuit"],
-  ["B2","","Lire","Vous essayez. Les aiguilles reviennent toutes seules à leur place. Z1 crache dans votre direction.",""],
+  ["B2","","Lire","Vous essayez. Les aiguilles reviennent toutes seules à leur place. Pazu crache dans votre direction.",""],
   ["B2","","Action","Ouvrir la porte du balancier","1 cran"],
   ["B2","","Texte","**Rien.**",""],
   ["B2","","Lire","Un coucou en jaillit et vous hurle dessus. Ce n'était même pas une horloge à coucou.",""],
   ["B3","La télé","Lire","Une vieille télé cathodique, allumée toute seule. Sur l'écran, de la neige… puis une image apparaît.",""],
   ["B3","","Action","Regarder la télé","gratuit"],
-  ["B3","","Texte","Le MJ montre sur la tablette l'extrait de V où C. et B. forment des mots au Scrabble, dont le mot secret.",""],
+  ["B3","","Texte","Le MJ montre sur la tablette l'extrait du *Cœur a ses raisons* où Croquette et Brett forment des mots au Scrabble, dont WQT.",""],
   ["B3","","MJ","C'est la clé de l'énigme du Scrabble (C2), mais rien ne le dit.",""],
   ["B3","","Action","Zapper","gratuit"],
   ["B3","","Lire","Toutes les chaînes diffusent la même émission. Inquiétant.",""],
   ["B3","","Action","Regarder derrière la télé","1 cran"],
   ["B3","","Texte","**Rien.**",""],
   ["B3","","Lire","Un nid de câbles et une télécommande sans piles.",""],
-  ["B4","La porte de la cuisine","Lire","Une porte en bois, fermée à clé. Une odeur sucrée de biscuits passe dessous. Par le trou de la serrure, vous apercevez des étagères et une boîte en fer.",""],
-  ["B4","","MJ","Scooby, devant cette porte : Ça sent les biscuits !",""],
+  ["B4","La porte de la cuisine","Lire","Une porte en bois, fermée à clé. Une odeur sucrée de Scooby-Snacks passe dessous. Par le trou de la serrure, vous apercevez des étagères et une boîte en fer.",""],
+  ["B4","","MJ","Scooby, devant cette porte : Ça sent les Scooby-Snacks !",""],
   ["B4","","Action","Frapper","gratuit"],
-  ["B4","","Lire","Pas de réponse. L'odeur de biscuits se fait plus forte. Scooby salive.",""],
+  ["B4","","Lire","Pas de réponse. L'odeur de Scooby-Snacks se fait plus forte. Scooby salive.",""],
   ["B4","","Action","Forcer la porte","capacité de Scrappy"],
-  ["B4","","Lire","Scrappy prend son élan : \"En force !\" La porte de la cuisine cède dans un grand fracas.",""],
+  ["B4","","Lire","Scrappy prend son élan : \"Puppy Power !\" La porte de la cuisine cède dans un grand fracas.",""],
   ["B4","","Texte","→ **F**, la Cuisine. C'est la seule façon d'y entrer.",""],
-  ["C","Bibliothèque : l'entrée","Lire","Des étagères de livres montent jusqu'au plafond. Sur la plus proche, des titres étranges : *La Créature augmentée*, *Transhumanisme pour les débutants*. Dans un coin, une grande cheminée de pierre, éteinte. Z2 trône sur un énorme grimoire. Au centre, une partie de Scrabble abandonnée sur une table. Et sur un pupitre, un journal relié de cuir.",""],
-  ["C1","Z2 et le grimoire","Lire","Z2 est installée sur le grimoire comme sur un trône. Quand vous tendez la main, elle vous fixe avec un mépris royal. Elle ne bougera pas.",""],
+  ["C","Bibliothèque : l'entrée","Lire","Des étagères de livres montent jusqu'au plafond. Sur la plus proche, des titres étranges : *La Créature augmentée*, *Transhumanisme pour les débutants*. Dans un coin, une grande cheminée de pierre, éteinte. Amaya trône sur un énorme grimoire. Au centre, une partie de Scrabble abandonnée sur une table. Et sur un pupitre, un journal relié de cuir.",""],
+  ["C1","Amaya et le grimoire","Lire","Amaya est installée sur le grimoire comme sur un trône. Quand vous tendez la main, elle vous fixe avec un mépris royal. Elle ne bougera pas.",""],
   ["C1","","MJ","[Gag ou clin d'œil à compléter]",""],
   ["C1","","Action","Essayer de la pousser","gratuit"],
   ["C1","","Lire","Elle feule. Vous reculez.",""],
   ["C1","","Action","Lire le titre du grimoire","gratuit"],
   ["C1","","Lire","Impossible, elle est couchée dessus. On devine juste un mot : \"…MÉCANISMES…\"",""],
-  ["C1","","Action","Lui donner un biscuit","capacité de Sammy"],
+  ["C1","","Action","Lui donner un Scooby-Snack","capacité de Sammy"],
   ["C1","","Texte","→ Le grimoire.",""],
-  ["C1b","Avec le biscuit","Lire","Z2 renifle le biscuit, le prend délicatement, puis descend du grimoire avec une lenteur calculée. Le grimoire s'intitule *Mécanismes et automates de salon*. Une page est cornée, annotée à la main : \"Les passages ne s'ouvrent qu'à minuit pile, quand l'horloge du salon sonne le douzième coup.\" [Lore à compléter]",""],
+  ["C1b","Avec le Scooby-Snack","Lire","Amaya renifle le Scooby-Snack, le prend délicatement, puis descend du grimoire avec une lenteur calculée. Le grimoire s'intitule *Mécanismes et automates de salon*. Une page est cornée, annotée à la main : \"Les passages ne s'ouvrent qu'à minuit pile, quand l'horloge du salon sonne le douzième coup.\" [Lore à compléter]",""],
   ["C1b","","Texte","**Lore : pourquoi l'Ombre sort à minuit pile.**",""],
-  ["C1b","","MJ","À confirmer : pour l'instant le biscuit sur Z2 ne donne que du lore.",""],
+  ["C1b","","MJ","À confirmer : pour l'instant le Scooby-Snack sur Amaya ne donne que du lore.",""],
   ["C2","Le Scrabble","Lire","Une partie de Scrabble abandonnée. Sous le plateau, un tiroir. Il est verrouillé.",""],
-  ["C2","","Texte","**L'énigme :** le groupe doit poser le mot secret sur le plateau. Le MJ demande simplement : Quel mot formez-vous ? (réponse à voix haute, gratuite, sans limite d'essais).",""],
-  ["C2","","MJ","La clé est à la télé du Salon (B3), mais rien ne l'indique : les joueurs doivent tomber dessus et faire le lien eux-mêmes. L'extrait de V montre plusieurs mots, dont le mot secret. Le groupe peut tâtonner, et M. saura lequel c'est.",""],
+  ["C2","","Texte","**L'énigme :** le groupe doit poser WQT sur le plateau. Le MJ demande simplement : Quel mot formez-vous ? (réponse à voix haute, gratuite, sans limite d'essais).",""],
+  ["C2","","MJ","La clé est à la télé du Salon (B3), mais rien ne l'indique : les joueurs doivent tomber dessus et faire le lien eux-mêmes. L'extrait du *Cœur a ses raisons* montre plusieurs mots, dont WQT. Le groupe peut tâtonner, et Mickaël saura lequel c'est.",""],
   ["C2","","Action","Former un mauvais mot","gratuit"],
   ["C2","","Lire","Vous posez les lettres. Le plateau grince. Rien d'autre.",""],
-  ["C2","","Action","Former le mot secret","gratuit"],
+  ["C2","","Action","Former WQT","gratuit"],
   ["C2","","Texte","→ **C2b**, le tiroir.",""],
-  ["C2b","Le tiroir","Lire","Dès que vous posez les lettres du mot secret sur le plateau, un mécanisme se déclenche et le tiroir s'ouvre avec un déclic. À l'intérieur, un plan roulé : le schéma d'un monte-charge. Une cabine monte à la verticale depuis une grande pièce du sous-sol, jusque dans les conduits des cheminées situées juste au-dessus. Dans un coin, une annotation soignée : \"À l'attention de Madame.\"",""],
+  ["C2b","Le tiroir","Lire","Dès que vous posez les lettres de WQT sur le plateau, un mécanisme se déclenche et le tiroir s'ouvre avec un déclic. À l'intérieur, un plan roulé : le schéma d'un monte-charge. Une cabine monte à la verticale depuis une grande pièce du sous-sol, jusque dans les conduits des cheminées situées juste au-dessus. Dans un coin, une annotation soignée : \"À l'attention de Madame.\"",""],
   ["C2b","","Texte","**Fait 3 :** seules les cheminées au-dessus du Laboratoire sont truquées. Avec le plan des étages, ça élimine le Hall.",""],
   ["C2b","","MJ","Madame prépare le démasquage (et fait écho aux traces de talons du Salon).",""],
   ["C3","Le journal","Lire","Un journal épais, rempli d'une écriture nerveuse. À côté, un catalogue glissé sous le pupitre.",""],
   ["C3","","Action","Lire le journal","gratuit"],
-  ["C3","","Texte","Une entrée parle des Habitants :",""],
-  ["C3","","Lire","Aujourd'hui, j'ai vu d'étranges créatures dans la serre, [description physique des Habitants]. Elles sont sorties quand j'ai arrosé les plantes.",""],
-  ["C3","","MJ","La clé pour faire sortir les Habitants et obtenir la liane.",""],
+  ["C3","","Texte","Une entrée parle des Sylvains :",""],
+  ["C3","","Lire","Aujourd'hui, j'ai vu d'étranges créatures dans la serre, [description physique des Sylvains]. Elles sont sorties quand j'ai arrosé les plantes.",""],
+  ["C3","","MJ","La clé pour faire sortir les Sylvains et obtenir la liane.",""],
   ["C3","","Action","Feuilleter le catalogue","gratuit"],
-  ["C3","","Texte","Un catalogue de prothèses articulées, une page cornée : *modèle G*.",""],
-  ["C3","","MJ","Ambiance : G et le transhumanisme.",""],
+  ["C3","","Texte","Un catalogue de prothèses articulées, une page cornée : *modèle Georges*.",""],
+  ["C3","","MJ","Ambiance : Georges et le transhumanisme.",""],
   ["C3","","Action","Fouiller le journal page par page","1 cran"],
   ["C3","","Lire","Vous remarquez une page coincée à la fin, presque déchirée : \"Le monte-charge de la bibliothèque est encore bloqué. Rappeler l'artisan.\"",""],
   ["C3","","Texte","**Fait 2 : la cheminée de la Bibliothèque est hors service.**",""],
@@ -588,8 +599,8 @@ const BOOK_DEFAULT = [
   ["D1","","Action","Secouer les plantes","gratuit"],
   ["D1","","Lire","Les rires s'arrêtent net. Vous avez vexé quelque chose.",""],
   ["D1","","Action","Arroser les plantes","1 cran"],
-  ["D1","","Texte","→ **D1b**, les Habitants.",""],
-  ["D1b","Les Habitants","Lire","Dès que l'eau touche les feuilles, trois petites créatures sortent timidement en s'ébrouant. [Lore et clins d'œil à compléter.] Pour vous remercier, elles vous tendent une longue liane, solide comme un câble. \"Ça pourra toujours vous servir !\"",""],
+  ["D1","","Texte","→ **D1b**, les Sylvains.",""],
+  ["D1b","Les Sylvains","Lire","Dès que l'eau touche les feuilles, trois petites créatures sortent timidement en s'ébrouant. [Lore et clins d'œil à compléter.] Pour vous remercier, elles vous tendent une longue liane, solide comme un câble. \"Ça pourra toujours vous servir !\"",""],
   ["D1b","","Texte","**Objet : la liane (le piège).** Le groupe prend le jeton liane.",""],
   ["D2","L'établi","Lire","Un vieil établi couvert de terre, de sachets de graines, d'outils rouillés, de vieux papiers et d'un arrosoir cabossé. On dirait que personne n'y a touché depuis des mois.",""],
   ["D2","","Action","Lire les sachets de graines","gratuit"],
@@ -611,7 +622,7 @@ const BOOK_DEFAULT = [
   ["E1","Le tourne-disque","Lire","Sur le tourne-disque, un vinyle sans pochette. Sur l'étiquette, quelqu'un a griffonné : *Ma playlist secrète*.",""],
   ["E1","","Action","Écouter le vinyle","gratuit"],
   ["E1","","Texte","Le MJ lance Finale de *Babylon* (Justin Hurwitz).",""],
-  ["E1","","MJ","Un moment de danse et de gag, en référence à SL. Pas d'énigme.",""],
+  ["E1","","MJ","Un moment de danse et de gag, en référence à Sans Logique. Pas d'énigme.",""],
   ["E1","","Action","Regarder les pochettes","gratuit"],
   ["E1","","Lire","Toutes les pochettes sont vides, sauf une, dédicacée : [dédicace absurde à compléter].",""],
   ["E1","","Action","Retourner les pochettes une par une","1 cran"],
@@ -623,26 +634,26 @@ const BOOK_DEFAULT = [
   ["E2","","Action","Examiner la cheminée","1 cran"],
   ["E2","","Lire","Sur le sol devant l'âtre, une longue trace en arc de cercle, comme si un pan de la cheminée pivotait.",""],
   ["E2","","Texte","**Fait 3** (même résultat que dans la Bibliothèque : volontairement, rien ne désigne la Chambre).",""],
-  ["E3","Le placard de Z3","MJ","Son : respiration bruyante qui s'intensifie.",""],
-  ["E3","","Lire","La respiration devient de plus en plus forte à mesure que vous approchez. Vous ouvrez la porte d'un coup… Z3 est assise sur une pile de linge. Elle respire très fort et vous fixe sans cligner des yeux.",""],
-  ["E3","","MJ","Z3 ne bouge pas, quoi qu'on fasse. [Gags ou répliques à compléter]",""],
+  ["E3","Le placard de Nolad","MJ","Son : respiration bruyante qui s'intensifie.",""],
+  ["E3","","Lire","La respiration devient de plus en plus forte à mesure que vous approchez. Vous ouvrez la porte d'un coup… Nolad est assise sur une pile de linge. Elle respire très fort et vous fixe sans cligner des yeux.",""],
+  ["E3","","MJ","Nolad ne bouge pas, quoi qu'on fasse. [Gags ou répliques à compléter]",""],
   ["E3","","Action","Lui parler","gratuit"],
   ["E3","","Lire","Vous lui posez une question. Elle respire plus fort. Vous prenez ça pour un non.",""],
   ["E3","","Action","Regarder la pile de linge","gratuit"],
-  ["E3","","Lire","Sous Z3, au milieu des draps, dépassent des morceaux de tissu noir et violet, découpés grossièrement… comme pour coudre une cape.",""],
+  ["E3","","Lire","Sous Nolad, au milieu des draps, dépassent des morceaux de tissu noir et violet, découpés grossièrement… comme pour coudre une cape.",""],
   ["E3","","MJ","Ambiance : prépare le démasquage.",""],
   ["E3","","Action","Refermer doucement la porte","gratuit"],
   ["E3","","Lire","La respiration continue derrière la porte. Vous n'êtes pas rassurés.",""],
-  ["E3","","Action","Fouiller derrière Z3","1 cran"],
+  ["E3","","Action","Fouiller derrière Nolad","1 cran"],
   ["E3","","Texte","**Rien.**",""],
-  ["E3","","Lire","Vous essayez de fouiller derrière Z3. Elle vous regarde. Vous abandonnez.",""],
+  ["E3","","Lire","Vous essayez de fouiller derrière Nolad. Elle vous regarde. Vous abandonnez.",""],
   ["F","Cuisine : l'entrée","Lire","Une cuisine à l'abandon. Des casseroles pendent au plafond. Au fond, la porte entrouverte d'un garde-manger. Sur la table, les restes d'un repas à moitié mangé.",""],
-  ["F1","Le garde-manger","Lire","Des étagères de bocaux poussiéreux. Tout en haut, une boîte en fer avec une étiquette : *Biscuits*. En bas, un gros sac de granulés : *Croquettes premium pour G*.",""],
-  ["F1","","Action","Prendre la boîte de biscuits","gratuit"],
-  ["F1","","Texte","Sammy retourne sa carte capacité face visible. Il peut à nouveau donner un biscuit.",""],
+  ["F1","Le garde-manger","Lire","Des étagères de bocaux poussiéreux. Tout en haut, une boîte en fer avec une étiquette : *Scooby-Snacks*. En bas, un gros sac de granulés : *Croquettes premium pour Georges*.",""],
+  ["F1","","Action","Prendre la boîte de Scooby-Snacks","gratuit"],
+  ["F1","","Texte","Sammy retourne sa carte capacité face visible. Il peut à nouveau donner un Scooby-Snack.",""],
   ["F1","","Action","Regarder le sac de granulés","gratuit"],
   ["F1","","Lire","\"Enrichi en circuits imprimés.\" Hein ?",""],
-  ["F1","","MJ","Ambiance : G et le transhumanisme.",""],
+  ["F1","","MJ","Ambiance : Georges et le transhumanisme.",""],
   ["F1","","Action","Fouiller derrière les bocaux","1 cran"],
   ["F1","","Texte","**Rien.**",""],
   ["F1","","Lire","Un bocal de cornichons qui vous regarde.",""],
@@ -667,10 +678,10 @@ const BOOK_DEFAULT = [
   ["H2","","Action","Le remonter","gratuit"],
   ["H2","","Lire","Les lumières se rallument dans tout le manoir. Pour combien de temps ?",""],
   ["H3","La porte du Laboratoire","Lire","Une porte en métal, verrouillée de l'intérieur. Derrière, vous entendez des pas… et un grognement étrange ?",""],
-  ["H3","","MJ","Teaser de G et du Laboratoire. La porte ne s'ouvre qu'à l'épilogue. Aucune action.",""],
+  ["H3","","MJ","Teaser de Georges et du Laboratoire. La porte ne s'ouvre qu'à l'épilogue. Aucune action.",""],
   ["J1","Jour 1 · Matin : le jardinier","Lire","Au petit matin, l'orage n'est plus qu'une pluie fine. On frappe à la porte d'entrée. Sur le perron, un vieil homme en ciré, un sécateur à la main, refuse de franchir le seuil. \"Vous avez dormi ICI ? Vous êtes fous ! Je suis le voisin. Je m'occupais du jardin et de la serre pour le maître, avant qu'il disparaisse. Depuis, quelque chose rôde la nuit dans ce manoir. Ça revient chaque nuit, à minuit pile. Moi, je ne mets plus un pied dans cette maison.\"",""],
   ["J1","","Lire","Il jette un œil à votre van. \"Je peux vous le réparer, mais la pièce n'arrivera pas avant deux jours. D'ici là… vous allez devoir tenir. Si on savait par où ça entre, on pourrait peut-être l'arrêter…\"",""],
-  ["J1","","MJ","Si les joueurs demandent à dormir chez lui : \"Chez moi ? Ma femme ne veut pas d'un Scooby qui parle.\"",""],
+  ["J1","","MJ","Si les joueurs demandent à dormir chez lui : \"Chez moi ? Ma femme ne veut pas d'un chien qui parle.\"",""],
   ["J1R","Jour 1 · Les règles (hors histoire)","Puce","**Le sablier :** 4 crans le jour 1, 6 crans le jour 2. Une action payante (examiner, fouiller, arroser…) ou aller dans une pièce voisine (le Hall se traverse sans payer) fait avancer le temps d'un cran. Choisir un élément, les actions gratuites, les énigmes et les capacités sont gratuits. Quand le dernier jeton tombe, la nuit tombe.",""],
   ["J1R","","Puce","**Les codes :** sur chaque tuile, les éléments ont un code (A1, A2…). Les joueurs annoncent le code, le MJ lit le script. Chaque action annonce son coût.",""],
   ["J1R","","Puce","**Les capacités :** chacune s'utilise une seule fois dans toute la partie, pendant une journée. On retourne la carte après usage. Insister : La partie dure deux jours : réfléchissez bien avant d'utiliser vos capacités à usage unique.",""],
@@ -684,7 +695,7 @@ const BOOK_DEFAULT = [
   ["JR","","Lire","Le soleil se couche ! Je rentre chez moi. Bonne chance… vous en aurez besoin.",""],
   ["JR","","Action","Dernière chance (jour 2, 1 cran)",""],
   ["JR","","Lire","Le soleil se couche ! Si vous avez encore un tour dans votre sac, c'est maintenant ou jamais !",""],
-  ["JR","","Texte","Si le groupe n'a pas la liane : toc toc à la fenêtre du Hall. Les Habitants y passent une longue liane : Ça pourra vous servir ! Puis le jardinier rentre chez lui.",""],
+  ["JR","","Texte","Si le groupe n'a pas la liane : toc toc à la fenêtre du Hall. Les Sylvains y passent une longue liane : Ça pourra vous servir ! Puis le jardinier rentre chez lui.",""],
   ["JR","","Action","Indice gratuit (groupe bloqué)",""],
   ["JR","","Lire","Je ne suis sûr de rien, mais… [indice adapté à ce qui manque au groupe].",""],
   ["JR","","Action","Le lendemain (fin)",""],
@@ -709,11 +720,11 @@ const BOOK_DEFAULT = [
   ["N2-5","","Lire","**Véra :** Encore faut-il savoir par où elle passe…",""],
   ["N3-1","Nuit 3 · La tombée de la nuit","Lire","Le soleil se couche. Le jardinier vous a souhaité bonne chance de loin. Cette fois, vous êtes prêts.",""],
   ["N3-1","","Puce","**Le MJ :** Où tendez-vous la liane ? Le groupe choisit une pièce du plan (même jamais visitée) et y pose le jeton liane.",""],
-  ["N3-1","","Puce","**Le groupe se cache** dans cette pièce (dans la Chambre : le placard de Z3).",""],
+  ["N3-1","","Puce","**Le groupe se cache** dans cette pièce (dans la Chambre : le placard de Nolad).",""],
   ["N3-1","","Lire","Vous tendez la liane en travers de la pièce, à hauteur de cheville. Puis vous vous cachez… et vous attendez.",""],
   ["N3-1","","MJ","Son : carillon. L'horloge sonne les douze coups. Au douzième…",""],
   ["N3-1","","Texte","**Règle :** la liane ne l'arrête que si elle est devant la sortie, ou si le groupe l'y attire pendant une poursuite.",""],
-  ["N3-2A","Nuit 3 · Capture directe (la Chambre)","Lire","Dans le placard, vous êtes serrés comme des sardines. Z3 respire fort. Très fort. \"Chut, Z3 !\"",""],
+  ["N3-2A","Nuit 3 · Capture directe (la Chambre)","Lire","Dans le placard, vous êtes serrés comme des sardines. Nolad respire fort. Très fort. \"Chut, Nolad !\"",""],
   ["N3-2A","","Lire","Un raclement dans la cheminée. Un pan de pierre pivote dans un grincement. L'Ombre sort du conduit à quatre pattes, toussant, aveuglée par la suie… Elle se relève, fait un pas… et se prend les pieds dans la liane ! Elle s'étale de tout son long. Vous jaillissez du placard et la ficelez avant qu'elle se relève.",""],
   ["N3-2A","","Texte","→ **Capture.** Passer au démasquage.",""],
   ["N3-2B","Nuit 3 · La liane est ailleurs","Lire","Un raclement, quelque part dans les murs. Des pas.",""],
@@ -723,14 +734,14 @@ const BOOK_DEFAULT = [
   ["N3-3B","Nuit 3 · La capture","Lire","Vous revenez en courant vers votre liane et sautez par-dessus. L'Ombre, lancée à toute vitesse derrière vous, ne regarde pas où elle met les pieds… et se prend les pieds dedans ! Elle s'étale de tout son long. À l'attaque !",""],
   ["N3-3B","","Lire","Fred noue le dernier nœud. L'Ombre est ficelée comme un saucisson. Vous l'avez eue !",""],
   ["N4-1","Fin · Le démasquage","Puce","Un joueur retire le masque (au choix du groupe).",""],
-  ["N4-1","","Lire","Vous tirez sur le masque… C'est… X ?!",""],
+  ["N4-1","","Lire","Vous tirez sur le masque… C'est… Léa Seydoux ?!",""],
   ["N4-1","","MJ","Tablette : l'image du visage.",""],
-  ["N4-1","","Lire","\"Oui, c'est moi, la propriétaire de ce manoir ! Depuis des années, je mène en secret mes essais sur le transhumanisme. J'ai inventé l'Ombre pour faire fuir les curieux… et j'aurais réussi sans vous et votre fichu Scooby !\" [Mobile détaillé et inside jokes à compléter]",""],
+  ["N4-1","","Lire","\"Oui, c'est moi, la propriétaire de ce manoir ! Depuis des années, je mène en secret mes essais sur le transhumanisme. J'ai inventé l'Ombre pour faire fuir les curieux… et j'aurais réussi sans vous et votre fichu chien !\" [Mobile détaillé et inside jokes à compléter]",""],
   ["N4-1","","Lire","Dans sa poche, un trousseau : la clé de la cave… et celle du Laboratoire.",""],
-  ["N4-2","Fin · Le Laboratoire","Lire","Vous descendez au sous-sol et ouvrez la lourde porte en métal. Un laboratoire plein d'écrans, de tubes et de câbles. Au plafond, la cabine d'un monte-charge. Sur les murs, des schémas de pattes mécaniques. Dans une cage, une créature équipée d'un bras robotique lève une pince pour vous saluer. C'est G.",""],
-  ["N4-2","","Puce","[Répliques de G à compléter]",""],
-  ["N4-2","","Lire","Vous ouvrez la cage. G sort… et vous serre la main. Avec sa pince.",""],
-  ["N4-3","Fin · Le lendemain","Lire","Au petit matin, le jardinier a réparé votre van. \"Vous nous avez débarrassés de ce fantôme… C'est cadeau !\" Vous montez à bord. G est assis sur la banquette arrière. Personne ne sait comment il est arrivé là.",""],
+  ["N4-2","Fin · Le Laboratoire","Lire","Vous descendez au sous-sol et ouvrez la lourde porte en métal. Un laboratoire plein d'écrans, de tubes et de câbles. Au plafond, la cabine d'un monte-charge. Sur les murs, des schémas de pattes mécaniques. Dans une cage, une créature équipée d'un bras robotique lève une pince pour vous saluer. C'est Georges.",""],
+  ["N4-2","","Puce","[Répliques de Georges à compléter]",""],
+  ["N4-2","","Lire","Vous ouvrez la cage. Georges sort… et vous serre la main. Avec sa pince.",""],
+  ["N4-3","Fin · Le lendemain","Lire","Au petit matin, le jardinier a réparé votre van. \"Vous nous avez débarrassés de ce fantôme… C'est cadeau !\" Vous montez à bord. Georges est assis sur la banquette arrière. Personne ne sait comment il est arrivé là.",""],
   ["N4-3","","MJ","Musique : générique (code S). **FIN.**",""]
 ];
 
@@ -842,7 +853,7 @@ const GROUPS = {A:"Grand Hall", B:"Salon", C:"Bibliothèque", D:"Serre", E:"Cham
 /* Codes que la régie cherche dans le livret ; signalés s'ils manquent après un import. */
 const EXPECTED = [...Object.keys(ROOMS), ...Object.values(ELEMENTS).flat().map(e=>e[0]), "A1b","B1b","C1b","C2b","D1b",
   "J1","J2","JR","N1-1","N2-1","N3-1","N3-2A","N3-2B","N3-3B","N4-1"];
-const ui = {book:false, from:null, offline:false};
+const ui = {book:false, from:null, offline:false, opts:new Set()};
 let BOOK = new Map(), bookSrc = {name:null, at:null}, fileHandle = null;
 
 /* Tri alphanumérique : les chiffres avant les lettres, "A" avant "A1" avant "A1b". */
@@ -1018,6 +1029,61 @@ function scriptList(items){
 }
 const codesFrom = prefix => [...BOOK.keys()].filter(c=>c.startsWith(prefix));
 
+/* ---------- Boutons de la régie dans le livret ----------
+   Chaque action du livret retrouve son action de la régie, sans rien à remplir dans le tableau :
+   l'action payante de l'élément par son coût « 1 cran », la capacité par la mention « capacité »
+   dans le coût, les actions gratuites suivies par leurs mots-clés. Ce qui ne trouve pas sa ligne
+   s'affiche en bas du script. */
+const FREE_KEYS = {a1c:/cave|sous-sol/i, a1l:/liane/i, a2k:/cl[ée]/i, a3c:/courrier/i, b3t:/t[ée]l[ée]/i,
+  c2w:/^(?!.*mauvais).*(former|mot secret)/i, c3l:/journal/i, f1t:/bo[iî]te/i, h1p:/plan/i};
+const CAP_LINKS = {
+  B1:{k:"gourmand", o:"z1", room:"B", t:"Lui donner un biscuit", btn:"Donner un biscuit", done:()=>S.gave.z1, sub:"B1b"},
+  C1:{k:"gourmand", o:"z2", room:"C", t:"Lui donner un biscuit", btn:"Donner un biscuit", done:()=>S.gave.z2, sub:"C1b"},
+  B4:{k:"costaud", o:"F", room:"B", t:"Forcer la porte", btn:"En force !", done:()=>S.unlocked.F},
+  A2:{k:"costaud", o:"H", room:"A", t:"Forcer la porte", btn:"En force !", done:()=>S.unlocked.H}
+};
+function linkActions(s){
+  const el = s.code==="A1b" ? "A1" : s.code;
+  const cands = ACTIONS.filter(a=>a.el===el && (s.code==="A1b" || a.day!==2));
+  const opts = s.rows.filter(r=>r.type==="action");
+  const links = new Map(), used = new Set();
+  const capIx = CAP_LINKS[el] ? opts.findIndex(r=>/capacit/i.test(r.cost)) : -1;
+  if(capIx>=0) links.set(capIx, {cap:CAP_LINKS[el]});
+  opts.forEach((r,i)=>{
+    if(links.has(i) || !/cran/i.test(r.cost)) return;
+    const a=cands.find(a=>a.cost && !used.has(a.id));
+    if(a){ links.set(i, {a}); used.add(a.id); }
+  });
+  for(const a of cands.filter(a=>!a.cost && FREE_KEYS[a.id])){
+    const i=opts.findIndex((r,j)=>!links.has(j) && !/cran|capacit/i.test(r.cost) && FREE_KEYS[a.id].test(r.text));
+    if(i>=0){ links.set(i, {a}); used.add(a.id); }
+  }
+  return {links, rest:cands.filter(a=>!used.has(a.id)), restCap: CAP_LINKS[el] && capIx<0 ? CAP_LINKS[el] : null};
+}
+const mutedNote = t => `<span class="muted">${t}</span>`;
+function bookActBtns(a){
+  if(S.done[a.id]) return `${a.sub?readBtn(a.sub, `Lire ${a.sub}`):""}<span class="cost free">fait ✓</span>`;
+  if(!isDay()) return mutedNote("Le jour seulement.");
+  if(a.el[0]!==S.room) return mutedNote(`Le groupe n'est pas dans cette pièce (${ROOMS[a.el[0]].name}).`);
+  if(a.day && a.day!==dayNum()) return mutedNote(`Jour ${a.day} seulement.`);
+  if(a.needKey && S.unlocked.H) return mutedNote("La cave est déjà ouverte.");
+  if(a.needKey && !S.key) return mutedNote("Il faut d'abord le double de la clé (D2).");
+  const free=!a.cost || S.joker==="action";
+  return `${a.cost && capOk("flaireur") ? `<button class="btn fog sm" data-act="sniff" data-id="${a.id}" title="Capacité de Scooby">Renifler</button>`:""}
+    ${a.cost && capOk("elegante") && !S.joker ? `<button class="btn fog sm" data-act="act" data-id="${a.id}" data-eleg="1" title="Capacité de Daphné : action payante gratuite">Daphné : gratuit</button>`:""}
+    <button class="btn ${a.cost?"lamp":""} sm" data-act="act" data-id="${a.id}" ${a.cost&&S.crans===0?"disabled":""}>${a.cost?(free?"Faire (gratuit)":"Faire · 1 cran"):"Noter"}</button>`;
+}
+function bookCapBtns(c){
+  if(c.done()) return `${c.sub?readBtn(c.sub, `Lire ${c.sub}`):""}<span class="cost free">${c.k==="costaud"?"porte ouverte":"fait ✓"}</span>`;
+  if(!isDay()) return mutedNote("Le jour seulement.");
+  if(S.room!==c.room) return mutedNote(`Le groupe n'est pas dans cette pièce (${ROOMS[c.room].name}).`);
+  if(S.caps[c.k].used) return mutedNote(`Capacité de ${CAPNAME[c.k]} déjà utilisée${capOk("meneur")?" (Fred peut la lui rendre)":""}.`);
+  if(!capOk(c.k)) return mutedNote("Plus de crans : la nuit tombe.");
+  return `<button class="btn fog sm" data-act="cap" data-k="${c.k}" data-o="${c.o}">${c.btn}</button>`;
+}
+const linkDone = l => l.cap ? l.cap.done() : !!S.done[l.a.id];
+const linkBtns = l => l.cap ? bookCapBtns(l.cap) : bookActBtns(l.a);
+
 /* ================= Actions ================= */
 const handlers = {
   undo(){
@@ -1106,8 +1172,8 @@ const handlers = {
       }
       if(k==="gourmand"){
         S.caps.gourmand.used=true;
-        if(opt==="z1"){ S.gave.z1=true; S.hidden=true; addFact(1,"B1b"); log(`${who("gourmand")} donne un biscuit à Z1 → B1b : la pièce cachée (fait 1, fumigènes).`); toast("B1b : pièce cachée. Poser la tuile de la pièce cachée."); }
-        else { S.gave.z2=true; log(`${who("gourmand")} donne un biscuit à Z2 → le grimoire (lore : minuit pile).`); toast("C1 : le grimoire. Les passages ne s'ouvrent qu'à minuit pile."); }
+        if(opt==="z1"){ S.gave.z1=true; S.hidden=true; addFact(1,"B1b"); log(`${who("gourmand")} donne un biscuit à Pazu → B1b : la pièce cachée (fait 1, fumigènes).`); toast("B1b : pièce cachée. Poser la tuile de la pièce cachée."); }
+        else { S.gave.z2=true; log(`${who("gourmand")} donne un biscuit à Amaya → le grimoire (lore : minuit pile).`); toast("C1 : le grimoire. Les passages ne s'ouvrent qu'à minuit pile."); }
       }
       if(k==="costaud"){
         S.caps.costaud.used=true; S.unlocked[opt]=true;
@@ -1214,6 +1280,12 @@ document.addEventListener("toggle", e=>{
   document.querySelectorAll("details[data-fold]").forEach(d=>{ folds[d.dataset.fold]=d.open; });
   try{ localStorage.setItem(FOLD_KEY, JSON.stringify(folds)); }catch(err){}
 }, true);
+/* Actions du livret ouvertes : gardées d'un affichage à l'autre (le livret se redessine à chaque clic). */
+document.addEventListener("toggle", e=>{
+  const d=e.target;
+  if(!d.matches || !d.matches("details.opt")) return;
+  if(d.open) ui.opts.add(d.dataset.k); else ui.opts.delete(d.dataset.k);
+}, true);
 
 function render(){
   $("stack").className = `stack ${isDay()?"day":"night"}`;
@@ -1280,17 +1352,25 @@ function glass(c,max,idle){
 
 function scriptCard(s){
   const read=!!S.read[s.code], from=ui.from===s.code;
-  let n=0, inOpt=false, body="";
+  const {links, rest, restCap} = linkActions(s);
+  let n=0, body="", close="";
   for(const r of s.rows){
     if(r.type==="action"){
-      if(inOpt) body+="</div>";
-      inOpt=true; n++;
+      body+=close;
+      const link=links.get(n), k=`${s.code}#${n}`;
+      n++;
       const cls=/gratuit/i.test(r.cost) ? "free" : /capacit/i.test(r.cost) ? "capa" : "";
-      body+=`<div class="opt"><div class="opt-h"><span class="n">${n}.</span> <b>${fmt(r.text)}</b>${r.cost?` <span class="cost ${cls}">${esc(r.cost)}</span>`:""}</div>`;
+      body+=`<details class="opt" data-k="${esc(k)}" ${ui.opts.has(k)?"open":""}>
+        <summary class="opt-h"><span class="n">${n}.</span><b>${fmt(r.text)}</b>${r.cost?`<span class="cost ${cls}">${esc(r.cost)}</span>`:""}${link&&linkDone(link)?`<span class="cost free">fait ✓</span>`:""}</summary>
+        <div class="opt-body">`;
+      close=`${link?`<div class="opt-btns">${linkBtns(link)}</div>`:""}</div></details>`;
     } else if(r.type==="res") body+=`<div class="res"><span class="res-l">Résultat</span><span>${fmt(r.text)}</span></div>`;
     else body+=`<p class="${r.type}">${fmt(r.text)}</p>`;
   }
-  if(inOpt) body+="</div>";
+  body+=close;
+  if(rest.length || restCap) body+=`<div class="opt-rest"><span class="eyebrow">Aussi suivi par la régie</span>
+    ${restCap?`<div class="row"><span>${esc(restCap.t)}</span>${bookCapBtns(restCap)}</div>`:""}
+    ${rest.map(a=>`<div class="row"><span>${esc(a.t)}</span>${bookActBtns(a)}</div>`).join("")}</div>`;
   return `<article class="script ${read?"read":""} ${from?"flash":""}" id="sc-${esc(s.code)}">
     <div class="script-h">
       <span class="chip lamp">${esc(s.code)}</span><h3>${fmt(s.title||s.code)}</h3>
@@ -1458,7 +1538,7 @@ function renderRoom(){
   const el=$("room");
   if(!isDay()){
     el.innerHTML = `<div class="panel-head"><h2>${P().id==="fin"?"Le Laboratoire":"Le Salon"}</h2><span class="eyebrow">La nuit</span></div>
-      <p class="muted" style="margin:0">${P().id==="fin"?"On descend libérer G.":"Le groupe dort au Salon. Les pièces s'explorent le jour."}</p>`;
+      <p class="muted" style="margin:0">${P().id==="fin"?"On descend libérer Georges.":"Le groupe dort au Salon. Les pièces s'explorent le jour."}</p>`;
     return;
   }
   const r=S.room, d=dayNum();
@@ -1478,19 +1558,19 @@ function renderRoom(){
     const key = (code==="A1" && d===2) ? "A1b" : code;
     const acts = ACTIONS.filter(a=>a.el===code && (!a.day || a.day===d) && (!a.needKey || S.done[a.id] || (S.key && !S.unlocked.H)));
     const extra = [];
-    if(code==="B1"){ extra.push(S.gave.z1 ? doneRow("Biscuit donné à Z1", "→ B1b : la pièce cachée, fait 1, fumigènes", "B1b")
+    if(code==="B1"){ extra.push(S.gave.z1 ? doneRow("Biscuit donné à Pazu", "→ B1b : la pièce cachée, fait 1, fumigènes", "B1b")
       : capOk("gourmand") ? capRow("gourmand", "Lui donner un biscuit", "→ B1b : la pièce cachée, fait 1, fumigènes", capBtn("gourmand","Donner un biscuit","z1"))
-      : note(`Biscuit à Z1 : ${spent("gourmand")}. Recharge : boîte de la Cuisine (F1).`)); }
-    if(code==="C1"){ extra.push(S.gave.z2 ? doneRow("Biscuit donné à Z2", "Lore : les passages ne s'ouvrent qu'à minuit pile", "C1b")
+      : note(`Biscuit à Pazu : ${spent("gourmand")}. Recharge : boîte de la Cuisine (F1).`)); }
+    if(code==="C1"){ extra.push(S.gave.z2 ? doneRow("Biscuit donné à Amaya", "Lore : les passages ne s'ouvrent qu'à minuit pile", "C1b")
       : capOk("gourmand") ? capRow("gourmand", "Lui donner un biscuit", "→ le grimoire. Lore : les passages ne s'ouvrent qu'à minuit pile", capBtn("gourmand","Donner un biscuit","z2"))
-      : note(`Bloqué. Biscuit à Z2 : ${spent("gourmand")}. Recharge : boîte de la Cuisine (F1).`)); }
+      : note(`Bloqué. Biscuit à Amaya : ${spent("gourmand")}. Recharge : boîte de la Cuisine (F1).`)); }
     if(code==="B4" && !S.unlocked.F) extra.push(capOk("costaud") ? capRow("costaud", "Forcer la porte", "La porte cède : accès à la Cuisine (F)", capBtn("costaud","En force !","F"))
       : note(`Fermée à clé : ${spent("costaud")}.`));
     if(code==="A2" && !S.unlocked.H) extra.push(capOk("costaud") ? capRow("costaud", "Forcer la porte", "La porte cède : accès au sous-sol (H)", capBtn("costaud","En force !","H"))
       : note(`Fermée à clé : ${S.key?"le groupe a le double de la clé.":`double de la clé (D2), ${spent("costaud")}.`}`));
     if(code==="A2" && S.unlocked.H) extra.push(`<span class="chip ok" style="align-self:flex-start">Cave ouverte</span>`);
     if(code==="B4" && S.unlocked.F) extra.push(`<span class="chip ok" style="align-self:flex-start">Cuisine ouverte</span>`);
-    if(code==="H3") extra.push(note("Bloquée. Teaser de G."));
+    if(code==="H3") extra.push(note("Bloquée. Teaser de Georges."));
     const rows = acts.map(a=>{
       const done=!!S.done[a.id], free=!a.cost || S.joker==="action";
       return `<div class="act ${done?"done":""}">
@@ -1530,7 +1610,7 @@ function renderCaps(){
     meneur: targets.length ? "Bouton en haut de la pièce." : "Aucune autre capacité utilisée pour l'instant.",
     elegante: "Boutons sur le plan (déplacement) et sur chaque action payante.",
     enquetrice: "Bouton en haut de la pièce.",
-    gourmand: "Bouton sur Z1 (B1, Salon) et Z2 (C1, Bibliothèque).",
+    gourmand: "Bouton sur Pazu (B1, Salon) et Amaya (C1, Bibliothèque).",
     flaireur: "Bouton « Renifler » sur les actions payantes de la pièce.",
     costaud: "Bouton sur la porte de la Cuisine (B4, Salon) et de la cave (A2, Hall)."
   };
