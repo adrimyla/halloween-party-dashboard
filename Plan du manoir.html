@@ -156,6 +156,8 @@ const FLOORS = [
       {pts:"505,0 710,0 710,170 505,170", cls:"sealed"},
       {pts:"0,170 710,170 710,450 0,450"}
     ],
+    /* Cloisons sans porte : le palier et le placard font partie de l'étage, y aller ne coûte rien. */
+    partitions:"M275,170 V370 M275,430 V450 M365,170 V240 H345 M300,240 H275",
     stairs:[{...UPSTAIRS}],
     doors:[{x:55,y:170,len:60,o:"h",k:"sealed"}],
     arrows:[{x:192,y:200,dir:"e",t:"RdC"}]
@@ -199,7 +201,7 @@ const FLOORS = [
    Les puces portent le numéro du script de l'élément (pas les scripts qui suivent : A1b, B1b…). */
 const INSET = 8;
 const TILES = [
-  { floor:"etage", name:"Chambre", pts:"0,170 210,170 210,230 275,230 275,170 710,170 710,450 0,450", at:[480,330],
+  { floor:"etage", name:"Chambre", pts:"275,170 710,170 710,450 275,450", at:[495,330],
     chem:[[600,180,80,20]], pins:[["E1",420,405],["E2",640,222],["E3",330,205]] },
   { floor:"rdc", name:"Grand Hall", pts:"275,170 455,170 455,450 275,450", at:[365,322],
     chem:[[425,360,20,70]], pins:[["A1",365,422],["A2",302,405],["A3",400,395]] },
@@ -279,7 +281,8 @@ function planSVG(f, withTiles){
   const fills = f.rooms.map(r => `<polygon class="${r.cls||"room-fill"}" points="${r.pts}"/>`).join("")
     + (f.serre ? `<polygon class="serre" points="${f.serre}"/>` : "");
   const walls = f.rooms.map(r => `<polygon class="wall" points="${r.pts}"/>`).join("")
-    + (f.serre ? `<polygon class="glass" points="${f.serre}"/><polygon class="glass-in" points="${f.serre}"/>` : "");
+    + (f.serre ? `<polygon class="glass" points="${f.serre}"/><polygon class="glass-in" points="${f.serre}"/>` : "")
+    + (f.partitions ? `<path class="wall" d="${f.partitions}"/>` : "");
   const tiles = withTiles ? TILES.filter(t => t.floor===f.id && !t.extension).map(t => tileBody(t, false)).join("") : "";
   const ext = withTiles ? TILES.filter(t => t.floor===f.id && t.extension).map(t => tileBody(t, false)).join("") : "";
   const myst = f.mystery ? `<text class="ask" x="${f.mystery[0]}" y="${f.mystery[1]+24}">?</text>` : "";
