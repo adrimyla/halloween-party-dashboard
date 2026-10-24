@@ -88,9 +88,9 @@ h2{font-family:var(--f-display);font-weight:400;font-size:1.35rem;letter-spacing
 
 /* ---------- Grille ---------- */
 .stack{display:flex;flex-direction:column;gap:16px;margin-top:16px;min-width:0}
-/* Le jour, les actions de la pièce passent avant le panneau de phase ; la nuit, l'inverse. */
-.stack.day #room,.stack.night #phase{order:1}
-.stack.day #phase,.stack.night #room{order:2}
+/* Le panneau de phase (objectif, scripts à lire) passe toujours avant les actions de la pièce. */
+.stack #phase{order:1}
+.stack #room{order:2}
 .stack .fold{order:3}
 .stack #journal{order:4}
 .stack #sound-panel{order:0}
