@@ -93,6 +93,26 @@ h2{font-family:var(--f-display);font-weight:400;font-size:1.35rem;letter-spacing
 .stack.day #phase,.stack.night #room{order:2}
 .stack .fold{order:3}
 .stack #journal{order:4}
+.stack #sound-panel{order:0}
+
+/* ---------- Son et vidéo ---------- */
+.media-group{display:flex;flex-direction:column;gap:6px}
+.media-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.media-btn{
+  background:var(--panel-2);border:1px solid var(--line);border-radius:8px;
+  padding:8px 12px;min-height:40px;font-size:.88rem;text-align:left;touch-action:manipulation;
+}
+.media-btn:hover{border-color:var(--muted)}
+.media-btn.on{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+.media-btn.video{border-color:var(--fog)}
+.media-vol{display:flex;gap:10px;align-items:center;font-size:.8rem;color:var(--muted)}
+.media-vol span{min-width:6.5em}
+.media-vol input{flex:1;accent-color:var(--lamp);min-height:28px}
+.media-line{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.media-line.missing{font-size:.82rem;color:var(--warn);padding:4px 8px;border:1px dashed var(--warn);border-radius:7px}
+.video-layer{position:fixed;inset:0;z-index:40;background:#000;display:flex;flex-direction:column}
+.video-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px;background:#111;color:#eee}
+.video-layer video{flex:1;width:100%;min-height:0;background:#000}
 .fold summary{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;cursor:pointer;list-style:none}
 .fold summary::-webkit-details-marker{display:none}
 .fold summary h2::before{content:"▸ ";color:var(--muted);font-family:var(--f-body);font-size:.9rem}
@@ -359,6 +379,7 @@ mark.todo{background:var(--warn-soft);color:var(--warn);border:1px dashed var(--
 <!-- Une seule colonne ; l'ordre jour / nuit se fait en CSS. Manoir, capacités et enquête se replient. -->
 <main class="stack" id="stack">
   <section class="panel" id="time"></section>
+  <section class="panel fold" id="sound-panel"><details data-fold="sound"><summary id="sound-sum"></summary><div class="fold-body" id="sound"></div></details></section>
   <section class="panel" id="phase"></section>
   <section class="panel" id="room"></section>
   <section class="panel fold"><details data-fold="plan"><summary id="plan-sum"></summary><div class="fold-body" id="plan"></div></details></section>
@@ -390,6 +411,11 @@ mark.todo{background:var(--warn-soft);color:var(--warn);border:1px dashed var(--
 </aside>
 </div>
 <input type="file" id="book-file" accept=".xlsx,.xls,.xlsm" hidden>
+<!-- Vidéo en plein écran, par-dessus la régie. -->
+<div class="video-layer" id="video-layer" hidden>
+  <div class="video-bar"><b id="video-title"></b><button class="btn" data-act="videoClose">Fermer la vidéo ✕</button></div>
+  <video id="video" controls playsinline></video>
+</div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <script>
@@ -881,7 +907,8 @@ function natCmp(a, b){
   }
   return x.length-y.length;
 }
-const TYPES = {lire:"say", mj:"mj", note:"mj", puce:"li", action:"action", resultat:"res"};
+const TYPES = {lire:"say", mj:"mj", note:"mj", puce:"li", action:"action", resultat:"res",
+  son:"m-son", ambiance:"m-ambiance", musique:"m-ambiance", video:"m-video"};
 /* « Résultat : … » en tête du texte vaut le type Résultat, quel que soit le type choisi. */
 const RES_PREFIX = /^\**\s*r[ée]sultat\s*:\s*\**\s*/i;
 /* Lignes [code, titre, type, texte, coût] → scripts triés. Un code vide reprend celui du dessus. */
@@ -1098,6 +1125,129 @@ function bookCapBtns(c){
 const linkDone = l => l.cap ? l.cap.done() : !!S.done[l.a.id];
 const linkBtns = l => l.cap ? bookCapBtns(l.cap) : bookActBtns(l.a);
 
+/* ================= Son et vidéo =================
+   Les fichiers sont dans le dossier medias/ du dépôt : medias/ambiance, medias/sons, medias/videos.
+   La liste vient de l'API GitHub (le dépôt est public) et reste en mémoire pour les ouvertures sans réseau ;
+   les fichiers eux-mêmes sont servis à côté de la page. */
+const MEDIA_REPO = "adrimyla/halloween-party-dashboard";
+const MEDIA_KEY = "regie-halloween-medias";
+const MEDIA_DIRS = {ambiance:"ambiance", sons:"son", videos:"video"};
+const MEDIA_EXT = /\.(mp3|ogg|oga|wav|m4a|aac|opus|webm|mp4|m4v|mov)$/i;
+const MEDIA_LABEL = {ambiance:"Ambiance", son:"Son", video:"Vidéo"};
+const media = {list:[], loaded:false, err:null, amb:null, ambKey:null, ambWasOn:false, ambVol:.6, sfxVol:1, sfx:new Set()};
+const mediaKey = s => norm(String(s).replace(MEDIA_EXT, "")).replace(/[-_\s]+/g, " ").trim();
+const mediaName = n => { const t=n.replace(/[-_]+/g, " ").trim(); return t.charAt(0).toUpperCase()+t.slice(1); };
+const findMedia = (kind, name) => media.list.find(m=>m.kind===kind && m.key===mediaKey(name));
+
+async function loadMedia(){
+  try{ const saved=JSON.parse(localStorage.getItem(MEDIA_KEY)); if(Array.isArray(saved)) media.list=saved; }catch(e){}
+  try{
+    const res=await fetch(`https://api.github.com/repos/${MEDIA_REPO}/git/trees/main?recursive=1`, {cache:"no-store"});
+    if(!res.ok) throw new Error(`GitHub répond ${res.status}`);
+    const tree=(await res.json()).tree || [];
+    media.list = tree.filter(f=>f.type==="blob" && /^medias\/(ambiance|sons|videos)\/[^/]+$/.test(f.path) && MEDIA_EXT.test(f.path))
+      .map(f=>{
+        const [, dir, file]=f.path.split("/"), name=file.replace(MEDIA_EXT, "");
+        return {kind:MEDIA_DIRS[dir], name, key:mediaKey(name), url:f.path.split("/").map(encodeURIComponent).join("/")};
+      })
+      .sort((a,b)=>a.name.localeCompare(b.name, "fr"));
+    media.err=null;
+    try{ localStorage.setItem(MEDIA_KEY, JSON.stringify(media.list)); }catch(e){}
+  }catch(e){ media.err = navigator.onLine ? e.message : "pas de connexion"; }
+  media.loaded=true; render();
+}
+
+/* Fondu de volume : un seul à la fois par lecteur. */
+function fadeTo(el, vol, ms, done){
+  clearInterval(el._fade);
+  const from=el.volume, steps=Math.max(1, Math.round(ms/30)); let i=0;
+  el._fade=setInterval(()=>{
+    i++; el.volume=Math.min(1, Math.max(0, from+(vol-from)*i/steps));
+    if(i>=steps){ clearInterval(el._fade); if(done) done(); }
+  }, 30);
+}
+// L'ambiance baisse pendant qu'un bruitage joue, pour qu'on l'entende bien.
+const ambTarget = () => media.ambVol * (media.sfx.size ? .35 : 1);
+const duck = () => { if(media.amb && !media.amb.paused) fadeTo(media.amb, ambTarget(), 300); };
+const missing = (kind, name) => toast(`${MEDIA_LABEL[kind]} « ${name} » introuvable dans medias/${kind==="son"?"sons":kind==="video"?"videos":"ambiance"}.`);
+
+function ambStop(quick){
+  const a=media.amb; if(!a) return;
+  media.amb=null; media.ambKey=null;
+  fadeTo(a, 0, quick?150:900, ()=>a.pause());
+  render();
+}
+function ambToggle(name){
+  const m=findMedia("ambiance", name); if(!m){ missing("ambiance", name); return; }
+  if(media.ambKey===m.key){ ambStop(); return; }
+  ambStop(true);
+  const a=new Audio(m.url); a.loop=true; a.volume=0;
+  media.amb=a; media.ambKey=m.key;
+  a.play().then(()=>fadeTo(a, ambTarget(), 900)).catch(e=>{ toast(`Lecture impossible : ${e.message}`); if(media.amb===a){ media.amb=null; media.ambKey=null; render(); } });
+  render();
+}
+function playSound(name){
+  const m=findMedia("son", name); if(!m){ missing("son", name); return; }
+  const s=new Audio(m.url); s.volume=media.sfxVol;
+  const end=()=>{ if(media.sfx.delete(s)) duck(); };
+  s.addEventListener("ended", end); s.addEventListener("error", end);
+  media.sfx.add(s);
+  s.play().then(duck).catch(e=>{ end(); toast(`Lecture impossible : ${e.message}`); });
+}
+function stopAll(){
+  media.sfx.forEach(s=>s.pause()); media.sfx.clear();
+  ambStop();
+}
+/* La vidéo coupe tout le reste ; l'ambiance reprend à la fin si elle tournait. */
+function playVideo(name){
+  const m=findMedia("video", name); if(!m){ missing("video", name); return; }
+  media.ambWasOn = !!media.amb && !media.amb.paused;
+  if(media.amb) media.amb.pause();
+  media.sfx.forEach(s=>s.pause()); media.sfx.clear();
+  const v=$("video"); v.src=m.url; v.volume=1;
+  $("video-title").textContent=mediaName(m.name);
+  $("video-layer").hidden=false;
+  v.play().catch(()=>{});
+}
+function closeVideo(){
+  const v=$("video");
+  if($("video-layer").hidden) return;
+  v.pause(); v.removeAttribute("src"); v.load();
+  $("video-layer").hidden=true;
+  if(media.ambWasOn && media.amb){ media.amb.volume=0; media.amb.play().then(()=>fadeTo(media.amb, ambTarget(), 900)).catch(()=>{}); }
+  media.ambWasOn=false;
+}
+$("video").addEventListener("ended", closeVideo);
+
+/* Bouton d'un média, pour le panneau Son comme pour le livret. */
+function mediaBtn(m){
+  const act = m.kind==="son" ? "sfx" : m.kind==="ambiance" ? "amb" : "video";
+  const on = m.kind==="ambiance" && media.ambKey===m.key;
+  const icon = m.kind==="video" ? "▶" : m.kind==="ambiance" ? (on?"❚❚":"♫") : "♪";
+  return `<button class="media-btn ${on?"on":""} ${m.kind==="video"?"video":""}" data-act="${act}" data-n="${esc(m.name)}">${icon} ${esc(mediaName(m.name))}</button>`;
+}
+function renderSound(){
+  const playing = media.ambKey ? media.list.find(m=>m.key===media.ambKey && m.kind==="ambiance") : null;
+  $("sound-sum").innerHTML = `<h2>Son</h2><span class="eyebrow">${playing?`Ambiance : ${esc(mediaName(playing.name))}`:"Ambiance coupée"}</span>`;
+  const of = k => media.list.filter(m=>m.kind===k);
+  const group = (title, k) => of(k).length ? `<div class="media-group"><span class="eyebrow">${title}</span><div class="media-row">${of(k).map(mediaBtn).join("")}</div></div>` : "";
+  const empty = media.loaded && !media.list.length
+    ? `<span class="muted" style="font-size:.82rem">Aucun fichier trouvé. Déposer les sons dans les dossiers <b>medias/ambiance</b>, <b>medias/sons</b> et <b>medias/videos</b> du dépôt GitHub, puis « Actualiser ».</span>` : "";
+  $("sound").innerHTML = `
+    ${!media.loaded ? `<span class="muted" style="font-size:.82rem">Recherche des fichiers…</span>` : ""}
+    ${empty}
+    ${group("Ambiance (en boucle)", "ambiance")}
+    ${group("Bruitages", "son")}
+    ${group("Vidéos", "video")}
+    <label class="media-vol"><span>Volume ambiance</span><input type="range" min="0" max="100" value="${Math.round(media.ambVol*100)}" data-media-vol="amb"></label>
+    <label class="media-vol"><span>Volume bruitages</span><input type="range" min="0" max="100" value="${Math.round(media.sfxVol*100)}" data-media-vol="sfx"></label>
+    <div class="row">
+      <button class="btn" data-act="mediaStop">■ Tout couper</button>
+      <button class="btn ghost sm" data-act="mediaReload" title="Relire la liste des fichiers sur GitHub">Actualiser</button>
+      ${media.err ? `<span class="muted" style="font-size:.78rem">Liste GitHub injoignable (${esc(media.err)}) : dernière liste connue.</span>` : ""}
+    </div>`;
+}
+
 /* ================= Actions ================= */
 const handlers = {
   undo(){
@@ -1202,6 +1352,12 @@ const handlers = {
   bookClose(){ ui.book=false; ui.from=null; render(); },
   bookGo(d){ ui.from=d.c; ui.toc=false; render(); const el=$(`sc-${d.c}`); if(el) el.scrollIntoView({block:"start"}); },
   tocToggle(){ ui.toc=!ui.toc; renderBook(); },
+  amb(d){ ambToggle(d.n); },
+  sfx(d){ playSound(d.n); },
+  video(d){ playVideo(d.n); },
+  videoClose(){ closeVideo(); },
+  mediaStop(){ stopAll(); },
+  mediaReload(){ media.loaded=false; render(); loadMedia(); },
   bookRead(d){
     const c=d.c, on=!S.read[c];
     if(on && ui.from===c){ ui.from=null; if(!dock.matches) ui.book=false; }
@@ -1237,6 +1393,11 @@ document.addEventListener("click", e=>{
 });
 document.addEventListener("input", e=>{
   if(e.target.matches("[data-name]")){ S.names[e.target.dataset.name]=e.target.value.trim(); save(); }
+  if(e.target.matches("[data-media-vol]")){
+    const v=+e.target.value/100;
+    if(e.target.dataset.mediaVol==="amb"){ media.ambVol=v; if(media.amb){ clearInterval(media.amb._fade); media.amb.volume=ambTarget(); } }
+    else { media.sfxVol=v; media.sfx.forEach(s=>s.volume=v); }
+  }
 });
 document.addEventListener("change", e=>{
   if(e.target.id==="chrono-dur"){ chrono.dur=+e.target.value; if(!chrono.running){ chrono.left=chrono.dur; paintChrono(); } }
@@ -1246,6 +1407,7 @@ $("book-file").addEventListener("change", e=>{
   e.target.value="";
 });
 document.addEventListener("keydown", e=>{
+  if(e.key==="Escape" && !$("video-layer").hidden){ closeVideo(); return; }
   if(e.key==="Escape" && ui.toc){ ui.toc=false; renderBook(); return; }
   if(e.key==="Escape" && ui.book && !dock.matches){ handlers.bookClose(); return; }
   if((e.ctrlKey||e.metaKey) && e.key==="z" && !e.target.matches("input")){ e.preventDefault(); handlers.undo(); }
@@ -1290,7 +1452,8 @@ addEventListener("resize", ()=>{ if(dock.matches!==renderedDock) render(); });
 const FOLD_KEY = "regie-halloween-plis";
 try{
   const folds=JSON.parse(localStorage.getItem(FOLD_KEY)) || {};
-  document.querySelectorAll("details[data-fold]").forEach(d=>{ d.open=!!folds[d.dataset.fold]; });
+  // Le panneau Son est déplié par défaut ; les autres repliés.
+  document.querySelectorAll("details[data-fold]").forEach(d=>{ const k=d.dataset.fold; d.open = k in folds ? !!folds[k] : k==="sound"; });
 }catch(e){}
 document.addEventListener("toggle", e=>{
   if(!e.target.matches || !e.target.matches("details[data-fold]")) return;
@@ -1307,7 +1470,7 @@ document.addEventListener("toggle", e=>{
 
 function render(){
   $("stack").className = `stack ${isDay()?"day":"night"}`;
-  renderRail(); renderTime(); renderPhase(); renderPlan(); renderRoom(); renderCaps(); renderInquiry(); renderJournal(); renderBook();
+  renderRail(); renderTime(); renderSound(); renderPhase(); renderPlan(); renderRoom(); renderCaps(); renderInquiry(); renderJournal(); renderBook();
   $("undo").disabled=!hist.length;
   paintChrono();
 }
@@ -1383,6 +1546,12 @@ function scriptCard(s){
         <div class="opt-body">`;
       close=`${link?`<div class="opt-btns">${linkBtns(link)}</div>`:""}</div></details>`;
     } else if(r.type==="res") body+=`<div class="res"><span class="res-l">Résultat</span><span>${fmt(r.text)}</span></div>`;
+    else if(r.type.startsWith("m-")){
+      // Ligne Son / Ambiance / Vidéo : le bouton du fichier du même nom, ou un avertissement s'il manque.
+      const kind=r.type.slice(2), m=findMedia(kind, r.text);
+      body+= m ? `<div class="media-line">${mediaBtn(m)}</div>`
+        : `<div class="media-line missing"><span>${MEDIA_LABEL[kind]} : ${esc(r.text)}</span><span>${media.loaded?`fichier introuvable dans medias/${kind==="son"?"sons":kind==="video"?"videos":"ambiance"}`:"recherche des fichiers…"}</span></div>`;
+    }
     else body+=`<p class="${r.type}">${fmt(r.text)}</p>`;
   }
   body+=close;
@@ -1701,6 +1870,7 @@ function renderJournal(){
 }
 
 loadBook();
+loadMedia();
 if(getLink()) loadFromLink(getLink(), true);
 if(!S.log.length) log("Nuit 1 commence. Le groupe dort au Salon.");
 render();
