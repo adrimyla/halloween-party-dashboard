@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Matériel à imprimer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Caveat:wght@400;600&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+/* Le matériel posé sur la table, en plus du plan : cartes personnage, jetons, documents à remettre, aide de jeu.
+   Tout est en millimètres : imprimé à 100 %, les jetons entrent pile dans les cases de la piste du sablier. */
+:root{
+  --paper:#f4efe4; --sheet:#fffdf8; --ink:#1f1b24; --muted:#6b6470; --line:#d9d0c0;
+  --tile:#f7ecd6; --wood:#c9a882; --leaf:#8db66a; --vine:#4f6b33; --snack:#e8d38f;
+  --red:#b3261e; --blue:#2c4a7a; --aged:#efe2c4;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 48px}
+header h1{font:400 2.4rem/1.1 "IM Fell English SC",Georgia,serif;margin:0}
+header p{margin:.3rem 0 0;color:var(--muted)}
+
+.bar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:16px 0 8px;padding:10px 12px;background:var(--sheet);border:1px solid var(--line);border-radius:10px}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--ink);border-radius:8px;overflow:hidden}
+.seg button{font:inherit;border:0;background:transparent;color:var(--ink);padding:7px 14px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--sheet)}
+.bar .print{margin-left:auto;font:inherit;padding:7px 14px;border-radius:8px;border:1px solid var(--ink);background:var(--sheet);cursor:pointer}
+.hint{color:var(--muted);font-size:.85rem;margin:0 0 10px}
+.todo{font-size:.85rem;background:#fff6dc;border:1px solid #e9d49a;border-radius:8px;padding:8px 12px;margin:0 0 14px}
+.todo ul{margin:.2rem 0 0;padding-left:1.2rem}
+
+.sheet{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:22px;overflow-x:auto}
+.sheet h2{margin:0 0 8px;font:400 1.6rem/1 "IM Fell English SC",Georgia,serif}
+.sheet h3{margin:6mm 0 3mm;font:400 1.15rem/1 "IM Fell English SC",Georgia,serif}
+.cut{display:flex;flex-wrap:wrap;gap:5mm;align-items:flex-start}
+.cut figure{margin:0;width:min-content;break-inside:avoid}
+.cut figcaption{font-size:.72rem;color:var(--muted);margin-top:1.5mm;max-width:100%}
+.cut figcaption b{color:var(--ink)}
+
+/* ---------- Cartes personnage (63 × 88 mm, format carte à jouer) ---------- */
+.cards{display:grid;grid-template-columns:repeat(3,63mm);gap:2mm;justify-content:center}
+.card{width:63mm;height:88mm;border:.3mm solid #b9ae9c;border-radius:3mm;padding:2.5mm;background:var(--sheet)}
+.card .in{height:100%;border:.5mm solid var(--ink);border-radius:2mm;outline:.25mm solid var(--ink);outline-offset:-1.3mm;
+  padding:3mm 3.5mm;display:flex;flex-direction:column;align-items:center;text-align:center;background:var(--tile)}
+.card .name{font:400 19pt/1 "IM Fell English SC",Georgia,serif;margin-top:.5mm}
+.card svg{width:21mm;height:21mm;margin:2mm 0 1.5mm}
+.card .q{font:italic 11.5pt/1.15 "IM Fell English",Georgia,serif;margin:0 0 2mm}
+.card .rule{font-size:8.3pt;line-height:1.3;margin:0}
+.card .foot{margin-top:auto;font:italic 7.5pt/1.2 "IM Fell English",Georgia,serif;color:var(--muted);border-top:.25mm solid #b9ae9c;padding-top:1.5mm;width:100%}
+.card.back .in{justify-content:center;background:repeating-linear-gradient(45deg,#ece5d8 0 2.2mm,#d8cdb9 2.2mm 3.2mm)}
+.card.back .name{background:var(--sheet);padding:2mm 4mm;border:.4mm solid var(--ink);border-radius:2mm}
+.card.back .used{margin-top:3mm;background:var(--sheet);padding:1mm 3mm;border-radius:1.5mm;font:italic 11pt "IM Fell English",Georgia,serif}
+
+/* ---------- Jetons ---------- */
+.token{display:block;width:28mm;height:28mm}
+.token.big{width:36mm;height:36mm}
+.tk-edge{fill:var(--tile);stroke:var(--ink);stroke-width:1.6}
+.tk-ring{fill:none;stroke:var(--ink);stroke-width:.6}
+.tk-t{font:400 10px "IM Fell English SC",Georgia,serif;fill:var(--ink);text-anchor:middle}
+.letters{display:flex;flex-wrap:wrap;gap:2mm}
+.letter{position:relative;width:16mm;height:16mm;background:#f0dfb0;border:.3mm solid #8c7a55;border-radius:1.5mm;
+  display:grid;place-items:center;font:700 22pt/1 Georgia,serif;color:var(--ink)}
+.letter small{position:absolute;right:1.2mm;bottom:.6mm;font:700 6.5pt system-ui,sans-serif}
+
+/* ---------- Documents à remettre ---------- */
+.doc{position:relative;color:var(--ink);box-shadow:0 0 0 .3mm #b9ae9c}
+.hand{font-family:"Caveat",cursive}
+.type{font-family:"Special Elite","Courier New",monospace}
+
+.d-note{width:120mm;padding:7mm 9mm 6mm;font-size:17pt;line-height:8mm;
+  background:#fffdf3 repeating-linear-gradient(to bottom,transparent 0 7.6mm,#a9c3e0 7.6mm 8mm) 0 6.6mm}
+.d-note p{margin:0}
+.d-note .sig{text-align:right;margin-top:2mm}
+
+.d-type{width:94mm;min-height:118mm;padding:7mm 7mm 8mm;background:#fbfaf6;font-size:8.6pt;line-height:1.45}
+.d-type .head{text-align:center;border-bottom:.5mm double var(--ink);padding-bottom:2.5mm;margin-bottom:3mm}
+.d-type .head b{display:block;font:400 13pt/1.1 "IM Fell English SC",Georgia,serif;letter-spacing:.04em}
+.d-type .head span{font-size:7pt;color:var(--muted)}
+.d-type h4{margin:0 0 2.5mm;font:inherit;font-size:11pt;text-align:center;letter-spacing:.12em}
+.d-type p{margin:0 0 2mm}
+.d-type table{width:100%;border-collapse:collapse;margin:2mm 0 3mm}
+.d-type td{padding:1.2mm 0;border-bottom:.2mm dotted #8f8679;vertical-align:top}
+.d-type td:last-child{text-align:right;white-space:nowrap;padding-left:3mm}
+.d-type .stamp{position:absolute;right:8mm;bottom:12mm;transform:rotate(-12deg);border:.6mm solid var(--blue);color:var(--blue);
+  padding:1mm 3mm;font-size:9pt;letter-spacing:.1em;opacity:.8}
+
+.d-journal{width:94mm;min-height:90mm;padding:8mm 8mm 8mm 13mm;font-size:15.5pt;line-height:1.15;
+  background:var(--aged) linear-gradient(to right,transparent 9mm,#d8a9a0 9mm 9.4mm,transparent 9.4mm)}
+.d-journal .date{font-size:13pt;text-decoration:underline;margin:0 0 2mm}
+.d-journal p{margin:0 0 3mm}
+.d-journal .other{opacity:.75}
+
+.d-torn{width:94mm;padding:12mm 9mm 7mm 13mm;font-size:16.5pt;line-height:1.15;
+  background:var(--aged) linear-gradient(to right,transparent 9mm,#d8a9a0 9mm 9.4mm,transparent 9.4mm);
+  clip-path:polygon(0 9%,6% 3%,11% 8%,17% 1%,24% 7%,30% 2%,37% 9%,44% 3%,50% 8%,57% 0,63% 6%,70% 2%,77% 9%,83% 3%,90% 7%,95% 1%,100% 6%,100% 100%,0 100%);
+  box-shadow:none;filter:drop-shadow(0 0 .25mm #8f8679)}
+.d-torn p{margin:0}
+
+.d-blue{width:165mm;background:#f2f6fa}
+.d-blue svg,.d-tech svg{display:block;width:100%;height:auto}
+.bl{fill:none;stroke:var(--blue);stroke-width:1.4}
+.bl-thin{fill:none;stroke:var(--blue);stroke-width:.7}
+.bl-fill{fill:#dbe5f0;stroke:var(--blue);stroke-width:1.4}
+.bl-t{font:400 10px "Special Elite","Courier New",monospace;fill:var(--blue)}
+.bl-h{font:400 13px "IM Fell English SC",Georgia,serif;fill:var(--blue)}
+.madame{font:italic 15px "IM Fell English",Georgia,serif;fill:#3a2a4a}
+
+.d-tech{width:160mm;background:#fbfaf6}
+.tc-room{fill:#fffdf8;stroke:var(--ink);stroke-width:2.5}
+.tc-sealed{fill:#ece5d8;stroke:var(--ink);stroke-width:2.5}
+.tc-wire{fill:none;stroke:#5a5560;stroke-width:1.6;stroke-dasharray:7 4}
+.tc-lamp{fill:#fffdf8;stroke:#5a5560;stroke-width:1.4}
+.tc-chem{fill:#6d625a;stroke:var(--ink);stroke-width:1.5}
+.tc-name{font:400 17px "IM Fell English",Georgia,serif;fill:var(--ink);text-anchor:middle}
+.tc-red{fill:none;stroke:var(--red);stroke-width:3.2;stroke-linecap:round}
+.tc-note{font:600 21px "Caveat",cursive;fill:var(--red)}
+.tc-title{font:400 15px "Special Elite","Courier New",monospace;fill:var(--ink)}
+
+.d-cat{width:94mm;padding:6mm 7mm;background:#fdfcf8;font-size:8.3pt;line-height:1.35}
+.d-cat .head{background:var(--ink);color:var(--sheet);margin:-6mm -7mm 4mm;padding:4mm 7mm 3mm}
+.d-cat .head b{display:block;font:400 14pt/1 "IM Fell English SC",Georgia,serif}
+.d-cat .item{display:grid;grid-template-columns:22mm 1fr;gap:3mm;padding:2.5mm 0;border-bottom:.2mm solid var(--line)}
+.d-cat .item svg{width:22mm;height:18mm;background:#f2ede2;border-radius:1mm}
+.d-cat .item b{font-size:9.5pt}
+.d-cat .price{font-weight:700}
+.d-cat .circled{position:relative}
+.d-cat .circled::after{content:"";position:absolute;inset:-1mm -2mm;border:.6mm solid var(--red);border-radius:50%;transform:rotate(-2deg)}
+.d-cat::after{content:"";position:absolute;right:0;top:0;width:14mm;height:14mm;background:linear-gradient(225deg,var(--paper) 50%,#e3dccd 50%);box-shadow:-.4mm .4mm .8mm #0002}
+
+.d-grim{width:94mm;padding:8mm 9mm;background:#f3e7cc;font:10pt/1.4 "IM Fell English",Georgia,serif}
+.d-grim .run{text-align:center;font:italic 8pt "IM Fell English",Georgia,serif;color:var(--muted);margin-bottom:4mm}
+.d-grim h4{font:400 14pt/1.1 "IM Fell English SC",Georgia,serif;text-align:center;margin:0 0 4mm}
+.d-grim p{margin:0 0 3mm;text-align:justify;hyphens:auto}
+.d-grim p:first-of-type::first-letter{float:left;font-size:30pt;line-height:.85;margin:1mm 1.5mm 0 0}
+.d-grim .margin{font:600 15pt/1.1 "Caveat",cursive;color:#3a2a4a;transform:rotate(-3deg);margin:4mm 0 0;padding:2mm 3mm;border-left:.6mm solid #3a2a4a}
+.d-grim::after{content:"";position:absolute;right:0;top:0;width:12mm;height:12mm;background:linear-gradient(225deg,var(--paper) 50%,#ddcfae 50%)}
+
+.d-napkin{width:68mm;height:68mm;display:grid;place-items:center;background:#fff;
+  box-shadow:0 0 0 .3mm #b9ae9c,inset 0 0 0 3mm #fff,inset 0 0 0 3.4mm #e3dccd}
+.d-napkin p{margin:0;font:600 20pt/1 "Caveat",cursive;transform:rotate(-6deg)}
+
+/* ---------- Aide de jeu ---------- */
+.track{display:block;width:190mm;height:auto}
+.tr-board{fill:var(--tile);stroke:var(--ink);stroke-width:1.4}
+/* La piste est dessinée en millimètres : 1px du viewBox = 1 mm imprimé. */
+.tr-board{stroke-width:.4}
+.tr-slot{fill:var(--sheet);stroke:var(--ink);stroke-width:.35;stroke-dasharray:1.5 1}
+.tr-slot.j2{fill:#ece5d8}
+.tr-n{font:400 9px "IM Fell English",Georgia,serif;fill:#b9ae9c;text-anchor:middle;dominant-baseline:central}
+.tr-l{font:600 3.2px system-ui,sans-serif;fill:var(--ink);text-anchor:middle}
+.tr-s{font:italic 3.6px "IM Fell English",Georgia,serif;fill:var(--muted);text-anchor:middle}
+.tr-h{font:400 6.5px "IM Fell English SC",Georgia,serif;fill:var(--ink)}
+.aid{width:190mm;border:.5mm solid var(--ink);border-radius:3mm;background:var(--tile);padding:6mm 7mm;margin-top:6mm;font-size:10pt;line-height:1.4}
+.aid h4{margin:0 0 3mm;font:400 17pt/1 "IM Fell English SC",Georgia,serif;text-align:center}
+.aid .cols{display:grid;grid-template-columns:1fr 1fr;gap:6mm}
+.aid h5{margin:0 0 1.5mm;font:400 12.5pt "IM Fell English SC",Georgia,serif;border-bottom:.3mm solid var(--ink)}
+.aid ul,.aid ol{margin:0 0 3mm;padding-left:5mm}
+.aid li{margin-bottom:.8mm}
+.aid .code{display:inline-grid;place-items:center;min-width:7mm;height:5mm;padding:0 1.2mm;border-radius:2.5mm;background:var(--ink);color:var(--sheet);font:700 7.5pt/1 system-ui,sans-serif}
+
+/* Les quatre vues */
+.view{display:none}
+body[data-view="cards"] .v-cards, body[data-view="tokens"] .v-tokens, body[data-view="docs"] .v-docs, body[data-view="aid"] .v-aid{display:block}
+
+@page{size:A4 portrait;margin:8mm}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0}
+  .bar,header,.hint,.todo{display:none}
+  .sheet{border:0;border-radius:0;padding:0;margin:0;overflow:visible;background:#fff;break-after:page}
+  .view > .sheet:last-child{break-after:auto}
+  .sheet h2{font-size:15pt;margin:0 0 3mm}
+  .sheet h3{margin:4mm 0 2mm}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body data-view="cards">
+<div class="wrap">
+  <header>
+    <h1>Matériel à imprimer</h1>
+    <p>Tout ce qui se pose sur la table en plus du plan : les cartes, les jetons, les documents que le MJ remet, et l'aide de jeu.</p>
+  </header>
+
+  <div class="bar">
+    <span class="seg" role="group" aria-label="Vue">
+      <button type="button" data-view="cards" aria-pressed="true">Cartes personnage</button>
+      <button type="button" data-view="tokens" aria-pressed="false">Jetons</button>
+      <button type="button" data-view="docs" aria-pressed="false">Documents</button>
+      <button type="button" data-view="aid" aria-pressed="false">Aide de jeu</button>
+    </span>
+    <button type="button" class="print" onclick="window.print()">Imprimer cette vue</button>
+  </div>
+  <p class="hint" id="hint"></p>
+
+  <div class="view v-cards" id="v-cards"></div>
+  <div class="view v-tokens" id="v-tokens"></div>
+  <div class="view v-docs" id="v-docs"></div>
+  <div class="view v-aid" id="v-aid"></div>
+</div>
+
+<script>
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const sheet = (title, inner) => `<section class="sheet"><h2>${title}</h2>${inner}</section>`;
+const fig = (inner, caption) => `<figure>${inner}<figcaption>${caption}</figcaption></figure>`;
+
+const HINTS = {
+  cards:"Recto-verso, retourner sur le bord long : les versos sont rangés en miroir pour tomber pile derrière leur recto. Sans recto-verso, imprimer les deux pages et les coller dos à dos.",
+  tokens:"Imprimer à 100 % (taille réelle) : les jetons de 28 mm entrent dans les cases de la piste du sablier. Sur papier épais, ou collés sur du carton.",
+  docs:"Imprimer à 100 %, découper au ras du papier. La légende sous chaque document dit quand le remettre : elle part à la découpe.",
+  aid:"Imprimer à 100 % : les cases de la piste font la taille des jetons."
+};
+
+/* ---------- Emblèmes des personnages (60 × 60) ---------- */
+const ICON = {
+  // Un plan griffonné, chemin en pointillés jusqu'à la croix.
+  plan:`<rect x="9" y="11" width="42" height="38" rx="2" fill="#fffdf8" stroke="#1f1b24" stroke-width="2"/>
+    <path d="M15,42 Q24,20 34,32 T45,18" fill="none" stroke="#1f1b24" stroke-width="1.8" stroke-dasharray="3 2.5"/>
+    <path d="M42,14 l6,6 M48,14 l-6,6" stroke="#b3261e" stroke-width="2.4" stroke-linecap="round"/>`,
+  sparkle:`<path d="M27,6 L32,23 L49,28 L32,33 L27,50 L22,33 L5,28 L22,23 Z" fill="#e8d38f" stroke="#1f1b24" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M46,40 L48,46 L54,48 L48,50 L46,56 L44,50 L38,48 L44,46 Z" fill="#e8d38f" stroke="#1f1b24" stroke-width="1.5" stroke-linejoin="round"/>`,
+  loupe:`<line x1="35" y1="35" x2="51" y2="51" stroke="#1f1b24" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="25" cy="25" r="15" fill="#dfe8f2" stroke="#1f1b24" stroke-width="3.5"/>
+    <path d="M17,20 q4,-6 10,-6" fill="none" stroke="#fffdf8" stroke-width="2.5" stroke-linecap="round"/>`,
+  bone:`<g fill="#e8d38f" stroke="#1f1b24" stroke-width="2"><circle cx="14" cy="23" r="7"/><circle cx="14" cy="37" r="7"/>
+    <circle cx="46" cy="23" r="7"/><circle cx="46" cy="37" r="7"/></g><rect x="14" y="24" width="32" height="12" fill="#e8d38f"/>
+    <path d="M17,24 H43 M17,36 H43" stroke="#1f1b24" stroke-width="2"/>`,
+  paw:`<g fill="#7a5a3a" stroke="#1f1b24" stroke-width="1.5"><ellipse cx="30" cy="40" rx="12" ry="10"/>
+    <ellipse cx="15" cy="26" rx="5" ry="6.5"/><ellipse cx="24" cy="15" rx="5" ry="6.5"/><ellipse cx="36" cy="15" rx="5" ry="6.5"/><ellipse cx="45" cy="26" rx="5" ry="6.5"/></g>`,
+  bolt:`<polygon points="35,4 13,33 27,33 22,56 47,24 33,24 39,4" fill="#f3b14a" stroke="#1f1b24" stroke-width="2" stroke-linejoin="round"/>`
+};
+
+/* Textes joueurs : pas de spoiler (rien sur la Chambre ni sur les pièces où la capacité sert). */
+const CARDS = [
+  {name:"Fred", icon:"plan", q:"« Les gars, j'ai un plan ! »",
+    rule:"Rend son usage à la capacité d'un autre joueur, déjà utilisée. Pas à la sienne."},
+  {name:"Daphné", icon:"sparkle", q:"« Un jeu d'enfant ! »",
+    rule:"Au choix : un déplacement gratuit, ou une action payante gratuite."},
+  {name:"Véra", icon:"loupe", q:"« Œil de lynx »",
+    rule:"Inspecte la pièce où se trouve le groupe : le MJ dit si quelque chose cloche."},
+  {name:"Sammy", icon:"bone", q:"« Donner un Scooby-Snack »",
+    rule:"Amadoue un animal. Une boîte de Scooby-Snacks permet de retourner la carte face visible."},
+  {name:"Scooby", icon:"paw", q:"« Renifler »",
+    rule:"Avant une action payante. Il bâille : rien. Il remue la queue : quelque chose. Il s'excite : très important."},
+  {name:"Scrappy", icon:"bolt", q:"« Puppy Power ! »",
+    rule:"Force une porte fermée à clé."}
+];
+const FOOT = "Une seule fois dans la partie, pendant une journée, sans coût en temps. Retourner la carte après usage.";
+
+const cardFront = c => `<div class="card"><div class="in">
+  <div class="name">${esc(c.name)}</div>
+  <svg viewBox="0 0 60 60" aria-hidden="true">${ICON[c.icon]}</svg>
+  <p class="q">${esc(c.q)}</p><p class="rule">${esc(c.rule)}</p><p class="foot">${FOOT}</p></div></div>`;
+const cardBack = c => `<div class="card back"><div class="in"><div class="name">${esc(c.name)}</div><div class="used">Capacité utilisée</div></div></div>`;
+// Recto-verso sur le bord long : chaque rangée de trois s'inverse au verso.
+const mirrored = list => list.reduce((rows, c, i) => (i % 3 ? rows[rows.length-1].push(c) : rows.push([c]), rows), [])
+  .flatMap(r => [...r, ...Array(3 - r.length).fill(null)].reverse());
+
+document.getElementById("v-cards").innerHTML =
+  sheet("Cartes personnage · recto", `<div class="cards">${CARDS.map(cardFront).join("")}</div>`)
+  + sheet("Cartes personnage · verso", `<div class="cards">${mirrored(CARDS).map(c => c ? cardBack(c) : "<div></div>").join("")}</div>`);
+
+/* ---------- Jetons (100 × 100, imprimés à 28 mm) ---------- */
+const TOKEN = {
+  sablier:{t:"Sablier", art:`<path d="M36,22 H64 M36,74 H64" stroke="#1f1b24" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M39,22 C39,40 49,44 49,48 C49,52 39,56 39,74 H61 C61,56 51,52 51,48 C51,44 61,40 61,22 Z" fill="#fffdf8" stroke="#1f1b24" stroke-width="2.2"/>
+    <path d="M43,30 H57 C55,38 51,42 50,44 C49,42 45,38 43,30 Z M42,72 C44,64 48,61 50,60 C52,61 56,64 58,72 Z" fill="#e8d38f"/>`},
+  groupe:{t:"Le groupe", big:true, art:`<rect x="20" y="34" width="60" height="28" rx="6" fill="#9fd356" stroke="#1f1b24" stroke-width="2.2"/>
+    <path d="M26,34 L32,24 H68 L74,34" fill="#9fd356" stroke="#1f1b24" stroke-width="2.2" stroke-linejoin="round"/>
+    <rect x="35" y="27" width="13" height="8" fill="#dfe8f2" stroke="#1f1b24" stroke-width="1.4"/><rect x="52" y="27" width="13" height="8" fill="#dfe8f2" stroke="#1f1b24" stroke-width="1.4"/>
+    <path d="M30,48 q5,-6 10,0 t10,0 t10,0" fill="none" stroke="#f3b14a" stroke-width="3"/>
+    <circle cx="33" cy="63" r="7" fill="#3a3340"/><circle cx="67" cy="63" r="7" fill="#3a3340"/>`},
+  liane:{t:"Liane", art:`<path d="M18,62 C28,30 40,70 50,42 S70,30 82,38" fill="none" stroke="#4f6b33" stroke-width="5" stroke-linecap="round"/>
+    <g fill="#8db66a" stroke="#4f6b33" stroke-width="1.4"><ellipse cx="30" cy="42" rx="7" ry="4" transform="rotate(-40 30 42)"/>
+    <ellipse cx="46" cy="58" rx="7" ry="4" transform="rotate(30 46 58)"/><ellipse cx="62" cy="30" rx="7" ry="4" transform="rotate(-20 62 30)"/>
+    <ellipse cx="74" cy="46" rx="6" ry="3.5" transform="rotate(40 74 46)"/></g>`},
+  cle:{t:"Cave (double)", art:`<circle cx="32" cy="46" r="12" fill="none" stroke="#8a6a3a" stroke-width="6"/>
+    <path d="M44,46 H78 M70,46 V56 M62,46 V54" fill="none" stroke="#8a6a3a" stroke-width="6" stroke-linecap="square"/>
+    <path d="M26,30 Q20,20 30,16" fill="none" stroke="#1f1b24" stroke-width="1.4"/><rect x="24" y="10" width="16" height="10" rx="2" fill="#fffdf8" stroke="#1f1b24" stroke-width="1.4" transform="rotate(-15 32 15)"/>`},
+  snacks:{t:"Scooby-Snacks", fs:8.5, art:`<rect x="26" y="28" width="48" height="40" rx="4" fill="#c06a3a" stroke="#1f1b24" stroke-width="2.2"/>
+    <rect x="23" y="23" width="54" height="9" rx="3" fill="#a3542b" stroke="#1f1b24" stroke-width="2.2"/>
+    <g transform="translate(50 50) scale(.55) translate(-30 -30)">${ICON.bone}</g>`}
+};
+function tokenSVG(k){
+  const t = TOKEN[k];
+  return `<svg class="token${t.big ? " big" : ""}" viewBox="0 0 100 100" role="img" aria-label="Jeton : ${esc(t.t)}">
+    <circle class="tk-edge" cx="50" cy="50" r="49"/><circle class="tk-ring" cx="50" cy="50" r="44"/>
+    <g transform="translate(0 -6)">${t.art}</g><text class="tk-t" x="50" y="86"${t.fs ? ` style="font-size:${t.fs}px"` : ""}>${esc(t.t)}</text></svg>`;
+}
+// Valeurs du Scrabble français.
+const SCRABBLE = {A:1,B:3,C:3,D:2,E:1,F:4,G:2,H:4,I:1,J:8,K:10,L:1,M:2,N:1,O:1,P:3,Q:8,R:1,S:1,T:1,U:1,V:4,W:10,X:10,Y:10,Z:10};
+
+document.getElementById("v-tokens").innerHTML = sheet("Jetons à découper", `
+  <h3>Le sablier</h3>
+  <div class="cut">${Array.from({length:6}, () => fig(tokenSVG("sablier"), "")).join("")}</div>
+  <h3>Le groupe et les objets</h3>
+  <div class="cut">
+    ${fig(tokenSVG("groupe"), "<b>Pion du groupe</b> · sur le plan")}
+    ${fig(tokenSVG("liane"), "<b>Liane</b> · D1b, les Sylvains")}
+    ${fig(tokenSVG("cle"), "<b>Clé de la cave</b> · D2, l'établi")}
+    ${fig(tokenSVG("snacks"), "<b>Boîte de Scooby-Snacks</b> · F1")}
+  </div>
+  <h3>Lettres de Scrabble (optionnel)</h3>
+  <div class="letters">${Object.entries(SCRABBLE).map(([l,v]) => `<div class="letter">${l}<small>${v}</small></div>`).join("")}</div>`);
+
+/* ---------- Documents à remettre ----------
+   Les textes viennent des scripts (livret et Notion). Ceux qui y sont encore entre crochets ont un texte provisoire, listé dans TODO. */
+const TODO = [
+  "Journal (C3) : la description physique des Sylvains",
+  "Plan technique (H1) : les annotations en rouge",
+  "Devis et bon de commande (B1b) : le nom de l'entreprise et les prix"
+];
+
+// Les prothèses du catalogue (66 × 54).
+const hand = `<g fill="#d8d2c6" stroke="#1f1b24" stroke-width="1.4"><rect x="12" y="30" width="26" height="12" rx="3"/>
+  <path d="M38,32 h12 M38,36 h14 M38,40 h11" stroke-width="3" stroke-linecap="round"/><path d="M50,32 q6,0 6,4" fill="none"/></g>`;
+const knee = `<g fill="#d8d2c6" stroke="#1f1b24" stroke-width="1.4"><rect x="28" y="6" width="10" height="20" rx="2"/><circle cx="33" cy="29" r="5"/>
+  <rect x="29" y="33" width="8" height="16" rx="2"/><path d="M29,40 h8 M29,44 h8" fill="none"/></g>`;
+const claw = `<g fill="#d8d2c6" stroke="#1f1b24" stroke-width="1.4"><rect x="8" y="22" width="26" height="10" rx="3"/><circle cx="36" cy="27" r="5"/>
+  <path d="M40,24 L52,14 L58,18 L46,27 M40,30 L52,40 L58,36 L46,27" stroke-linejoin="round"/></g>`;
+const catItem = (name, text, price, art, circled) => `<div class="item"><svg viewBox="0 0 66 54" aria-hidden="true">${art}</svg>
+  <div><b class="${circled ? "circled" : ""}">${name}</b><br>${text}<br><span class="price">${price}</span></div></div>`;
+
+const scribble = `<svg width="90" height="26" viewBox="0 0 90 26" aria-hidden="true"><path d="M4,18 C14,2 18,24 26,12 S36,4 40,16 S54,22 58,8 S72,18 86,10" fill="none" stroke="#2c4a7a" stroke-width="1.6"/></svg>`;
+
+const DOCS = [
+  fig(`<div class="doc d-note hand"><p>Monsieur,</p>
+    <p>Tous les jours je retrouve des lianes au fond de la serre et je suis obligé de les couper. Qui s'amuse à faire ça&nbsp;??</p>
+    <p class="sig">Votre jardinier</p></div>`,
+    "<b>A3 · Lire le courrier</b> (gratuit) · la note du jardinier, parmi les factures"),
+
+  fig(`<div class="doc d-type type"><div class="head"><b>Établissements Poulie &amp; Fils</b><span>Monte-charges · Ascenseurs · Mécanismes sur mesure</span></div>
+    <h4>DEVIS N° 1313</h4>
+    <p>Client : le propriétaire du manoir.</p>
+    <p>Objet : installation d'un monte-charge vertical dans les conduits de cheminée du manoir.</p>
+    <table>
+      <tr><td>Relevé et étude des conduits</td><td>1 200 F</td></tr>
+      <tr><td>Cabine renforcée, silencieuse</td><td>4 800 F</td></tr>
+      <tr><td>Panneau pivotant habillé de pierre</td><td>2 600 F</td></tr>
+      <tr><td>Pose et réglages, de nuit</td><td>2 000 F</td></tr>
+      <tr><td><b>Total</b></td><td><b>10 600 F</b></td></tr>
+    </table>
+    <p>Discrétion absolue garantie.</p>
+    <p style="margin-top:6mm">Lu et approuvé :</p>${scribble}</div>`,
+    "<b>B1b · La pièce cachée</b> (Scooby-Snack de Sammy) · 1/2, à agrafer avec le bon de commande"),
+
+  fig(`<div class="doc d-type type"><div class="head"><b>Établissements Poulie &amp; Fils</b><span>Monte-charges · Ascenseurs · Mécanismes sur mesure</span></div>
+    <h4>BON DE COMMANDE N° 1314</h4>
+    <p>Suite au devis n° 1313.</p>
+    <table>
+      <tr><td>Désignation</td><td>Quantité</td></tr>
+      <tr><td>Mécanisme de monte-charge pour conduit de cheminée</td><td>2</td></tr>
+    </table>
+    <p>Livraison : au manoir, par l'entrée de service.</p>
+    <p>Règlement : à la commande.</p>
+    <span class="stamp">PAYÉ</span></div>`,
+    "<b>B1b · La pièce cachée</b> · 2/2, à agrafer derrière le devis"),
+
+  fig(`<div class="doc d-journal hand">
+    <p class="date">12 octobre</p>
+    <p class="other">Pluie toute la journée. Le jardinier n'est pas venu.</p>
+    <p class="date">14 octobre</p>
+    <p>Aujourd'hui, j'ai vu d'étranges créatures dans la serre, pas plus hautes qu'un arrosoir, couvertes de mousse, avec des doigts comme des brindilles. Elles sont sorties quand j'ai arrosé les plantes.</p></div>`,
+    "<b>C3 · Lire le journal</b> (gratuit) · l'entrée sur les Sylvains"),
+
+  fig(`<div class="doc d-torn hand"><p>Le monte-charge de la bibliothèque est encore bloqué. Rappeler l'artisan.</p></div>`,
+    "<b>C3 · Fouiller le journal page par page</b> (1 cran) · à ne remettre qu'après l'action"),
+
+  fig(`<div class="doc d-blue">${liftPlan()}</div>`,
+    "<b>C2b · Le tiroir du Scrabble</b> (WQT) · le plan du monte-charge"),
+
+  fig(`<div class="doc d-tech">${techPlan()}</div>`,
+    "<b>H1 · Le plan technique</b> (gratuit) · au mur du sous-sol"),
+
+  fig(`<div class="doc d-cat"><div class="head"><b>Prothèses articulées</b>Catalogue d'automne · livraison discrète</div>
+    ${catItem("Modèle Albert", "Main à ressort, trois doigts. Serre une tasse sans la briser (le plus souvent).", "890 F", hand)}
+    ${catItem("Modèle Simone", "Genou télescopique, réglable en hauteur. Idéal pour les étagères du haut.", "1 450 F", knee)}
+    ${catItem("Modèle Georges", "Pince robotique, rotation complète. Taille petite patte. Garantie à vie (la sienne).", "3 900 F", claw, true)}</div>`,
+    "<b>C3 · Feuilleter le catalogue</b> (gratuit) · bonus ambiance, page cornée"),
+
+  fig(`<div class="doc d-grim"><div class="run">Mécanismes et automates de salon · 213</div>
+    <h4>Des passages dérobés</h4>
+    <p>Un passage dérobé ne vaut que par son mécanisme. Le plus sûr se commande par l'horloge : une came montée sur le balancier libère le verrou au passage d'une heure choisie, et à nulle autre.</p>
+    <p>On choisira de préférence une heure où la maison dort. Le panneau pivote alors sans bruit sur son axe, et se referme de lui-même au coup suivant.</p>
+    <p class="margin">Les passages ne s'ouvrent qu'à minuit pile, quand l'horloge du salon sonne le douzième coup.</p></div>`,
+    "<b>C1 · Scooby-Snack à Amaya</b> (Sammy) · bonus, la page cornée du grimoire"),
+
+  fig(`<div class="doc d-napkin"><p>7/10, manque de sel.</p></div>`,
+    "<b>F2 · Soulever l'assiette</b> (1 cran) · bonus")
+];
+
+/* Rangés par paires de même largeur (94 mm, ou la note avec la serviette) pour tenir en trois pages A4,
+   puis les deux grands plans ensemble. La légende de chacun dit à quelle pièce il appartient. */
+const PACKED = [1,2, 3,4, 7,8, 0,9, 5,6].map(i => DOCS[i]);
+
+/* Le plan du monte-charge, en coupe : la cabine monte du sous-sol jusqu'aux deux cheminées empilées au-dessus.
+   Il ne nomme aucune pièce : c'est le plan des étages qui dit lesquelles. */
+function liftPlan(){
+  const fire = (x, y) => `<path class="bl-fill" d="M${x},${y} v-26 h34 v26 h-8 v-12 a9,9 0 0 0 -18,0 v12 Z"/>
+    <path class="bl-thin" d="M${x-2},${y} a30,30 0 0 0 -30,-30" stroke-dasharray="3 2"/>`;
+  return `<svg viewBox="0 0 360 236" role="img" aria-label="Plan du monte-charge, vue en coupe">
+    <defs><pattern id="earth" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#2c4a7a" stroke-width=".6"/></pattern></defs>
+    <text class="bl-h" x="14" y="22">Monte-charge vertical</text><text class="bl-t" x="14" y="35">Coupe · éch. 1/50</text>
+    <path class="bl" d="M20,62 H340 M20,118 H340 M20,170 H340"/>
+    <text class="bl-t" x="22" y="112">Étage</text><text class="bl-t" x="22" y="164">Rez-de-chaussée</text><text class="bl-t" x="22" y="190">Sous-sol</text>
+    <rect x="20" y="170" width="320" height="62" fill="url(#earth)" opacity=".45"/>
+    <rect class="bl-fill" x="150" y="176" width="186" height="52" style="fill:#f2f6fa"/>
+    <text class="bl-t" x="243" y="222" text-anchor="middle">grande pièce</text>
+    <path class="bl" d="M262,176 V44 H286 V176"/><path class="bl-thin" d="M268,44 V30 h12 v14"/>
+    <circle class="bl" cx="274" cy="52" r="6"/><path class="bl-thin" d="M274,58 V128 M274,52 v-6"/>
+    <rect class="bl-fill" x="265" y="128" width="18" height="26"/><path class="bl-thin" d="M265,141 h18"/>
+    <path class="bl-thin" d="M290,128 v-30 l-4,6 m4,-6 l4,6 M290,154 v14 l-4,-6 m4,6 l4,-6"/>
+    ${fire(228,118)}${fire(228,170)}
+    <path class="bl-thin" d="M196,92 h-40 M196,144 h-40"/><text class="bl-t" x="96" y="88">mécanisme n° 1</text><text class="bl-t" x="96" y="140">mécanisme n° 2</text>
+    <text class="madame" x="200" y="22">À l'attention de Madame.</text>
+  </svg>`;
+}
+
+/* Le plan technique du sous-sol : le rez-de-chaussée vu par l'électricien, repris des coordonnées du Plan du manoir. */
+function techPlan(){
+  const rooms = [
+    ["0,0 210,0 210,230 0,230","Cuisine",125,130], ["0,230 275,230 275,450 0,450","Salon",80,390],
+    ["210,170 455,170 455,450 275,450 275,230 210,230","Hall",340,330], ["455,170 710,170 710,450 455,450","Bibliothèque",582,330],
+    ["210,-75 505,-75 505,170 210,170","Serre",340,60], ["505,0 710,0 710,170 505,170","",0,0,true]
+  ];
+  const lamps = [[60,60],[138,300],[400,250],[582,260],[440,-20]];
+  return `<svg viewBox="-30 -150 770 640" role="img" aria-label="Plan technique du rez-de-chaussée">
+    <text class="tc-title" x="-14" y="-122">Manoir · circuits électriques · rez-de-chaussée</text>
+    ${rooms.map(([p,n,x,y,s]) => `<polygon class="${s ? "tc-sealed" : "tc-room"}" points="${p}"/>${n ? `<text class="tc-name" x="${x}" y="${y}">${n}</text>` : ""}`).join("")}
+    <rect class="tc-chem" x="425" y="360" width="20" height="70"/><rect class="tc-chem" x="600" y="180" width="80" height="20"/>
+    <path class="tc-wire" d="M240,430 V400 H170 V300 H138 M240,400 H400 V250 M400,280 H582 V260 M240,400 V190 H440 V-20 M170,300 V250 H60 V60"/>
+    ${lamps.map(([x,y]) => `<circle class="tc-lamp" cx="${x}" cy="${y}" r="9"/><path class="tc-wire" style="stroke-dasharray:none" d="M${x-6},${y-6} l12,12 M${x+6},${y-6} l-12,12"/>`).join("")}
+    <rect x="228" y="430" width="24" height="16" fill="#8f8a86" stroke="#1f1b24" stroke-width="1.5"/><text class="tc-name" style="font-size:12px" x="240" y="470">tableau</text>
+    <ellipse class="tc-red" cx="640" cy="192" rx="62" ry="30" transform="rotate(-4 640 192)"/>
+    <text class="tc-note" x="604" y="250" style="font-size:34px">KO</text>
+    <text class="tc-note" x="390" y="-100">Serre : arrosage coupé</text>
+    <text class="tc-note" x="-14" y="-70">Salon : la télé</text><text class="tc-note" x="-14" y="-44">s'allume toute seule ??</text>
+  </svg>`;
+}
+
+document.getElementById("v-docs").innerHTML =
+  `<div class="todo"><b>Textes provisoires</b>, encore entre crochets dans les scripts :<ul>${TODO.map(t => `<li>${esc(t)}</li>`).join("")}</ul></div>`
+  + sheet("Documents à remettre", `<div class="cut">${PACKED.join("")}</div>`);
+
+/* ---------- Aide de jeu ----------
+   La piste : 6 cases de 30 mm pour des jetons de 28 mm. On retire un jeton à chaque cran, de gauche à droite. */
+function trackSVG(){
+  const W = 190, H = 64, r = 15, gap = 31, x0 = 2.5;   // en millimètres
+  const slots = Array.from({length:6}, (_, i) => {
+    const n = 6 - i, x = x0 + r + i*gap, j2 = n > 4;
+    return `<circle class="tr-slot${j2 ? " j2" : ""}" cx="${x}" cy="28" r="${r}"/><text class="tr-n" x="${x}" y="28">${n}</text>
+      <text class="tr-s" x="${x}" y="50">${j2 ? "jour 2 seulement" : ""}</text>`;
+  }).join("");
+  const xLast = x0 + r + 5*gap;
+  return `<svg class="track" viewBox="0 0 ${W} ${H}" style="width:${W}mm" role="img" aria-label="Piste du sablier">
+    <rect class="tr-board" x=".5" y=".5" width="${W-1}" height="${H-1}" rx="4"/>
+    <text class="tr-h" x="6" y="9">Le sablier</text>
+    ${slots}
+    <text class="tr-l" x="${xLast}" y="48">Jour 1 : 21h</text><text class="tr-l" x="${W - 4}" y="52.5" style="text-anchor:end">Jour 2 : Dernière chance !</text>
+    <text class="tr-s" x="${W/2}" y="${H-2.5}">Jour 1 : 4 jetons (cases 4 à 1) · Jour 2 : 6 jetons. Quand le dernier jeton tombe, la nuit tombe.</text>
+  </svg>`;
+}
+
+document.getElementById("v-aid").innerHTML = sheet("Aide de jeu", `${trackSVG()}
+  <div class="aid"><h4>Comment on joue</h4>
+    <div class="cols">
+      <div>
+        <h5>Explorer une pièce</h5>
+        <ol>
+          <li>À la première visite, le MJ lit l'entrée et pose la tuile de la pièce sur le plan.</li>
+          <li>Annoncez le code d'un élément (<span class="code">C2</span>) : le MJ le décrit et lit les actions possibles, avec leur coût.</li>
+          <li>Choisissez une action. Elle donne son résultat, ou mène plus loin.</li>
+        </ol>
+        <h5>Les capacités</h5>
+        <ul>
+          <li>Chacune sert une seule fois dans toute la partie, pendant une journée.</li>
+          <li>Elles ne coûtent pas de temps. Retournez la carte après usage.</li>
+          <li>La partie dure deux jours : réfléchissez bien.</li>
+        </ul>
+      </div>
+      <div>
+        <h5>Coûte 1 cran</h5>
+        <ul>
+          <li>Une action payante : examiner, fouiller, arroser…</li>
+          <li>Aller dans une autre pièce, quelle qu'elle soit.</li>
+        </ul>
+        <h5>Gratuit</h5>
+        <ul>
+          <li>Revenir au Hall.</li>
+          <li>Choisir un élément et écouter sa description.</li>
+          <li>Les actions gratuites et les énigmes.</li>
+          <li>Les capacités.</li>
+        </ul>
+        <h5>À retenir</h5>
+        <ul>
+          <li>Le groupe reste ensemble. Chaque journée commence dans le Hall.</li>
+          <li>Une action payante déjà faite ne se refait pas.</li>
+          <li>On ne peut pas perdre.</li>
+        </ul>
+      </div>
+    </div>
+  </div>`);
+
+function show(view){
+  document.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", x.dataset.view === view));
+  document.body.dataset.view = view;
+  document.getElementById("hint").textContent = HINTS[view];
+}
+document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => show(b.dataset.view)));
+show("cards");
+</script>
+</body>
+</html>
