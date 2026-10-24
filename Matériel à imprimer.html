@@ -259,16 +259,16 @@ const TOKEN = {
     <ellipse cx="46" cy="58" rx="7" ry="4" transform="rotate(30 46 58)"/><ellipse cx="62" cy="30" rx="7" ry="4" transform="rotate(-20 62 30)"/>
     <ellipse cx="74" cy="46" rx="6" ry="3.5" transform="rotate(40 74 46)"/></g>`},
   cle:{t:"Cave (double)", art:`<circle cx="32" cy="46" r="12" fill="none" stroke="#8a6a3a" stroke-width="6"/>
-    <path d="M44,46 H78 M70,46 V56 M62,46 V54" fill="none" stroke="#8a6a3a" stroke-width="6" stroke-linecap="square"/>
-    <path d="M26,30 Q20,20 30,16" fill="none" stroke="#1f1b24" stroke-width="1.4"/><rect x="24" y="10" width="16" height="10" rx="2" fill="#fffdf8" stroke="#1f1b24" stroke-width="1.4" transform="rotate(-15 32 15)"/>`},
+    <path d="M44,46 H78 M70,46 V56 M62,46 V54" fill="none" stroke="#8a6a3a" stroke-width="6" stroke-linecap="square"/>`},
   // Le dernier Scooby-Snack de la boîte (F1) : il s'utilise comme la capacité de Sammy.
-  snacks:{t:"Scooby-Snack", fs:9.5, art:`<g transform="translate(50 50) scale(1.05) translate(-30 -30)">${ICON.bone}</g>`}
+  snacks:{t:"Scooby-Snack", art:`<g transform="translate(50 50) scale(1.05) translate(-30 -30)">${ICON.bone}</g>`}
 };
+/* Le nom passe sous le dessin, dans l'anneau intérieur : un nom long est resserré pour ne pas toucher le bord. */
 function tokenSVG(k){
-  const t = TOKEN[k];
+  const t = TOKEN[k], fit = t.t.length > 9 ? ` textLength="52" lengthAdjust="spacingAndGlyphs"` : "";
   return `<svg class="token${t.big ? " big" : ""}" viewBox="0 0 100 100" role="img" aria-label="Jeton : ${esc(t.t)}">
     <circle class="tk-edge" cx="50" cy="50" r="49"/><circle class="tk-ring" cx="50" cy="50" r="44"/>
-    <g transform="translate(0 -6)">${t.art}</g><text class="tk-t" x="50" y="86"${t.fs ? ` style="font-size:${t.fs}px"` : ""}>${esc(t.t)}</text></svg>`;
+    <g transform="translate(0 -9)">${t.art}</g><text class="tk-t" x="50" y="80"${fit}>${esc(t.t)}</text></svg>`;
 }
 // Valeurs du Scrabble français.
 const SCRABBLE = {A:1,B:3,C:3,D:2,E:1,F:4,G:2,H:4,I:1,J:8,K:10,L:1,M:2,N:1,O:1,P:3,Q:8,R:1,S:1,T:1,U:1,V:4,W:10,X:10,Y:10,Z:10};
