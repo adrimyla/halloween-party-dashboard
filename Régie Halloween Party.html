@@ -1561,8 +1561,9 @@ function scriptCard(s){
       const cls=/gratuit/i.test(r.cost) ? "free" : /capacit/i.test(r.cost) ? "capa" : "";
       body+=`<details class="opt" data-k="${esc(k)}" ${ui.opts.has(k)?"open":""}>
         <summary class="opt-h"><span class="n">${n}.</span><b>${fmt(r.text)}</b>${r.cost?`<span class="cost ${cls}">${esc(r.cost)}</span>`:""}${link&&linkDone(link)?`<span class="cost free">fait ✓</span>`:""}</summary>
-        <div class="opt-body">`;
-      close=`${link?`<div class="opt-btns">${linkBtns(link)}</div>`:""}</div></details>`;
+        <div class="opt-body">${link?`<div class="opt-btns">${linkBtns(link)}</div>`:""}`;
+      // Le bouton passe avant le texte : on clique d'abord, on lit ensuite.
+      close=`</div></details>`;
     } else if(r.type==="res") body+=`<div class="res"><span class="res-l">Résultat</span><span>${fmt(r.text)}</span></div>`;
     else if(r.type.startsWith("m-")){
       // Ligne Son / Ambiance / Vidéo : le bouton du fichier du même nom, ou un avertissement s'il manque.
