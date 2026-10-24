@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plan du manoir</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+<style>
+/* Plan des joueurs : le plan vierge, les tuiles à découper, et le plan avec toutes les tuiles posées.
+   Tout est dessiné à la même échelle (SCALE mm par unité) : imprimé à 100 %, chaque tuile tombe pile sur sa pièce
+   et les trois étages se superposent. */
+:root{
+  --paper:#f4efe4; --sheet:#fffdf8; --ink:#1f1b24; --muted:#6b6470; --line:#d9d0c0;
+  --room:#fffdf8; --tile:#f7ecd6; --serre:#eef6e4; --mystery:#e4ddd0;
+  --open:#9fd356; --locked:#f0645a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 48px}
+header h1{font:400 2.4rem/1.1 "IM Fell English SC",Georgia,serif;margin:0}
+header p{margin:.3rem 0 0;color:var(--muted)}
+
+.bar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:16px 0 8px;padding:10px 12px;background:var(--sheet);border:1px solid var(--line);border-radius:10px}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--ink);border-radius:8px;overflow:hidden}
+.seg button{font:inherit;border:0;background:transparent;color:var(--ink);padding:7px 14px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--sheet)}
+.bar .print{margin-left:auto;font:inherit;padding:7px 14px;border-radius:8px;border:1px solid var(--ink);background:var(--sheet);cursor:pointer}
+.hint{color:var(--muted);font-size:.85rem;margin:0 0 10px}
+
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.85rem;color:var(--muted);margin:6px 0 18px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{display:inline-block;width:22px;height:10px;border:1.5px solid var(--ink);border-radius:2px}
+.pin{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 5px;border-radius:11px;font:700 .72rem/1 system-ui,sans-serif;background:var(--ink);color:var(--sheet)}
+
+.sheet{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:22px}
+.sheet h2{margin:0 0 8px;font:400 1.6rem/1 "IM Fell English SC",Georgia,serif}
+.sheet svg.plan{display:block;width:100%;max-width:calc(845 * var(--mm));height:auto;margin:0 auto}
+.tiles{display:flex;flex-wrap:wrap;gap:8mm 6mm;align-items:flex-end}
+.tiles figure{margin:0;break-inside:avoid}
+.tiles figcaption{font-size:.75rem;color:var(--muted);text-align:center;margin-top:2px}
+.tiles svg{display:block;max-width:100%;height:auto}
+
+/* Dessin */
+.room-fill{fill:var(--room)}
+.wall{fill:none;stroke:var(--ink);stroke-width:3}
+.outline{fill:none;stroke:var(--ink);stroke-width:10;stroke-linejoin:miter}
+.sealed{fill:url(#hatch)}
+.serre{fill:var(--serre)}
+.mystery{fill:var(--mystery)}
+.glass{fill:none;stroke:var(--ink);stroke-width:7}
+.glass-in{fill:none;stroke:var(--serre);stroke-width:3}
+.stairbox{fill:var(--sheet);stroke:var(--ink);stroke-width:2}
+.stairs-down{fill:url(#descend);stroke:var(--ink);stroke-width:2}
+.tread{stroke:var(--ink);stroke-width:1.6}
+.door{stroke:var(--ink);stroke-width:1.5}
+.door.open{fill:var(--open)} .door.locked{fill:var(--locked)} .door.sealed{fill:url(#hatch-door)}
+.go{fill:var(--open);stroke:var(--ink);stroke-width:1.5;stroke-linejoin:round}
+.go-t{font:600 12px system-ui,sans-serif;fill:var(--ink);text-anchor:middle}
+.ask{font:400 70px "IM Fell English",Georgia,serif;fill:var(--muted);text-anchor:middle}
+.out{font:italic 15px "IM Fell English",Georgia,serif;fill:var(--muted);text-anchor:middle}
+
+.tile{fill:var(--tile)}
+.tile-edge{fill:none;stroke:var(--ink);stroke-width:1;stroke-dasharray:5 4;opacity:.55}
+.tile-wall{fill:none;stroke:var(--ink);stroke-width:10;stroke-linejoin:miter}
+.curtain{fill:none;stroke:#8a2f3a;stroke-width:4}
+.chem{fill:#6d625a;stroke:var(--ink);stroke-width:2}
+.rname{font:400 22px "IM Fell English",Georgia,serif;fill:var(--ink);text-anchor:middle}
+.mk circle,.mk rect{fill:var(--ink)}
+.mk text{fill:var(--sheet);font:700 12px system-ui,sans-serif;text-anchor:middle;dominant-baseline:central}
+
+/* Les trois vues */
+.view{display:none}
+body[data-view="full"] .v-full, body[data-view="blank"] .v-blank, body[data-view="tiles"] .v-tiles{display:block}
+body[data-view="tiles"] .legend .no-tiles{display:none}
+
+@page{size:A4 landscape;margin:8mm}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none;padding:0}
+  .bar,header,.hint{display:none}
+  .legend{margin:0 0 3mm;font-size:9pt}
+  .sheet{border:0;border-radius:0;padding:0;margin:0;break-after:page}
+  .view > .sheet:last-child{break-after:auto}
+  .sheet h2{font-size:15pt;margin:0 0 2mm}
+  .sheet svg.plan{width:calc(845 * var(--mm));max-width:none}
+  .tiles svg{max-width:none}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body data-view="full">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="hatch" patternUnits="userSpaceOnUse" width="12" height="12" patternTransform="rotate(45)">
+      <rect width="12" height="12" fill="#ece5d8"/><line x1="0" y1="0" x2="0" y2="12" stroke="#b9ae9c" stroke-width="3"/>
+    </pattern>
+    <pattern id="hatch-door" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+      <rect width="6" height="6" fill="#fff"/><line x1="0" y1="0" x2="0" y2="6" stroke="#1f1b24" stroke-width="2.4"/>
+    </pattern>
+    <!-- L'escalier de la cave s'enfonce vers l'ouest : plus sombre en bas. -->
+    <linearGradient id="descend" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#fffdf8"/><stop offset="1" stop-color="#9a9184"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header>
+    <h1>Plan du manoir</h1>
+    <p>Le plan des joueurs : vierge au départ, puis le MJ pose la tuile de chaque pièce à la première visite.</p>
+  </header>
+
+  <div class="bar">
+    <span class="seg" role="group" aria-label="Vue">
+      <button type="button" data-view="full" aria-pressed="true">Plan avec les tuiles</button>
+      <button type="button" data-view="blank" aria-pressed="false">Plan vierge</button>
+      <button type="button" data-view="tiles" aria-pressed="false">Tuiles à découper</button>
+    </span>
+    <button type="button" class="print" onclick="window.print()">Imprimer cette vue</button>
+  </div>
+  <p class="hint">Imprimer à 100 % (taille réelle), sans « ajuster à la page » : c'est ce qui fait tomber les tuiles pile sur les pièces.</p>
+
+  <div class="legend">
+    <span class="no-tiles"><i class="sw" style="background:var(--open)"></i>porte ouverte</span>
+    <span class="no-tiles"><i class="sw" style="background:var(--locked)"></i>porte fermée à clé</span>
+    <span class="no-tiles"><i class="sw" style="background:repeating-linear-gradient(45deg,#ece5d8 0 4px,#b9ae9c 4px 7px)"></i>pièce ou porte condamnée</span>
+    <span class="no-tiles"><svg width="26" height="14" viewBox="0 0 26 14"><path class="go" d="M1,4 H15 V1 L25,7 L15,13 V10 H1 Z"/></svg>escalier vers un autre étage</span>
+    <span><i class="sw" style="background:#6d625a"></i>cheminée</span>
+    <span><i class="pin">B2</i>élément : numéro de son script</span>
+  </div>
+
+  <div class="view v-full" id="v-full"></div>
+  <div class="view v-blank" id="v-blank"></div>
+  <div class="view v-tiles" id="v-tiles"></div>
+</div>
+
+<script>
+/* Échelle d'impression : 1 unité du dessin = 0,28 mm. Le plan fait 845 × 605 unités (≈ 237 × 169 mm). */
+const SCALE = 0.28;
+document.documentElement.style.setProperty("--mm", SCALE + "mm");
+const VIEW = {x:-120, y:-85, w:845, h:605};
+
+/* ---------- Le plan vierge ----------
+   Repère commun aux trois niveaux : corps du manoir x 0→710, y 170→450 ; ailes au nord (y 0→170).
+   L'emprise mystère au −1 (x ≥ 455) est sous la Bibliothèque et la Chambre, jamais sous le Hall. */
+const U = "0,0 210,0 210,170 505,170 505,0 710,0 710,450 0,450";
+const CAVE = {x:160, y:360, w:115, h:90};   // escalier de la cave, même emprise au RdC et au −1
+const UPSTAIRS = {x:210, y:170, w:65, h:60}; // escalier entre le RdC et l'étage
+
+const FLOORS = [
+  { id:"etage", title:"Étage 1",
+    rooms:[
+      {pts:"0,0 210,0 210,170 0,170", cls:"sealed"},
+      {pts:"505,0 710,0 710,170 505,170", cls:"sealed"},
+      {pts:"0,170 710,170 710,450 0,450"}
+    ],
+    stairs:[{...UPSTAIRS}],
+    doors:[{x:55,y:170,len:60,o:"h",k:"sealed"}],
+    arrows:[{x:192,y:200,dir:"e",t:"RdC"}]
+  },
+  { id:"rdc", title:"Rez-de-chaussée",
+    rooms:[
+      {pts:"0,0 210,0 210,230 0,230"},
+      {pts:"0,230 275,230 275,450 0,450"},
+      {pts:"210,170 455,170 455,450 275,450 275,230 210,230"},
+      {pts:"455,170 710,170 710,450 455,450"},
+      {pts:"505,0 710,0 710,170 505,170", cls:"sealed"}
+    ],
+    serre:"210,-75 505,-75 505,170 210,170",
+    stairs:[{...UPSTAIRS}, {...CAVE, down:true, walls:"M160,450 V360 H275"}],
+    doors:[
+      {x:327,y:170,len:60,o:"h",k:"open"},    // Hall → Serre
+      {x:275,y:262,len:58,o:"v",k:"open"},    // Hall → Salon
+      {x:275,y:376,len:58,o:"v",k:"locked"},  // Hall → cave
+      {x:68,y:230,len:58,o:"h",k:"locked"},   // Salon → Cuisine
+      {x:455,y:262,len:58,o:"v",k:"open"},    // Hall → Bibliothèque
+      {x:335,y:450,len:60,o:"h",k:"open"}     // entrée
+    ],
+    arrows:[{x:300,y:200,dir:"w",t:"Étage"}],
+    outside:[["Entrée",365,488]]
+  },
+  { id:"ss", title:"Sous-sol",
+    rooms:[
+      {pts:"0,0 210,0 210,170 0,170", cls:"sealed"},
+      {pts:"0,170 455,170 455,450 0,450"},
+      {pts:"455,170 505,170 505,0 710,0 710,450 455,450", cls:"mystery"}
+    ],
+    stairs:[{...CAVE, down:true, walls:"M160,360 H275 V450"}],
+    doors:[{x:455,y:272,len:70,o:"v",k:"locked"}, {x:60,y:170,len:60,o:"h",k:"sealed"}],
+    arrows:[{x:132,y:405,dir:"e",t:"Hall"}],
+    mystery:[600,280]
+  }
+];
+
+/* ---------- Les tuiles ----------
+   Une tuile = la pièce rentrée de INSET unités, pour laisser voir les murs, portes et escaliers du plan.
+   Les puces portent le numéro du script de l'élément (pas les scripts qui suivent : A1b, B1b…). */
+const INSET = 8;
+const TILES = [
+  { floor:"etage", name:"Chambre", pts:"0,170 210,170 210,230 275,230 275,170 710,170 710,450 0,450", at:[480,330],
+    chem:[[600,180,80,20]], pins:[["E1",420,405],["E2",640,222],["E3",330,205]] },
+  { floor:"rdc", name:"Grand Hall", pts:"275,170 455,170 455,450 275,450", at:[365,322],
+    chem:[[425,360,20,70]], pins:[["A1",365,422],["A2",302,405],["A3",400,395]] },
+  { floor:"rdc", name:"Salon", pts:"0,230 275,230 275,360 160,360 160,450 0,450", at:[118,318],
+    pins:[["B1",34,398],["B2",205,262],["B3",30,262],["B4",97,262]] },
+  { floor:"rdc", name:"Cuisine", pts:"0,0 210,0 210,230 0,230", at:[105,112],
+    pins:[["F1",35,35],["F2",165,192]] },
+  { floor:"rdc", name:"Bibliothèque", pts:"455,170 710,170 710,450 455,450", at:[588,318],
+    chem:[[600,180,80,20]], pins:[["C1",500,214],["C2",560,395],["C3",672,395],["C4",640,222]] },
+  { floor:"rdc", name:"Serre", pts:"210,-75 505,-75 505,170 210,170", at:[357,52],
+    pins:[["D1",250,-38],["D2",465,-38],["D3",465,128]] },
+  /* La pièce cachée est une extension collée à l'ouest du Salon : elle n'existe pas sur le plan vierge. */
+  { floor:"rdc", name:"Pièce|cachée", pts:"-95,300 0,300 0,440 -95,440", at:[-48,362], extension:true,
+    walls:"M0,300 H-95 V440 H0", curtain:"M0,300 q6,8 0,14 t0,14 t0,14 t0,14 t0,14 t0,14 t0,14 t0,14 t0,14 t0,14" },
+  { floor:"ss", name:"Sous-sol", pts:"0,170 455,170 455,450 275,450 275,360 160,360 160,450 0,450", at:[235,292],
+    pins:[["H1",95,207],["H2",300,207],["H3",425,307]] }
+];
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const parse = pts => pts.trim().split(/\s+/).map(p => p.split(",").map(Number));
+
+/* Rentre un polygone orthogonal de d unités (chaque sommet est entre un côté horizontal et un vertical). */
+function inset(pts, d){
+  const P = parse(pts), n = P.length;
+  let area = 0;
+  for(let i=0;i<n;i++){ const [x1,y1]=P[i], [x2,y2]=P[(i+1)%n]; area += x1*y2 - x2*y1; }
+  const s = area > 0 ? 1 : -1;
+  // Décalage de chaque côté vers l'intérieur : x constant pour un côté vertical, y constant pour un horizontal.
+  const off = P.map(([x1,y1], i) => {
+    const [x2,y2] = P[(i+1)%n], dx = Math.sign(x2-x1), dy = Math.sign(y2-y1);
+    return dy === 0 ? {y: y1 + s*dx*d} : {x: x1 - s*dy*d};
+  });
+  return P.map((_, i) => {
+    const a = off[(i-1+n)%n], b = off[i];
+    return [(a.x ?? b.x), (a.y ?? b.y)].join(",");
+  }).join(" ");
+}
+
+function pin(code, x, y){
+  return `<g class="mk" transform="translate(${x},${y})"><circle r="14"/><text y="1">${esc(code)}</text></g>`;
+}
+function arrow(a){
+  // Flèche verte de 44 unités posée devant l'escalier, pointe dans la direction dir.
+  const rot = {e:0, s:90, w:180, n:270}[a.dir];
+  const ty = a.dir==="s" ? -22 : 30;
+  return `<g transform="translate(${a.x},${a.y})"><path class="go" transform="rotate(${rot})" d="M-22,-7 H4 V-15 L22,0 L4,15 V7 H-22 Z"/>
+    <text class="go-t" y="${ty}">${a.t}</text></g>`;
+}
+function stairs(s){
+  // Marches perpendiculaires au sens de la montée : ici les deux escaliers montent ou descendent d'est en ouest.
+  let l = "";
+  const n = Math.round(s.w/10);
+  for(let i=1;i<n;i++){ const x = s.x + i*s.w/n; l += `<line class="tread" x1="${x}" y1="${s.y}" x2="${x}" y2="${s.y+s.h}"/>`; }
+  const walls = s.walls ? `<path class="wall" d="${s.walls}"/>` : "";
+  return `<rect class="${s.down?"stairs-down":"stairbox"}" x="${s.x}" y="${s.y}" width="${s.w}" height="${s.h}"/>${l}${walls}`;
+}
+function door(d){
+  const t = 14;
+  return d.o==="h"
+    ? `<rect class="door ${d.k}" x="${d.x}" y="${d.y-t/2}" width="${d.len}" height="${t}"/>`
+    : `<rect class="door ${d.k}" x="${d.x-t/2}" y="${d.y}" width="${t}" height="${d.len}"/>`;
+}
+
+/* Contenu d'une tuile, dans le repère du plan : sert sur le plan complet et sur la planche à découper. */
+function tileBody(t, edge){
+  const poly = t.extension ? t.pts : inset(t.pts, INSET);
+  const lines = t.name.split("|");
+  const name = lines.map((w,i) => `<text class="rname" x="${t.at[0]}" y="${t.at[1] + i*24}" ${t.extension?'style="font-size:18px"':""}>${esc(w)}</text>`).join("");
+  return `<polygon class="tile" points="${poly}"/>
+    ${(t.chem||[]).map(([x,y,w,h]) => `<rect class="chem" x="${x}" y="${y}" width="${w}" height="${h}"/>`).join("")}
+    ${t.walls ? `<path class="tile-wall" d="${t.walls}"/>` : ""}${t.curtain ? `<path class="curtain" d="${t.curtain}"/>` : ""}
+    ${name}${(t.pins||[]).map(p => pin(...p)).join("")}
+    ${edge ? `<polygon class="tile-edge" points="${poly}"/>` : ""}`;
+}
+
+function planSVG(f, withTiles){
+  const fills = f.rooms.map(r => `<polygon class="${r.cls||"room-fill"}" points="${r.pts}"/>`).join("")
+    + (f.serre ? `<polygon class="serre" points="${f.serre}"/>` : "");
+  const walls = f.rooms.map(r => `<polygon class="wall" points="${r.pts}"/>`).join("")
+    + (f.serre ? `<polygon class="glass" points="${f.serre}"/><polygon class="glass-in" points="${f.serre}"/>` : "");
+  const tiles = withTiles ? TILES.filter(t => t.floor===f.id && !t.extension).map(t => tileBody(t, false)).join("") : "";
+  const ext = withTiles ? TILES.filter(t => t.floor===f.id && t.extension).map(t => tileBody(t, false)).join("") : "";
+  const myst = f.mystery ? `<text class="ask" x="${f.mystery[0]}" y="${f.mystery[1]+24}">?</text>` : "";
+  const out = (f.outside||[]).map(([t,x,y]) => `<text class="out" x="${x}" y="${y}">${t}</text>`).join("");
+  return `<svg class="plan" viewBox="${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}" role="img" aria-label="Plan : ${f.title}">
+    ${fills}${tiles}${f.stairs.map(stairs).join("")}${walls}
+    <polygon class="outline" points="${U}"/>
+    ${f.doors.map(door).join("")}${ext}${myst}${f.arrows.map(arrow).join("")}${out}
+  </svg>`;
+}
+
+function tileSVG(t){
+  const P = parse(t.pts), m = 6;
+  const xs = P.map(p=>p[0]), ys = P.map(p=>p[1]);
+  const x = Math.min(...xs)-m, y = Math.min(...ys)-m, w = Math.max(...xs)-x+m, h = Math.max(...ys)-y+m;
+  const where = FLOORS.find(f => f.id===t.floor).title;
+  return `<figure><svg viewBox="${x} ${y} ${w} ${h}" style="width:${(w*SCALE).toFixed(1)}mm" role="img" aria-label="Tuile : ${t.name.replace("|"," ")}">${tileBody(t, true)}</svg>
+    <figcaption>${esc(t.name.replace("|"," "))} · ${where}${t.extension ? ", à coller contre le Salon, côté ouest" : ""}</figcaption></figure>`;
+}
+
+const sheet = (title, inner) => `<section class="sheet"><h2>${title}</h2>${inner}</section>`;
+document.getElementById("v-full").innerHTML = FLOORS.map(f => sheet(f.title, planSVG(f, true))).join("");
+document.getElementById("v-blank").innerHTML = FLOORS.map(f => sheet(f.title, planSVG(f, false))).join("");
+// La Chambre est la plus large : seule sur sa ligne ; les autres tuiles se rangent autour.
+document.getElementById("v-tiles").innerHTML = sheet("Tuiles à découper", `<div class="tiles">${TILES.map(tileSVG).join("")}</div>`);
+
+document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", x===b));
+  document.body.dataset.view = b.dataset.view;
+}));
+</script>
+</body>
+</html>
