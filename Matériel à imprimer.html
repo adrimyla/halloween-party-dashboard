@@ -49,8 +49,11 @@ header p{margin:.3rem 0 0;color:var(--muted)}
 .card .rule{font-size:8.3pt;line-height:1.3;margin:0}
 .card .foot{margin-top:auto;font:italic 7.5pt/1.2 "IM Fell English",Georgia,serif;color:var(--muted);border-top:.25mm solid #b9ae9c;padding-top:1.5mm;width:100%}
 .card.back .in{justify-content:center;background:repeating-linear-gradient(45deg,#ece5d8 0 2.2mm,#d8cdb9 2.2mm 3.2mm)}
-.card.back .name{background:var(--sheet);padding:2mm 4mm;border:.4mm solid var(--ink);border-radius:2mm}
-.card.back .used{margin-top:3mm;background:var(--sheet);padding:1mm 3mm;border-radius:1.5mm;font:italic 11pt "IM Fell English",Georgia,serif}
+.card .in{position:relative}
+.card .num{position:absolute;left:2.2mm;top:2.2mm;width:6mm;height:6mm;border-radius:50%;background:var(--ink);color:var(--sheet);
+  display:grid;place-items:center;font:700 8.5pt/1 Cambria,"Times New Roman",serif}
+.card.back .big{width:30mm;height:30mm;border-radius:50%;background:var(--sheet);border:.6mm solid var(--ink);outline:.3mm solid var(--ink);outline-offset:1mm;
+  display:grid;place-items:center;font:400 54pt/1 Cambria,"Times New Roman",serif}
 
 /* ---------- Jetons ---------- */
 .token{display:block;width:28mm;height:28mm}
@@ -231,28 +234,30 @@ const ICON = {
   bolt:`<polygon points="35,4 13,33 27,33 22,56 47,24 33,24 39,4" fill="#f3b14a" stroke="#1f1b24" stroke-width="2" stroke-linejoin="round"/>`
 };
 
-/* Textes joueurs : pas de spoiler (rien sur la Chambre ni sur les pièces où la capacité sert). */
+/* Textes joueurs : pas de spoiler (rien sur la Chambre ni sur les pièces où la capacité sert).
+   Le numéro est celui de l'intro de la nuit 1 (« Le numéro 1, c'est Scooby… ») : distribuées face cachée, les cartes
+   se retournent une par une pendant la présentation. */
 const CARDS = [
-  {name:"Fred", icon:"plan", q:"« Les gars, j'ai un plan ! »",
-    rule:"Rend son usage à la capacité d'un autre joueur, déjà utilisée. Pas à la sienne."},
-  {name:"Daphné", icon:"sparkle", q:"« Un jeu d'enfant ! »",
+  {n:1, name:"Scooby", icon:"paw", q:"« Renifler »",
+    rule:"Avant une action payante. Il bâille : rien. Il remue la queue : quelque chose."},
+  {n:2, name:"Sammy", icon:"bone", q:"« Donner un Scooby-Snack »",
+    rule:"Parce qu'on ne dit jamais non à un Scooby-Snack !"},
+  {n:3, name:"Daphné", icon:"sparkle", q:"« Un jeu d'enfant ! »",
     rule:"Au choix : un déplacement gratuit, ou une action payante gratuite."},
-  {name:"Véra", icon:"loupe", q:"« Œil de lynx »",
-    rule:"Inspecte la pièce où se trouve le groupe : le MJ dit si quelque chose cloche."},
-  {name:"Sammy", icon:"bone", q:"« Donner un Scooby-Snack »",
-    rule:"Amadoue un animal. Une boîte de Scooby-Snacks permet de retourner la carte face visible."},
-  {name:"Scooby", icon:"paw", q:"« Renifler »",
-    rule:"Avant une action payante. Il bâille : rien. Il remue la queue : quelque chose. Il s'excite : très important."},
-  {name:"Scrappy", icon:"bolt", q:"« Puppy Power ! »",
-    rule:"Force une porte fermée à clé."}
+  {n:4, name:"Véra", icon:"loupe", q:"« Œil de lynx »",
+    rule:"Inspecte la pièce où se trouve le groupe : permet de révéler des détails non visibles jusque-là."},
+  {n:5, name:"Scrappy", icon:"bolt", q:"« Puppy Power ! »",
+    rule:"Force une porte fermée à clé."},
+  {n:6, name:"Fred", icon:"plan", q:"« Les gars, j'ai un plan ! »",
+    rule:"Permet de réinitialiser la capacité d'un autre joueur si elle a déjà été utilisée."}
 ];
 const FOOT = "Une seule fois dans la partie, pendant une journée, sans coût en temps. Retourner la carte après usage.";
 
-const cardFront = c => `<div class="card"><div class="in">
+const cardFront = c => `<div class="card"><div class="in"><span class="num">${c.n}</span>
   <div class="name">${esc(c.name)}</div>
   <svg viewBox="0 0 60 60" aria-hidden="true">${ICON[c.icon]}</svg>
   <p class="q">${esc(c.q)}</p><p class="rule">${esc(c.rule)}</p><p class="foot">${FOOT}</p></div></div>`;
-const cardBack = c => `<div class="card back"><div class="in"><div class="name">${esc(c.name)}</div><div class="used">Capacité utilisée</div></div></div>`;
+const cardBack = c => `<div class="card back"><div class="in"><div class="big">${c.n}</div></div></div>`;
 // Recto-verso sur le bord long : chaque rangée de trois s'inverse au verso.
 const mirrored = list => list.reduce((rows, c, i) => (i % 3 ? rows[rows.length-1].push(c) : rows.push([c]), rows), [])
   .flatMap(r => [...r, ...Array(3 - r.length).fill(null)].reverse());
