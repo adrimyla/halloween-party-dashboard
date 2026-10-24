@@ -330,7 +330,8 @@ mark.todo{background:var(--warn-soft);color:var(--warn);border:1px dashed var(--
   bottom:calc(16px + env(safe-area-inset-bottom, 0px));
   max-width:min(560px, calc(100% - 32px));
   background:var(--panel-2);border:1px solid var(--lamp);border-radius:10px;
-  padding:10px 14px;font-size:.92rem;box-shadow:0 10px 30px rgba(0,0,0,.45);z-index:20;
+  padding:10px 14px;font-size:.92rem;box-shadow:0 10px 30px rgba(0,0,0,.45);
+  z-index:35; /* au-dessus du livret (30), sous les vidéos plein écran (40) */
 }
 @media (max-width:520px){
   .plan{grid-template-columns:22px repeat(5,minmax(0,1fr));gap:4px}
