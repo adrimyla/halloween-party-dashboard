@@ -115,8 +115,9 @@ h2{font-family:var(--f-display);font-weight:400;font-size:1.35rem;letter-spacing
   width:116px;height:78px;background:var(--panel-2);
   display:flex;flex-wrap:wrap;justify-content:center;align-content:flex-start;gap:5px;padding:10px 22px;
 }
-.bulb.top{clip-path:polygon(0 0,100% 0,62% 100%,38% 100%);align-content:flex-start}
-.bulb.bottom{clip-path:polygon(38% 0,62% 0,100% 100%,0 100%);align-content:flex-end;flex-wrap:wrap-reverse}
+/* « bulb-up » et pas « top » : .top est la classe de l'entête collante, elle faisait coller le sablier en haut. */
+.bulb-up{clip-path:polygon(0 0,100% 0,62% 100%,38% 100%);align-content:flex-start}
+.bulb-down{clip-path:polygon(38% 0,62% 0,100% 100%,0 100%);align-content:flex-end;flex-wrap:wrap-reverse}
 .cap-bar{width:128px;height:6px;background:var(--line);border-radius:3px}
 .tok{width:16px;height:16px;border-radius:50%;background:var(--lamp);box-shadow:0 0 10px rgba(243,177,74,.45)}
 .tok.fallen{background:var(--line);box-shadow:none}
@@ -187,7 +188,7 @@ h2{font-family:var(--f-display);font-weight:400;font-size:1.35rem;letter-spacing
   background:var(--panel);border-left:1px solid var(--line);box-shadow:-12px 0 40px rgba(0,0,0,.5);
   display:flex;flex-direction:column;
 }
-.book-top{padding:calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px;background:var(--panel)}
+.book-top{position:relative;padding:calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px;background:var(--panel)}
 .book-top .row{align-items:center}
 .book-src{font-size:.78rem;color:var(--muted)}
 .book-set{display:flex;flex-direction:column;gap:8px}
@@ -199,11 +200,12 @@ h2{font-family:var(--f-display);font-weight:400;font-size:1.35rem;letter-spacing
 }
 .book-link input::placeholder{color:var(--muted)}
 /* Sommaire pensé pour le tactile : un bloc par pièce, des boutons d'au moins 44 × 40 px. */
-.book-toc-wrap > summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;min-height:36px;font-weight:700;font-size:.9rem}
-.book-toc-wrap > summary::-webkit-details-marker{display:none}
-.book-toc-wrap > summary::before{content:"▸";color:var(--muted)}
-.book-toc-wrap[open] > summary::before{content:"▾"}
-.book-toc{display:flex;flex-wrap:wrap;gap:8px 22px;max-height:42vh;overflow:auto;padding:2px 2px 4px}
+.book-toc{
+  position:absolute;top:100%;left:0;right:0;z-index:6;
+  display:flex;flex-wrap:wrap;gap:8px 22px;max-height:70vh;overflow:auto;
+  padding:14px 16px 18px;background:var(--panel);border-bottom:1px solid var(--line);box-shadow:0 18px 30px rgba(0,0,0,.5);
+}
+.toc-btn[aria-expanded="true"]{background:var(--lamp);color:var(--lamp-ink);border-color:var(--lamp)}
 .toc-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0}
 .toc-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-right:2px}
 .toc-chips{display:flex;flex-wrap:wrap;gap:6px}
@@ -369,6 +371,7 @@ mark.todo{background:var(--warn-soft);color:var(--warn);border:1px dashed var(--
   <div class="book-top">
     <div class="row">
       <h2 style="flex:1">Le livret</h2>
+      <button class="btn toc-btn" id="toc-btn" data-act="tocToggle" aria-controls="book-toc" aria-expanded="false">☰ Sommaire</button>
       <button class="btn" id="book-reload" data-act="bookReload" title="Relire la source du livret" hidden>Recharger</button>
       <button class="btn ghost sm book-close" data-act="bookClose" aria-label="Fermer le livret">Fermer ✕</button>
     </div>
@@ -380,10 +383,8 @@ mark.todo{background:var(--warn-soft);color:var(--warn);border:1px dashed var(--
       </div>
       <div class="row"><button class="btn sm" data-act="bookImport" title="Choisir le fichier Excel du livret">Importer un fichier Excel</button></div>
     </details>
-    <details class="book-toc-wrap" open>
-      <summary>Sommaire</summary>
-      <nav class="book-toc" id="book-toc" aria-label="Sommaire"></nav>
-    </details>
+    <!-- Volet du sommaire : fermé par défaut, il s'ouvre par-dessus le texte sans le pousser. -->
+    <nav class="book-toc" id="book-toc" aria-label="Sommaire" hidden></nav>
   </div>
   <div class="book-body" id="book-body"></div>
 </aside>
@@ -866,7 +867,7 @@ const GROUPS = {A:"Grand Hall", B:"Salon", C:"Bibliothèque", D:"Serre", E:"Cham
 /* Codes que la régie cherche dans le livret ; signalés s'ils manquent après un import. */
 const EXPECTED = [...Object.keys(ROOMS), ...Object.values(ELEMENTS).flat().map(e=>e[0]), "A1b","B1b","C1b","C2b","D1b",
   "J1","J2","JR","N1-1","N2-1","N3-1","N3-2A","N3-2B","N3-3B","N4-1"];
-const ui = {book:false, from:null, offline:false, opts:new Set()};
+const ui = {book:false, from:null, offline:false, opts:new Set(), toc:false};
 let BOOK = new Map(), bookSrc = {name:null, at:null}, fileHandle = null;
 
 /* Tri alphanumérique : les chiffres avant les lettres, "A" avant "A1" avant "A1b". */
@@ -1199,7 +1200,8 @@ const handlers = {
   read(d){ openScript(d.c); },
   bookOpen(){ ui.book=true; ui.from=null; render(); },
   bookClose(){ ui.book=false; ui.from=null; render(); },
-  bookGo(d){ ui.from=d.c; render(); const el=$(`sc-${d.c}`); if(el) el.scrollIntoView({block:"start"}); },
+  bookGo(d){ ui.from=d.c; ui.toc=false; render(); const el=$(`sc-${d.c}`); if(el) el.scrollIntoView({block:"start"}); },
+  tocToggle(){ ui.toc=!ui.toc; renderBook(); },
   bookRead(d){
     const c=d.c, on=!S.read[c];
     if(on && ui.from===c){ ui.from=null; if(!dock.matches) ui.book=false; }
@@ -1225,6 +1227,8 @@ const handlers = {
 };
 
 document.addEventListener("click", e=>{
+  // Un toucher hors du volet du sommaire le referme.
+  if(ui.toc && !e.target.closest("#book-toc, #toc-btn")){ ui.toc=false; renderBook(); }
   const b=e.target.closest("[data-act]");
   if(!b || b.disabled) return;
   wake();
@@ -1242,6 +1246,7 @@ $("book-file").addEventListener("change", e=>{
   e.target.value="";
 });
 document.addEventListener("keydown", e=>{
+  if(e.key==="Escape" && ui.toc){ ui.toc=false; renderBook(); return; }
   if(e.key==="Escape" && ui.book && !dock.matches){ handlers.bookClose(); return; }
   if((e.ctrlKey||e.metaKey) && e.key==="z" && !e.target.matches("input")){ e.preventDefault(); handlers.undo(); }
 });
@@ -1357,8 +1362,8 @@ function glass(c,max,idle){
   const toks=(n,cls)=>Array.from({length:n},()=>`<span class="tok ${cls}"></span>`).join("");
   return `<div class="glass" aria-label="${c} crans restants sur ${max}">
     <div class="cap-bar"></div>
-    <div class="bulb top">${toks(idle?0:c,"")}</div>
-    <div class="bulb bottom">${toks(idle?max:max-c,"fallen")}</div>
+    <div class="bulb bulb-up">${toks(idle?0:c,"")}</div>
+    <div class="bulb bulb-down">${toks(idle?max:max-c,"fallen")}</div>
     <div class="cap-bar"></div>
   </div>`;
 }
@@ -1407,6 +1412,8 @@ function renderBook(){
   $("book-reload").hidden = !(link || (window.showOpenFilePicker && bookSrc.name));
   const groups={};
   for(const c of BOOK.keys()) (groups[c[0]] ||= []).push(c);
+  $("book-toc").hidden=!ui.toc;
+  $("toc-btn").setAttribute("aria-expanded", ui.toc);
   // Une ligne par pièce (étiquette puis boutons), plusieurs pièces côte à côte quand la place le permet.
   $("book-toc").innerHTML = Object.entries(groups).map(([g,cs])=>`<div class="toc-group">
     <span class="toc-label">${esc(GROUPS[g]||g)}</span>
