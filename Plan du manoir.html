@@ -248,7 +248,7 @@ const DECOR = {
   },
   bench:(x,y,w,h) => R(x,y,w,h,"wood") + R(x+8,y+6,18,5,"furn-in",1) + C(x+w-18,y+h/2,5,"furn-in") + L(x+36,y+5,x+50,y+h-5),
   pot:(x,y) => C(x,y,13,"soil") + C(x-4,y-3,6,"leaf") + C(x+5,y+2,6,"leaf"),
-  // L'énorme grimoire, Amaya roulée en boule dessus.
+  // Le journal relié de cuir, Amaya roulée en boule dessus.
   grimoire:(x,y) => R(x,y,46,32,"book",2) + L(x+6,y,x+6,y+32) + `<ellipse class="cat" cx="${x+27}" cy="${y+15}" rx="15" ry="10"/>`,
   scrabble:(x,y) => DECOR.table(x,y,60,44) + R(x+16,y+8,28,28,"board",1),
   kitchen:() => R(8,8,104,26,"wood") + R(8,34,26,84,"wood") + C(58,21,6,"furn-in") + C(80,21,6,"furn-in") + R(12,66,18,24,"furn-in",3)
@@ -269,7 +269,7 @@ const TILES = [
     pins:[["F1",180,62],["F2",130,165]] },
   { floor:"rdc", name:"Bibliothèque", pts:"455,170 710,170 710,450 455,450", at:[590,300],
     chem:[[600,180,80,20]], decor:DECOR.shelves(680,232,20,200) + DECOR.grimoire(478,194) + DECOR.scrabble(530,374),
-    pins:[["C1",548,210],["C2",560,345],["C3",650,405],["C4",640,222]] },
+    pins:[["C1",548,210],["C2",560,345],["C4",640,222]] },
   { floor:"rdc", name:"Serre", pts:"210,-75 505,-75 505,170 210,170", at:[357,52],
     decor:DECOR.beds(226,-62,110,34) + DECOR.beds(226,-20,34,150) + DECOR.bench(410,-62,80,26) + DECOR.pot(470,132),
     pins:[["D1",285,0],["D2",450,-18],["D3",440,130]] },
