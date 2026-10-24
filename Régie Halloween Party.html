@@ -191,17 +191,27 @@ h2{font-family:var(--f-display);font-weight:400;font-size:1.35rem;letter-spacing
 .book-top .row{align-items:center}
 .book-src{font-size:.78rem;color:var(--muted)}
 .book-set{display:flex;flex-direction:column;gap:8px}
-.book-set summary{font-size:.78rem;color:var(--muted);cursor:pointer}
+.book-set summary{font-size:.8rem;color:var(--muted);cursor:pointer;padding:6px 0}
 .book-set[open] summary{margin-bottom:8px}
 .book-link input{
   flex:1 1 14em;min-width:0;background:var(--panel-2);color:var(--ink);
   border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:.85rem;
 }
 .book-link input::placeholder{color:var(--muted)}
-.book-toc{display:flex;flex-wrap:wrap;gap:5px 16px;max-height:22vh;overflow:auto}
-.book-toc div{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
-.book-toc span{font-size:.7rem;color:var(--muted);margin-right:3px}
-.book-toc button{font-family:var(--f-code);font-size:.72rem;font-weight:700;padding:2px 6px;border-radius:5px;background:var(--panel-2);border:1px solid var(--line)}
+/* Sommaire pensé pour le tactile : un bloc par pièce, des boutons d'au moins 44 × 40 px. */
+.book-toc-wrap > summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;min-height:36px;font-weight:700;font-size:.9rem}
+.book-toc-wrap > summary::-webkit-details-marker{display:none}
+.book-toc-wrap > summary::before{content:"▸";color:var(--muted)}
+.book-toc-wrap[open] > summary::before{content:"▾"}
+.book-toc{display:flex;flex-wrap:wrap;gap:8px 22px;max-height:42vh;overflow:auto;padding:2px 2px 4px}
+.toc-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0}
+.toc-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-right:2px}
+.toc-chips{display:flex;flex-wrap:wrap;gap:6px}
+.book-toc button{
+  font-family:var(--f-code);font-size:.9rem;font-weight:700;min-width:44px;min-height:40px;padding:6px 8px;
+  border-radius:8px;background:var(--panel-2);border:1px solid var(--line);touch-action:manipulation;
+}
+.book-toc button:hover{border-color:var(--muted)}
 .book-toc button.read{opacity:.45}
 .book-body{flex:1;overflow:auto;padding:12px 16px calc(40px + env(safe-area-inset-bottom, 0px));display:flex;flex-direction:column;gap:14px}
 .script{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:7px;scroll-margin-top:12px}
@@ -359,7 +369,7 @@ mark.todo{background:var(--warn-soft);color:var(--warn);border:1px dashed var(--
   <div class="book-top">
     <div class="row">
       <h2 style="flex:1">Le livret</h2>
-      <button class="btn sm" id="book-reload" data-act="bookReload" title="Relire la source du livret" hidden>Recharger</button>
+      <button class="btn" id="book-reload" data-act="bookReload" title="Relire la source du livret" hidden>Recharger</button>
       <button class="btn ghost sm book-close" data-act="bookClose" aria-label="Fermer le livret">Fermer ✕</button>
     </div>
     <details class="book-set">
@@ -370,7 +380,10 @@ mark.todo{background:var(--warn-soft);color:var(--warn);border:1px dashed var(--
       </div>
       <div class="row"><button class="btn sm" data-act="bookImport" title="Choisir le fichier Excel du livret">Importer un fichier Excel</button></div>
     </details>
-    <nav class="book-toc" id="book-toc" aria-label="Sommaire"></nav>
+    <details class="book-toc-wrap" open>
+      <summary>Sommaire</summary>
+      <nav class="book-toc" id="book-toc" aria-label="Sommaire"></nav>
+    </details>
   </div>
   <div class="book-body" id="book-body"></div>
 </aside>
@@ -1394,8 +1407,11 @@ function renderBook(){
   $("book-reload").hidden = !(link || (window.showOpenFilePicker && bookSrc.name));
   const groups={};
   for(const c of BOOK.keys()) (groups[c[0]] ||= []).push(c);
-  $("book-toc").innerHTML = Object.entries(groups).map(([g,cs])=>`<div><span>${esc(GROUPS[g]||g)}</span>${
-    cs.map(c=>`<button class="${S.read[c]?"read":""}" data-act="bookGo" data-c="${esc(c)}">${esc(c)}</button>`).join("")}</div>`).join("");
+  // Une ligne par pièce (étiquette puis boutons), plusieurs pièces côte à côte quand la place le permet.
+  $("book-toc").innerHTML = Object.entries(groups).map(([g,cs])=>`<div class="toc-group">
+    <span class="toc-label">${esc(GROUPS[g]||g)}</span>
+    <div class="toc-chips">${cs.map(c=>`<button class="${S.read[c]?"read":""}" data-act="bookGo" data-c="${esc(c)}">${esc(c)}</button>`).join("")}</div>
+  </div>`).join("");
   $("book-body").innerHTML = [...BOOK.values()].map(scriptCard).join("");
 }
 function chronoBlock(n){
