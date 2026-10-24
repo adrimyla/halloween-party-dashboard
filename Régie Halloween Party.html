@@ -441,7 +441,6 @@ const ROOMS = {
   F:{name:"Cuisine"},
   H:{name:"Sous-sol"}
 };
-const ADJ = {A:["B","C","D","E","H"], B:["A","F"], C:["A"], D:["A"], E:["A"], F:["B"], H:["A"]};
 
 const ELEMENTS = {
   A:[["A1","Le jardinier"],["A2","La porte de la cave"],["A3","La cheminée et le portrait"]],
@@ -467,16 +466,16 @@ const ACTIONS = [
   {id:"b3t", el:"B3", t:"Regarder la télé", cost:0, r:"Clé de l'énigme du Scrabble (extrait V)"},
   {id:"b3d", el:"B3", t:"Regarder derrière la télé", cost:1, r:"Rien", sniff:BAILLE},
   {id:"c2w", el:"C2", t:"Former le mot sur le plateau", cost:0, r:"→ C2b : plan du monte-charge, « À l'attention de Madame »", fact:[3,"C2b"], hint:"C2b", sub:"C2b"},
-  {id:"c3l", el:"C3", t:"Lire le journal", cost:0, r:"Clé des Habitants : arroser les fait sortir"},
+  {id:"c3l", el:"C3", t:"Lire le journal", cost:0, r:"Clé des Sylvains : arroser les fait sortir"},
   {id:"c3f", el:"C3", t:"Fouiller le journal page par page", cost:1, r:"Fait 2 : la cheminée de la Bibliothèque est hors service", sniff:REMUE, fact:[2,"C3"]},
   {id:"c4e", el:"C4", t:"Examiner la cheminée", cost:1, r:"Fait 3 : trace en arc au sol", sniff:REMUE, fact:[3,"C4"], hint:"C4"},
-  {id:"d1a", el:"D1", t:"Arroser les plantes", cost:1, r:"→ D1b : les Habitants donnent la liane", sniff:"il s'excite (très important)", liane:true, sub:"D1b"},
+  {id:"d1a", el:"D1", t:"Arroser les plantes", cost:1, r:"→ D1b : les Sylvains donnent la liane", sniff:"il s'excite (très important)", liane:true, sub:"D1b"},
   {id:"d2f", el:"D2", t:"Fouiller l'établi", cost:1, r:"Double de la clé de la cave", sniff:REMUE, key:true},
   {id:"d3f", el:"D3", t:"Fouiller son pot", cost:1, r:"Rien (mouche morte)", sniff:BAILLE},
   {id:"e1r", el:"E1", t:"Retourner les pochettes une par une", cost:1, r:"Rien", sniff:BAILLE},
   {id:"e2e", el:"E2", t:"Examiner la cheminée", cost:1, r:"Fait 3 : trace en arc au sol", sniff:REMUE, fact:[3,"E2"], hint:"E2"},
   {id:"e3f", el:"E3", t:"Fouiller derrière Nolad", cost:1, r:"Rien", sniff:"il s'excite (pour Nolad, pas pour un indice)"},
-  {id:"f1t", el:"F1", t:"Prendre la boîte de biscuits", cost:0, r:"Sammy récupère sa capacité", box:true},
+  {id:"f1t", el:"F1", t:"Prendre la boîte de Scooby-Snacks", cost:0, r:"Sammy récupère sa capacité", box:true},
   {id:"f1b", el:"F1", t:"Fouiller derrière les bocaux", cost:1, r:"Rien", sniff:BAILLE},
   {id:"f2s", el:"F2", t:"Soulever l'assiette", cost:1, r:"Rien (gag)", sniff:BAILLE},
   {id:"h1p", el:"H1", t:"Regarder le plan technique", cost:0, r:"Fait 2 : la Bibliothèque est marquée « KO »", fact:[2,"H1"]}
@@ -487,9 +486,9 @@ const CAPS = [
   {k:"meneur", role:"Fred", q:"« Les gars, j'ai un plan ! »", rule:"Rend son usage à la capacité déjà utilisée d'un autre joueur (pas la sienne)."},
   {k:"elegante", role:"Daphné", q:"« Un jeu d'enfant ! »", rule:"Au choix : un déplacement gratuit, ou une action payante gratuite."},
   {k:"enquetrice", role:"Véra", q:"« Œil de lynx »", rule:"Sur la pièce où se trouve le groupe. Utile dans la Chambre et la Bibliothèque."},
-  {k:"gourmand", role:"Sammy", q:"« Donner un biscuit »", rule:"À Pazu (Salon) : pièce cachée. À Amaya (Bibliothèque) : le grimoire. Rechargeable avec la boîte de la Cuisine."},
+  {k:"gourmand", role:"Sammy", q:"« Donner un Scooby-Snack »", rule:"À Pazu (Salon) : pièce cachée. À Amaya (Bibliothèque) : le grimoire. Rechargeable avec la boîte de la Cuisine."},
   {k:"flaireur", role:"Scooby", q:"« Renifler »", rule:"Avant une action payante : bouton « Renifler » sur l'action, dans la pièce."},
-  {k:"costaud", role:"Scrappy", q:"« En force ! »", rule:"Force une porte fermée à clé : la Cuisine (depuis le Salon) ou la cave (depuis le Hall)."}
+  {k:"costaud", role:"Scrappy", q:"« Puppy Power ! »", rule:"Force une porte fermée à clé : la Cuisine (depuis le Salon) ou la cave (depuis le Hall)."}
 ];
 const CAPNAME = Object.fromEntries(CAPS.map(c=>[c.k,c.role]));
 
@@ -704,13 +703,20 @@ const BOOK_DEFAULT = [
   ["F2","","Action","Soulever l'assiette","1 cran"],
   ["F2","","Texte","**Rien.**",""],
   ["F2","","Lire","Une serviette en papier où quelqu'un a griffonné : \"7/10, manque de sel.\" [Gag à compléter]",""],
-  ["H","Sous-sol : l'entrée","Lire","Un sous-sol humide, éclairé par une ampoule qui grésille. Au mur, un grand plan technique du manoir, couvert d'annotations, et un vieux tableau électrique. Sur un établi traînent des outils, des boulons et une pince robotique… de la taille d'une petite patte. Au fond, une lourde porte en métal, verrouillée.",""],
-  ["H1","Le plan technique","Lire","Un plan des circuits du manoir, étage par étage : électricité, eau, chauffage. Dans la bibliothèque, la cheminée est entourée en rouge, avec une mention griffonnée : *KO*.",""],
-  ["H1","","MJ","Tant que le fait 1 n'est pas connu, ce détail semble anodin.",""],
-  ["H1","","Action","Regarder le plan technique","gratuit"],
-  ["H1","","Texte","**Fait 2 :** la cheminée de la Bibliothèque est hors service (gratuit une fois sur place).",""],
-  ["H1","","Action","Lire les annotations","gratuit"],
-  ["H1","","Lire","[Annotations drôles à compléter]",""],
+  ["H","Entrée dans le sous-sol","MJ","Si Scrappy-Doo a ouvert la porte, lire à partir d'ici",""],
+  ["H","","Lire","En bas de l'escalier, vous retrouvez Scrappy-Doo coicné la tête la première dans une caisse en bois. Véra le sort de là et le remet sur pieds. Il est déboussolé, mais rien de cassé.",""],
+  ["H","","MJ","Si la porte a été ouverte avec la clé, lire à partir d'ici",""],
+  ["H","","Lire","Le sous-sol est humide et éclairé par une ampoule qui grésille. Au mur, un grand plan du manoir, couvert d'annotations, et un vieux tableau électrique. Sur un établi traînent des outils, des boulons et une pince robotique… on dirait une sorte de grappin. Scooby et Sammy tremblent comme des feuilles...",""],
+  ["H","","Lire","Tout au fond de la pièce, vous remarquez une grande porte métallique. Elle à l'air bien plus récente que le manoir et semble impossible à ouvrir par la force.",""],
+  ["H1","Le plan technique","Lire","Un plan des circuits électriques du manoir. Il semble avoir été mis à jour récemment, des annotations sont visibles, écrites en rouge.",""],
+  ["","","Lire","Que souhaitez-vous faire ?",""],
+  ["H1","","Action","Regarder ce qui est écrit","gratuit"],
+  ["H1","","Lire","(FAIT 2) : Vous remarquez un détail dans la bibliothèque : une croix rouge se trouve à l'emplacement de la cheminée et une note l'accompagne. Il est écrit \"Hors service, à réparer au plus vite\".",""],
+  ["H1","","Action","Noter l'emplacement des différentes pièces","1 cran"],
+  ["H1","","Lire","Vous regardez plus précisément l'emplacement des différentes pièces.",""],
+  ["H1","","MJ","Le MJ place tous les plans de la salle sur le plan du manoir.",""],
+  ["H1","","Lire","Vous vous repérez désormais bien mieux dans le manoir ! Cependant, la mystérieuse pièce qui se trouve derrière la porte métallique n'est pas indiquée sur le plan...",""],
+  ["H1","","Action","Continuer à explorer",""],
   ["H2","Le tableau électrique","Lire","Un vieux tableau électrique couvert de poussière… sauf le disjoncteur général.",""],
   ["H2","","Action","Regarder le disjoncteur","gratuit"],
   ["H2","","Lire","Il est baissé. À la main : on voit encore des traces de doigts dans la poussière. Quelqu'un coupe le courant… Un fantôme qui baisse un disjoncteur ?",""],
@@ -719,10 +725,11 @@ const BOOK_DEFAULT = [
   ["H2","","Lire","Les lumières se rallument dans tout le manoir. Pour combien de temps ?",""],
   ["H3","La porte du Laboratoire","Lire","Une porte en métal, verrouillée de l'intérieur. Derrière, vous entendez des pas… et un grognement étrange ?",""],
   ["H3","","MJ","Teaser de Georges et du Laboratoire. La porte ne s'ouvre qu'à l'épilogue. Aucune action.",""],
-  ["J1","Jour 1 · Matin : le jardinier","Lire","Au petit matin, l'orage n'est plus qu'une pluie fine. On frappe à la porte d'entrée. Sur le perron, un vieil homme en ciré, un sécateur à la main, refuse de franchir le seuil. \"Vous avez dormi ICI ? Vous êtes fous ! Je suis le voisin. Je m'occupais du jardin et de la serre pour le maître, avant qu'il disparaisse. Depuis, quelque chose rôde la nuit dans ce manoir. Ça revient chaque nuit, à minuit pile. Moi, je ne mets plus un pied dans cette maison.\"",""],
-  ["J1","","Lire","Il jette un œil à votre van. \"Je peux vous le réparer, mais la pièce n'arrivera pas avant deux jours. D'ici là… vous allez devoir tenir. Si on savait par où ça entre, on pourrait peut-être l'arrêter…\"",""],
-  ["J1","","MJ","Si les joueurs demandent à dormir chez lui : \"Chez moi ? Ma femme ne veut pas d'un chien qui parle.\"",""],
-  ["J1R","Jour 1 · Les règles (hors histoire)","Puce","**Le sablier :** 4 crans le jour 1, 6 crans le jour 2. Une action payante (examiner, fouiller, arroser…) ou aller dans une pièce voisine (le Hall se traverse sans payer) fait avancer le temps d'un cran. Choisir un élément, les actions gratuites, les énigmes et les capacités sont gratuits. Quand le dernier jeton tombe, la nuit tombe.",""],
+  ["J1","Jour 1 · Matin : le jardinier","Lire","Au petit matin, l'orage est toujours là. Il fait sombre et le tonerre gronde toujours. Tout le groupe est extenué.",""],
+  ["","","Lire","Soudain, on frappe à la porte d'entrée. Véra entrouve la porte. Sur le perron, un vieil homme en ciré jaune avec un sécateur à la main. Il se tient assez loin de la porte et demande : \"Vous avez dormi ICI ? Vous êtes fous ! Je suis le voisin. Je m'occupais du jardin et de la serre de ce manoir il y a de ça plusieurs années. Mais un soir, alors que j'arrosais les plantes de la serre, j'ai été supris par un cri terrifiant. J'ai pris mes jambes à mon cou et je ne suis jamais revenu ici. Je vous conseille de partir au plus vite !\"",""],
+  ["J1","","Lire","Vous expliquez au jardinier que votre van est en panne. Il vous propose de le réparer, mais cela risque de prendre du temps. Vous n'avez pas le choix : vous devez rester ici le temps que le van soit réparé.",""],
+  ["J1R","Jour 1 · Les règles (hors histoire)","MJ","Le MJ explique les règles du jeu et distribue le plan du RDC du manoir avec uniquement les tuiles du salon et du grand hall.",""],
+  ["","","Puce","**Le sablier :** 4 crans le jour 1, 6 crans le jour 2. Une action payante (examiner, fouiller, arroser…) ou aller dans une autre pièce fait avancer le temps d'un cran. Seul le fait de revenir au hall est gratuit. Choisir un élément, certaines actions, les énigmes et les capacités sont gratuits. Quand le dernier jeton tombe, la nuit tombe.",""],
   ["J1R","","Puce","**Les codes :** sur chaque tuile, les éléments ont un code (A1, A2…). Les joueurs annoncent le code, le MJ lit le script. Chaque action annonce son coût.",""],
   ["J1R","","Puce","**Les capacités :** chacune s'utilise une seule fois dans toute la partie, pendant une journée. On retourne la carte après usage. Insister : La partie dure deux jours : réfléchissez bien avant d'utiliser vos capacités à usage unique.",""],
   ["J1R","","Puce","Le MJ donne le plan vierge du manoir et pose les tuiles du Hall (A) et du Salon (B). Le groupe commence dans le Hall.",""],
@@ -741,11 +748,32 @@ const BOOK_DEFAULT = [
   ["JR","","Action","Le lendemain (fin)",""],
   ["JR","","Texte","Il répare le van.",""],
   ["JR","","Lire","Vous nous avez débarrassés de ce fantôme… C'est cadeau !",""],
-  ["N1-1","Nuit 1 · Arrivée","Lire","Il est 21h. L'orage gronde. Votre van tousse, crache… et s'arrête net devant la grille d'un manoir. Pas une lumière à des kilomètres. Vous poussez la grande porte : elle n'est pas fermée. Elle grince.",""],
-  ["N1-1","","MJ","Son : orage, porte qui grince.",""],
-  ["N1-1","","Lire","Personne ne répond. La poussière recouvre tout, comme si personne n'avait vécu ici depuis des années. Vous trouvez un salon avec de vieux canapés : parfait pour attendre le matin.",""],
-  ["N1-2","Nuit 1 · Minuit","Lire","Vous finissez par vous endormir. Quelque part, une horloge sonne les douze coups de minuit. Les lumières vacillent, puis s'éteignent. Dans le noir, un rire glaçant. Une porte grince. Des pas, lents, dans le couloir… puis plus rien. Quand vous parvenez enfin à allumer une bougie, il n'y a personne. Vous ne fermez plus l'œil de la nuit.",""],
-  ["N1-2","","MJ","Son : rire, porte qui grince, pas. Personne ne voit l'Ombre : sa première apparition, c'est la nuit 2. Aucun indice sur son chemin. Le courant reste coupé (le disjoncteur du sous-sol, H2).",""],
+  ["N1-0","Introduction","MJ","Faire piocher les cartes personnages aux joueurs face cachée (avec les numéros visibles). Indiquez au joueur qu'ils devront retourner leur pion quand leur numéro sera annoncé.",""],
+  ["N1-0","","MJ","Lancer la musique d'ambiance joyeuse",""],
+  ["N1-0","","Lire","Vous êtes une bande d'ami préparant un voyage. C'est enfin les vacances et vous partez tous les six avec votre bon vieux van. L'année a été riche en émotions, vous travaillez tous ensemble et le téléphone n'a pas arrêté de sonner. Les gens s'arrachent vos services pour résoudre des mystères : fantômes, maisons hantées, temples maudits... vous trouvez toujours une explication rationnelle et logique. Vous êtes tellement populaires, que vous avez même votre propre musique pour vous annoncer...",""],
+  ["N1-0","","MJ","Jouer la musique d'introduction",""],
+  ["N1-0","","Lire","Parmis vous, que des personnalités uniques. Celle-ci se complètent et chacune de vos capacités apportent une force redoutable à votre équipe.",""],
+  ["N1-0","","Lire","Le numéro 1, c'est Scooby. Malgré une trouille absolue pour le moindre bruit étrange, son flair incomparable lui permet de vous éviter bien des ennuis. Juste à son comportement, vous savez toujours si ce qui se cache derrière un objet en vaut la peine... ou non !",""],
+  ["N1-0","","MJ","Donner sa capacité à Scooby",""],
+  ["N1-0","","Lire","Le numéro 2, c'est Sammy, le meilleur ami de Scooby. Toujours affamé, toujours le premier à prendre ses jambes à son cou… et souvent le premier à trouver le frigo. Mais ne vous y trompez pas : avec ses Scooby-Snacks, il sait amadouer n'importe quel animal, même le plus grincheux.",""],
+  ["N1-0","","MJ","Donner sa capacité à Sammy",""],
+  ["N1-0","","Lire","Le numéro 3, c'est Daphné. Toujours élégante, même au fond d'une crypte, elle a le chic pour se fourrer dans les ennuis… et le talent pour en sortir sans une mèche de travers. Avec elle, ce qui semblait compliqué devient un jeu d'enfant.. en un rien de temps !",""],
+  ["N1-0","","MJ","Donner sa capacité à Daphné",""],
+  ["N1-0","","Lire","Le numéro 4, c'est Véra, le cerveau de l'équipe. Elle remarque ce que personne d'autre ne voit. Un seul coup d'œil dans une pièce lui suffit pour savoir si quelque chose cloche. C'est souvent elle qui élimine les pistes pour n'en garder qu'une seule.",""],
+  ["N1-0","","MJ","Donner sa capacité à Véra",""],
+  ["N1-0","","Lire","Le numéro 5, c'est Scrappy, le neveu de Scooby. Petit par la taille mais immense par le courage, il ne recule devant rien, et surtout pas devant une porte fermée. Quand il crie \"Puppy Power !\", mieux vaut s'écarter de son chemin.",""],
+  ["N1-0","","MJ","Donner sa capacité à Scrappy",""],
+  ["N1-0","","Lire","Le numéro 6, c'est Fred, le chef de la bande. Foulard impeccable et brushing parfait, il a toujours un plan… et presque toujours un piège. Il sait toujours comment remotiver son équipe dans les moments difficiles.",""],
+  ["N1-0","","MJ","Donner sa capacité à Fred",""],
+  ["N1-0","","Lire","Mais bien sûr, toutes ces capacités indispensables seront complètement inutiles durant vos vacances ! Le soleil brille pour un mois d'octobre et même si l'air est frais, rien ne pourra vous empêcher de profiter de vos vacances. Vous prenez la route en ce début de soirée.",""],
+  ["N1-1","Nuit 1 - Arrivée","MJ","Lancer la musique d'ambiance lugubre",""],
+  ["N1-1","","Lire","Cela fait plusieurs heures que vous roulez sous la pluie. Il fait nuit, l'orage gronde et vous ne voyez pas à trois mètres devant vous. Scooby et Sammy râlent et c'est au moins la quinzième fois qu'ils demandent à Fred quand est-ce qu'ils arrivent. Scrappy a besoin de se dégourdir les pattes, Véra à la nausée et Daphnée a perdu son rouge à lèvres dans le noir. Bref, il y a une très bonne ambiance dans le van.",""],
+  ["N1-1","","Lire","Tout a coup, le moteur se met à faire un drôle de bruit. Il s'emballe, les phares clignotent et puis... plus rien. L'accélérateur ne répond plus et vous vous arrêtez sur le bas côté de la route. Il pleut des cordes et les éclairs fusent dans le ciel. ",""],
+  ["N1-1","","Lire","Il faut absolument vous mettre à l'abri : entre deux éclairs, Véra aperçoit une silhouette ressemblant à une maison non loin de là. Vous prenez ce que vous pouvez avec vous et vous vous précipitez vers ce qui ressemble à un étrange manoir.",""],
+  ["N1-1","","MJ","Jouer le son de la porte qui grince",""],
+  ["N1-1","","Lire","Vous ouvrez la vieille porte du manoir. La tempête est si forte qu'elle vous oblige à vous réfugier à l'intérieur. Malgré une certaine réticence de la part de Scooby et Samm... vous finissez par entrer. Vous découvrez alors un grand hall lugubre, un immense portrait vous regarde. Le manoir semble abandonné, il y a des fuites d'eau de partout et des planches clouées sur plusieurs portes. Daphné fait un tour rapide des pièces encore ouvertes, une seule semble épargnée par les fuites d'eau : le salon. Vous décidez de vous y installer pour la nuit, en espérant pouvoir réparer le van demain matin, lorsque la tempête sera calmée.",""],
+  ["N1-2","Nuit 1 · Minuit","Lire","Vous vous êtes installés sur les canapés du salon. Scooby et Sammy grelottent sur leur couverture. Pendant la nuit, toutes sortes de bruits étranges vous empêchent de fermer l'oeil. Une porte grince, des pas, lents, dans le couloir… puis un rire étrange. Vous ne fermez plus l'œil de la nuit.",""],
+  ["N1-2","","MJ","Jouer les divers sons",""],
   ["N2-1","Nuit 2 · La tombée de la nuit","Lire","Le soleil disparaît derrière les arbres. Le jardinier est rentré chez lui. Vous vous barricadez dans le salon, les couvertures jusqu'au menton. Scooby et Sammy ont poussé un fauteuil contre la porte.",""],
   ["N2-2","Nuit 2 · Minuit","MJ","Son : carillon de l'horloge (douze coups).",""],
   ["N2-2","","Lire","L'horloge sonne les douze coups. Au douzième, un raclement résonne dans les murs, quelque part au-dessus de vous… comme quelque chose qui glisse dans un conduit. Puis des pas dans l'escalier. Le fauteuil glisse tout seul. La porte s'ouvre. Pour la première fois, vous la voyez : l'Ombre est là. \"PARTEZ D'ICI !\"",""],
@@ -835,21 +863,11 @@ function toast(t){
   clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.hidden=true, 4200);
 }
 function accessible(r){ return r==="F" ? S.unlocked.F : r==="H" ? S.unlocked.H : true; }
+/* Se déplacer coûte 1 cran quelle que soit la pièce (la distance ne compte pas) ; revenir au Hall est gratuit. */
 function cost(from,to){
   if(from===to) return 0;
   if(!accessible(to)) return Infinity;
-  const dist={[from]:0}, q=[[from,0]];
-  while(q.length){
-    q.sort((a,b)=>a[1]-b[1]);
-    const [r,d]=q.shift();
-    if(d>dist[r]) continue;
-    for(const n of ADJ[r]){
-      if(!accessible(n)) continue;
-      const nd = d + (n==="A"?0:1);
-      if(dist[n]===undefined || nd<dist[n]){ dist[n]=nd; q.push([n,nd]); }
-    }
-  }
-  return dist[to] ?? Infinity;
+  return to==="A" ? 0 : 1;
 }
 const capOk = k => isDay() && S.crans>0 && !S.caps[k].used;
 function loupeRes(r){
@@ -1078,10 +1096,10 @@ const codesFrom = prefix => [...BOOK.keys()].filter(c=>c.startsWith(prefix));
 const FREE_KEYS = {a1c:/cave|sous-sol/i, a1l:/liane/i, a2k:/cl[ée]/i, a3c:/courrier/i, b3t:/t[ée]l[ée]/i,
   c2w:/^(?!.*mauvais).*(former|mot secret)/i, c3l:/journal/i, f1t:/bo[iî]te/i, h1p:/plan/i};
 const CAP_LINKS = {
-  B1:{k:"gourmand", o:"z1", room:"B", t:"Lui donner un biscuit", btn:"Donner un biscuit", done:()=>S.gave.z1, sub:"B1b"},
-  C1:{k:"gourmand", o:"z2", room:"C", t:"Lui donner un biscuit", btn:"Donner un biscuit", done:()=>S.gave.z2, sub:"C1b"},
-  B4:{k:"costaud", o:"F", room:"B", t:"Forcer la porte", btn:"En force !", done:()=>S.unlocked.F},
-  A2:{k:"costaud", o:"H", room:"A", t:"Forcer la porte", btn:"En force !", done:()=>S.unlocked.H}
+  B1:{k:"gourmand", o:"z1", room:"B", t:"Lui donner un Scooby-Snack", btn:"Donner un Scooby-Snack", done:()=>S.gave.z1, sub:"B1b"},
+  C1:{k:"gourmand", o:"z2", room:"C", t:"Lui donner un Scooby-Snack", btn:"Donner un Scooby-Snack", done:()=>S.gave.z2, sub:"C1b"},
+  B4:{k:"costaud", o:"F", room:"B", t:"Forcer la porte", btn:"Puppy Power !", done:()=>S.unlocked.F},
+  A2:{k:"costaud", o:"H", room:"A", t:"Forcer la porte", btn:"Puppy Power !", done:()=>S.unlocked.H}
 };
 function linkActions(s){
   const el = s.code==="A1b" ? "A1" : s.code;
@@ -1336,17 +1354,17 @@ const handlers = {
       }
       if(k==="gourmand"){
         S.caps.gourmand.used=true;
-        if(opt==="z1"){ S.gave.z1=true; S.hidden=true; addFact(1,"B1b"); log(`${who("gourmand")} donne un biscuit à Pazu → B1b : la pièce cachée (fait 1, fumigènes).`); toast("B1b : pièce cachée. Poser la tuile de la pièce cachée."); }
-        else { S.gave.z2=true; log(`${who("gourmand")} donne un biscuit à Amaya → le grimoire (lore : minuit pile).`); toast("C1 : le grimoire. Les passages ne s'ouvrent qu'à minuit pile."); }
+        if(opt==="z1"){ S.gave.z1=true; S.hidden=true; addFact(1,"B1b"); log(`${who("gourmand")} donne un Scooby-Snack à Pazu → B1b : la pièce cachée (fait 1, fumigènes).`); toast("B1b : pièce cachée. Poser la tuile de la pièce cachée."); }
+        else { S.gave.z2=true; log(`${who("gourmand")} donne un Scooby-Snack à Amaya → le grimoire (lore : minuit pile).`); toast("C1 : le grimoire. Les passages ne s'ouvrent qu'à minuit pile."); }
       }
       if(k==="costaud"){
         S.caps.costaud.used=true; S.unlocked[opt]=true;
-        log(`${who("costaud")} : « En force ! » ${opt==="F"?"La porte de la Cuisine":"La porte de la cave"} cède.`);
+        log(`${who("costaud")} : « Puppy Power ! » ${opt==="F"?"La porte de la Cuisine":"La porte de la cave"} cède.`);
       }
     });
   },
   cancelJoker(){ commit(()=>{ S.joker=null; S.caps.elegante.used=false; log("Joker de Daphné annulé."); }); },
-  lianeGift(){ commit(()=>{ S.liane.found="Habitants"; log("« Dernière chance ! » Les Habitants passent la liane par une fenêtre du Hall."); }); },
+  lianeGift(){ commit(()=>{ S.liane.found="Habitants"; log("« Dernière chance ! » Les Sylvains passent la liane par une fenêtre du Hall."); }); },
   read(d){ openScript(d.c); },
   bookOpen(){ ui.book=true; ui.from=null; render(); },
   bookClose(){ ui.book=false; ui.from=null; render(); },
@@ -1500,7 +1518,7 @@ function renderTime(){
     alert=`<div class="alert"><b>L'horloge sonne 21h.</b><span>Le soleil va bientôt se coucher.</span></div>`;
   } else if(c===1 && dayNum()===2){
     alert=`<div class="alert warn"><b>« Dernière chance ! »</b><span>L'horloge sonne. Dernier moment pour utiliser les capacités.</span>
-      ${S.liane.found?`<span class="muted">Le groupe a déjà la liane.</span>`:`<span>Le groupe n'a pas la liane : les Habitants la passent par une fenêtre du Hall.</span><div class="row"><button class="btn lamp sm" data-act="lianeGift">Les Habitants apportent la liane</button></div>`}
+      ${S.liane.found?`<span class="muted">Le groupe a déjà la liane.</span>`:`<span>Le groupe n'a pas la liane : les Sylvains la passent par une fenêtre du Hall.</span><div class="row"><button class="btn lamp sm" data-act="lianeGift">Les Sylvains apportent la liane</button></div>`}
     </div>`;
   }
   const joker = S.joker ? `<div class="joker"><span><b>Joker de Daphné actif :</b> ${S.joker==="move"?"le prochain déplacement est gratuit":"la prochaine action payante est gratuite"}.</span><button class="btn ghost sm" data-act="cancelJoker">Annuler le joker</button></div>` : "";
@@ -1519,7 +1537,7 @@ function renderTime(){
       <button class="btn" data-act="untick" ${c>=max?"disabled":""}>Rendre un cran</button>
       <button class="btn ghost" data-act="nightfall" ${c===0?"disabled":""}>Faire tomber la nuit</button>
     </div>
-    <p class="muted" style="margin:0;font-size:.8rem">Les déplacements et actions payantes de la pièce retirent les crans tout seuls. Le Hall se traverse sans payer.</p>`;
+    <p class="muted" style="margin:0;font-size:.8rem">Les déplacements et actions payantes de la pièce retirent les crans tout seuls. Aller dans une autre pièce coûte 1 cran, quelle qu'elle soit ; revenir au Hall est gratuit.</p>`;
 }
 function glass(c,max,idle){
   const toks=(n,cls)=>Array.from({length:n},()=>`<span class="tok ${cls}"></span>`).join("");
@@ -1750,15 +1768,15 @@ function renderRoom(){
     const key = (code==="A1" && d===2) ? "A1b" : code;
     const acts = ACTIONS.filter(a=>a.el===code && (!a.day || a.day===d) && (!a.needKey || S.done[a.id] || (S.key && !S.unlocked.H)));
     const extra = [];
-    if(code==="B1"){ extra.push(S.gave.z1 ? doneRow("Biscuit donné à Pazu", "→ B1b : la pièce cachée, fait 1, fumigènes", "B1b")
-      : capOk("gourmand") ? capRow("gourmand", "Lui donner un biscuit", "→ B1b : la pièce cachée, fait 1, fumigènes", capBtn("gourmand","Donner un biscuit","z1"))
-      : note(`Biscuit à Pazu : ${spent("gourmand")}. Recharge : boîte de la Cuisine (F1).`)); }
-    if(code==="C1"){ extra.push(S.gave.z2 ? doneRow("Biscuit donné à Amaya", "Lore : les passages ne s'ouvrent qu'à minuit pile", "C1b")
-      : capOk("gourmand") ? capRow("gourmand", "Lui donner un biscuit", "→ le grimoire. Lore : les passages ne s'ouvrent qu'à minuit pile", capBtn("gourmand","Donner un biscuit","z2"))
-      : note(`Bloqué. Biscuit à Amaya : ${spent("gourmand")}. Recharge : boîte de la Cuisine (F1).`)); }
-    if(code==="B4" && !S.unlocked.F) extra.push(capOk("costaud") ? capRow("costaud", "Forcer la porte", "La porte cède : accès à la Cuisine (F)", capBtn("costaud","En force !","F"))
+    if(code==="B1"){ extra.push(S.gave.z1 ? doneRow("Scooby-Snack donné à Pazu", "→ B1b : la pièce cachée, fait 1, fumigènes", "B1b")
+      : capOk("gourmand") ? capRow("gourmand", "Lui donner un Scooby-Snack", "→ B1b : la pièce cachée, fait 1, fumigènes", capBtn("gourmand","Donner un Scooby-Snack","z1"))
+      : note(`Scooby-Snack à Pazu : ${spent("gourmand")}. Recharge : boîte de la Cuisine (F1).`)); }
+    if(code==="C1"){ extra.push(S.gave.z2 ? doneRow("Scooby-Snack donné à Amaya", "Lore : les passages ne s'ouvrent qu'à minuit pile", "C1b")
+      : capOk("gourmand") ? capRow("gourmand", "Lui donner un Scooby-Snack", "→ le grimoire. Lore : les passages ne s'ouvrent qu'à minuit pile", capBtn("gourmand","Donner un Scooby-Snack","z2"))
+      : note(`Bloqué. Scooby-Snack à Amaya : ${spent("gourmand")}. Recharge : boîte de la Cuisine (F1).`)); }
+    if(code==="B4" && !S.unlocked.F) extra.push(capOk("costaud") ? capRow("costaud", "Forcer la porte", "La porte cède : accès à la Cuisine (F)", capBtn("costaud","Puppy Power !","F"))
       : note(`Fermée à clé : ${spent("costaud")}.`));
-    if(code==="A2" && !S.unlocked.H) extra.push(capOk("costaud") ? capRow("costaud", "Forcer la porte", "La porte cède : accès au sous-sol (H)", capBtn("costaud","En force !","H"))
+    if(code==="A2" && !S.unlocked.H) extra.push(capOk("costaud") ? capRow("costaud", "Forcer la porte", "La porte cède : accès au sous-sol (H)", capBtn("costaud","Puppy Power !","H"))
       : note(`Fermée à clé : ${S.key?"le groupe a le double de la clé.":`double de la clé (D2), ${spent("costaud")}.`}`));
     if(code==="A2" && S.unlocked.H) extra.push(`<span class="chip ok" style="align-self:flex-start">Cave ouverte</span>`);
     if(code==="B4" && S.unlocked.F) extra.push(`<span class="chip ok" style="align-self:flex-start">Cuisine ouverte</span>`);
@@ -1847,7 +1865,7 @@ function renderInquiry(){
     </div>`;
   }).join("");
   const all = [1,2,3].every(n=>S.facts[n].length || (n===1 && S.hints1.length));
-  const lianeTxt = S.liane.found==="D1" ? "Trouvée (D1, les Habitants)" : S.liane.found==="Habitants" ? "Apportée à « Dernière chance ! »" : "Pas encore";
+  const lianeTxt = S.liane.found==="D1" ? "Trouvée (D1, les Sylvains)" : S.liane.found==="Habitants" ? "Apportée à « Dernière chance ! »" : "Pas encore";
   const found=[1,2,3].filter(n=>S.facts[n].length).length;
   $("inquiry-sum").innerHTML = `<h2>L'enquête</h2><span class="eyebrow">${found} fait${found>1?"s":""} sur 3 · liane ${S.liane.found?"trouvée":"pas encore"}</span>`;
   $("inquiry").innerHTML = `
@@ -1857,7 +1875,7 @@ function renderInquiry(){
     <dl class="kv">
       <dt>La liane</dt><dd><b style="color:${S.liane.found?"var(--ok)":"var(--ink)"}">${lianeTxt}</b>${S.liane.placed?` · tendue dans ${ROOMS[S.liane.placed].name}`:""}</dd>
       <dt>Double de la clé</dt><dd>${S.key?"Trouvé (D2)":"Pas trouvé"}</dd>
-      <dt>Boîte de biscuits</dt><dd>${S.box?"Prise (F1)":"Dans la Cuisine"}</dd>
+      <dt>Boîte de Scooby-Snacks</dt><dd>${S.box?"Prise (F1)":"Dans la Cuisine"}</dd>
       <dt>Portes</dt><dd>Cuisine ${S.unlocked.F?"ouverte":"fermée"} · Cave ${S.unlocked.H?"ouverte":"fermée"}</dd>
     </dl>`;
 }
