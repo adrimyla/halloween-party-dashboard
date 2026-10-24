@@ -66,6 +66,20 @@ header p{margin:.3rem 0 0;color:var(--muted)}
 .tile-wall{fill:none;stroke:var(--ink);stroke-width:10;stroke-linejoin:miter}
 .curtain{fill:none;stroke:#8a2f3a;stroke-width:4}
 .chem{fill:#6d625a;stroke:var(--ink);stroke-width:2}
+.furn{fill:#e6d6bb;stroke:var(--ink);stroke-width:1.5}
+.furn-in{fill:#f3e8d4;stroke:var(--ink);stroke-width:1.2}
+.furn-l{fill:none;stroke:var(--ink);stroke-width:1.2}
+.wood{fill:#c9a882;stroke:var(--ink);stroke-width:1.5}
+.face{fill:#fffdf8;stroke:var(--ink);stroke-width:1.2}
+.book{fill:#7a4b5c;stroke:var(--ink);stroke-width:1.5}
+.cat{fill:#3a3340;stroke:var(--ink);stroke-width:1}
+.board{fill:#e8d38f;stroke:var(--ink);stroke-width:1.2}
+.record{fill:#2b2630;stroke:#6d625a;stroke-width:1}
+.soil{fill:#b89a74;stroke:var(--ink);stroke-width:1.5}
+.leaf{fill:#8db66a;stroke:#4f6b33;stroke-width:1.2}
+.paper{fill:#dfe8f2;stroke:var(--ink);stroke-width:1.2}
+.elec{fill:#8f8a86;stroke:var(--ink);stroke-width:1.5}
+.glow{fill:#f6d77a;opacity:.45}
 .rname{font:400 22px "IM Fell English",Georgia,serif;fill:var(--ink);text-anchor:middle}
 .mk circle,.mk rect{fill:var(--ink)}
 .mk text{fill:var(--sheet);font:700 12px system-ui,sans-serif;text-anchor:middle;dominant-baseline:central}
@@ -200,24 +214,72 @@ const FLOORS = [
    Une tuile = la pièce rentrée de INSET unités, pour laisser voir les murs, portes et escaliers du plan.
    Les puces portent le numéro du script de l'élément (pas les scripts qui suivent : A1b, B1b…). */
 const INSET = 8;
+
+/* Meubles et décor, vus de dessus (la pendule de face) : pour que la cheminée ne soit pas le seul objet dessiné. */
+const R = (x,y,w,h,c="furn",rx=2) => `<rect class="${c}" x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}"/>`;
+const C = (x,y,r,c="furn") => `<circle class="${c}" cx="${x}" cy="${y}" r="${r}"/>`;
+const L = (x1,y1,x2,y2) => `<line class="furn-l" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+const DECOR = {
+  // Canapé, dossier au sud, deux places.
+  sofa:(x,y,w,h) => R(x,y,w,h,"furn",5) + R(x+9,y,w-18,h-10,"furn-in",3) + L(x+w/2,y,x+w/2,y+h-10),
+  // Le même, dossier à l'est : il regarde vers l'ouest.
+  sofaWest:(x,y,w,h) => R(x,y,w,h,"furn",5) + R(x,y+9,w-10,h-18,"furn-in",3) + L(x,y+h/2,x+w-10,y+h/2),
+  // Commode : deux tiroirs et un vase.
+  dresser:(x,y,w,h) => R(x,y,w,h,"wood") + L(x+w/2,y,x+w/2,y+h) + C(x+w*0.75,y+h/2,5,"face"),
+  crate:(x,y,w,h) => R(x,y,w,h,"wood",1) + L(x,y,x+w,y+h) + L(x+w,y,x,y+h),
+  // Établi du sous-sol contre le mur ouest : boulons, outils et la pince robotique.
+  labBench:(x,y) => R(x,y,28,96,"wood") + R(x+5,y+10,18,6,"furn-in",1) + C(x+8,y+32,3,"furn-in") + C(x+18,y+38,3,"furn-in")
+    + `<path class="furn-l" style="stroke-width:2" d="M${x+14},${y+84} v-16 l-7,-9 M${x+14},${y+68} l7,-9"/>` + C(x+14,y+86,4,"furn-in"),
+  bulb:(x,y) => C(x,y,22,"glow") + C(x,y,7,"face") + L(x,y-7,x,y-20),
+  // Pendule comtoise contre le mur : cadran et balancier.
+  clock:(x,y) => R(x,y,18,36,"wood",2) + C(x+9,y+9,6,"face") + L(x+9,y+16,x+9,y+28) + C(x+9,y+29,3,"wood"),
+  // Table et chaises : deux chaises en haut, deux en bas, une à chaque bout.
+  table:(x,y,w,h) => [[x+8,y-12],[x+w-22,y-12],[x+8,y+h+2],[x+w-22,y+h+2]].map(([a,b]) => R(a,b,14,10,"wood")).join("")
+    + R(x-12,y+h/2-7,10,14,"wood") + R(x+w+2,y+h/2-7,10,14,"wood") + R(x,y,w,h,"wood",3),
+  bed:(x,y,w,h) => R(x,y,w,h,"furn",4) + R(x+w-22,y+8,15,h/2-12,"furn-in",4) + R(x+w-22,y+h/2+4,15,h/2-12,"furn-in",4)
+    + `<path class="furn-l" d="M${x+w*0.55},${y} V${y+h}"/>`,
+  shelves:(x,y,w,h,step=20) => R(x,y,w,h,"wood") + Array.from({length:Math.floor(h/step)-1},(_,i) => L(x,y+(i+1)*step,x+w,y+(i+1)*step)).join(""),
+  vinyls:(x,y,w,h) => R(x,y,w,h,"wood") + Array.from({length:Math.floor(w/22)},(_,i) => C(x+12+i*22,y+h/2,8,"record")).join(""),
+  beds:(x,y,w,h) => {
+    let s = R(x,y,w,h,"soil",3);
+    for(let i=0, cols=Math.max(1,Math.round(w/22)), rows=Math.max(1,Math.round(h/22)); i<cols*rows; i++)
+      s += C(x + (i%cols+.5)*w/cols, y + (Math.floor(i/cols)+.5)*h/rows, 7, "leaf");
+    return s;
+  },
+  bench:(x,y,w,h) => R(x,y,w,h,"wood") + R(x+8,y+6,18,5,"furn-in",1) + C(x+w-18,y+h/2,5,"furn-in") + L(x+36,y+5,x+50,y+h-5),
+  pot:(x,y) => C(x,y,13,"soil") + C(x-4,y-3,6,"leaf") + C(x+5,y+2,6,"leaf"),
+  // L'énorme grimoire, Amaya roulée en boule dessus.
+  grimoire:(x,y) => R(x,y,46,32,"book",2) + L(x+6,y,x+6,y+32) + `<ellipse class="cat" cx="${x+27}" cy="${y+15}" rx="15" ry="10"/>`,
+  scrabble:(x,y) => DECOR.table(x,y,60,44) + R(x+16,y+8,28,28,"board",1),
+  kitchen:() => R(8,8,104,26,"wood") + R(8,34,26,84,"wood") + C(58,21,6,"furn-in") + C(80,21,6,"furn-in") + R(12,66,18,24,"furn-in",3)
+    + R(158,8,44,34,"wood") + L(180,8,180,42)
+};
+
 const TILES = [
   { floor:"etage", name:"Chambre", pts:"275,170 710,170 710,450 275,450", at:[495,330],
-    chem:[[600,180,80,20]], pins:[["E1",420,405],["E2",640,222],["E3",330,205]] },
+    chem:[[600,180,80,20]], decor:DECOR.bed(588,292,110,92) + DECOR.vinyls(380,418,90,22),
+    pins:[["E1",425,398],["E2",640,222],["E3",320,205]] },
   { floor:"rdc", name:"Grand Hall", pts:"275,170 455,170 455,450 275,450", at:[365,322],
-    chem:[[425,360,20,70]], pins:[["A1",365,422],["A2",302,405],["A3",400,395]] },
-  { floor:"rdc", name:"Salon", pts:"0,230 275,230 275,360 160,360 160,450 0,450", at:[118,318],
-    pins:[["B1",34,398],["B2",205,262],["B3",30,262],["B4",97,262]] },
-  { floor:"rdc", name:"Cuisine", pts:"0,0 210,0 210,230 0,230", at:[105,112],
-    pins:[["F1",35,35],["F2",165,192]] },
-  { floor:"rdc", name:"Bibliothèque", pts:"455,170 710,170 710,450 455,450", at:[588,318],
-    chem:[[600,180,80,20]], pins:[["C1",500,214],["C2",560,395],["C3",672,395],["C4",640,222]] },
+    chem:[[425,360,20,70]], decor:DECOR.dresser(403,181,42,24), pins:[["A1",365,422],["A2",302,405],["A3",400,395]] },
+  { floor:"rdc", name:"Salon", pts:"0,230 275,230 275,360 160,360 160,450 0,450", at:[215,332],
+    decor:DECOR.sofaWest(108,285,36,100) + R(62,310,30,50,"wood",4) + DECOR.clock(222,240),
+    pins:[["B1",34,398],["B2",200,257],["B3",30,262],["B4",97,262]] },
+  { floor:"rdc", name:"Cuisine", pts:"0,0 210,0 210,230 0,230", at:[115,106],
+    decor:DECOR.kitchen() + DECOR.table(95,145,70,40),
+    pins:[["F1",180,62],["F2",130,165]] },
+  { floor:"rdc", name:"Bibliothèque", pts:"455,170 710,170 710,450 455,450", at:[590,300],
+    chem:[[600,180,80,20]], decor:DECOR.shelves(680,232,20,200) + DECOR.grimoire(478,194) + DECOR.scrabble(530,374),
+    pins:[["C1",548,210],["C2",560,345],["C3",650,405],["C4",640,222]] },
   { floor:"rdc", name:"Serre", pts:"210,-75 505,-75 505,170 210,170", at:[357,52],
-    pins:[["D1",250,-38],["D2",465,-38],["D3",465,128]] },
+    decor:DECOR.beds(226,-62,110,34) + DECOR.beds(226,-20,34,150) + DECOR.bench(410,-62,80,26) + DECOR.pot(470,132),
+    pins:[["D1",285,0],["D2",450,-18],["D3",440,130]] },
   /* La pièce cachée est une extension collée à l'ouest du Salon : elle n'existe pas sur le plan vierge. */
   { floor:"rdc", name:"Pièce|cachée", pts:"-95,300 0,300 0,440 -95,440", at:[-48,362], extension:true,
     walls:"M0,300 H-95 V440 H0", curtain:"M0,300 q6,8 0,14 t0,14 t0,14 t0,14 t0,14 t0,14 t0,14 t0,14 t0,14 t0,14" },
   { floor:"ss", name:"Sous-sol", pts:"0,170 455,170 455,450 275,450 275,360 160,360 160,450 0,450", at:[235,292],
-    pins:[["H1",95,207],["H2",300,207],["H3",425,307]] }
+    decor:R(140,179,55,8,"paper",1) + R(285,179,30,13,"elec",1) + DECOR.labBench(10,225) + DECOR.bulb(235,240)
+      + DECOR.crate(38,378,30,30) + DECOR.crate(62,408,24,24),
+    pins:[["H1",167,207],["H2",300,213],["H3",425,307]] }
 ];
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -271,7 +333,7 @@ function tileBody(t, edge){
   const lines = t.name.split("|");
   const name = lines.map((w,i) => `<text class="rname" x="${t.at[0]}" y="${t.at[1] + i*24}" ${t.extension?'style="font-size:18px"':""}>${esc(w)}</text>`).join("");
   return `<polygon class="tile" points="${poly}"/>
-    ${(t.chem||[]).map(([x,y,w,h]) => `<rect class="chem" x="${x}" y="${y}" width="${w}" height="${h}"/>`).join("")}
+    ${t.decor||""}${(t.chem||[]).map(([x,y,w,h]) => `<rect class="chem" x="${x}" y="${y}" width="${w}" height="${h}"/>`).join("")}
     ${t.walls ? `<path class="tile-wall" d="${t.walls}"/>` : ""}${t.curtain ? `<path class="curtain" d="${t.curtain}"/>` : ""}
     ${name}${(t.pins||[]).map(p => pin(...p)).join("")}
     ${edge ? `<polygon class="tile-edge" points="${poly}"/>` : ""}`;
