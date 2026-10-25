@@ -1217,8 +1217,8 @@ function fadeTo(el, vol, ms, done){
 const ambTarget = () => media.ambVol * (media.sfx.size ? .35 : 1);
 const duck = () => { if(media.amb && !media.amb.paused && !ambHeld()) fadeTo(media.amb, ambTarget(), 300); };
 const missing = (kind, name) => toast(`${MEDIA_LABEL[kind]} « ${name} » introuvable dans medias/${MEDIA_DIR_OF[kind]}.`);
-// L'ambiance choisie se fait entendre seulement s'il n'y a ni musique courte ni vidéo en cours.
-const ambHeld = () => !!media.track || !$("video-layer").hidden;
+// L'ambiance choisie se fait entendre seulement s'il n'y a ni musique courte ni vidéo en cours (une télé éteinte ne compte plus).
+const ambHeld = () => !!media.track || (!$("video-layer").hidden && !tv.off);
 function ambResume(){
   const a=media.amb; if(!a || ambHeld()) return;
   a.volume=0;
@@ -1334,7 +1334,7 @@ function stopAll(){
 /* Vieille télé, fabriquée par le navigateur (aucun fichier) : le poste s'allume sur de la neige qui grésille,
    l'image arrive à travers la neige, puis à la fin la neige revient et l'écran s'éteint en un trait. */
 const TV = {lead:2.5, fade:1.2, tail:2.5, off:.6, hiss:.2};   // secondes de neige avant, fondu vers l'image, neige après, extinction ; volume du grésillement
-const tv = {raf:0, img:null, noise:null, hiss:null, timers:[], waiting:false};
+const tv = {raf:0, img:null, noise:null, hiss:null, timers:[], waiting:false, off:false};
 const tvLater = (fn, secs) => tv.timers.push(setTimeout(fn, secs*1000));
 function snowFrame(t){
   const c=$("tv-snow"), w=c.width, h=c.height, g=c.getContext("2d");
@@ -1372,7 +1372,7 @@ function snowStop(){
   const c=$("tv-snow"); c.style.transition=""; c.style.opacity=0;
 }
 function tvReset(){
-  tv.timers.forEach(clearTimeout); tv.timers=[]; tv.waiting=false;
+  tv.timers.forEach(clearTimeout); tv.timers=[]; tv.waiting=false; tv.off=false;
   snowStop();
   $("video-screen").classList.remove("tv-on", "tv-off");
 }
@@ -1398,7 +1398,8 @@ function playVideo(name){
     snow(false, TV.fade);
   }, TV.lead);
 }
-// Fin de la vidéo : la neige revient sur la dernière image, puis le poste s'éteint.
+/* Fin de la vidéo : la neige revient sur la dernière image, puis le poste s'éteint.
+   L'écran reste noir, pour que les joueurs ne voient pas la régie, jusqu'à « Fermer la vidéo » ; l'ambiance reprend déjà. */
 function videoEnd(){
   if($("video-layer").hidden) return;
   $("video").controls=false;
@@ -1407,15 +1408,16 @@ function videoEnd(){
     $("video-screen").classList.add("tv-off");
     if(tv.hiss) rampParam(tv.hiss.g.gain, 0, TV.off*.6);
   }, .4+TV.tail);
-  tvLater(closeVideo, .4+TV.tail+TV.off);
+  tvLater(()=>{ tv.off=true; snowStop(); ambResume(); }, .4+TV.tail+TV.off);
 }
 function closeVideo(){
   const v=$("video");
   if($("video-layer").hidden) return;
+  const wasOff=tv.off;
   tvReset();
   v.pause(); v.removeAttribute("src"); v.load(); v.controls=true;
   $("video-layer").hidden=true;
-  ambResume();
+  if(!wasOff) ambResume();
 }
 $("video").addEventListener("ended", videoEnd);
 
