@@ -129,7 +129,6 @@ header p{margin:.3rem 0 0;color:var(--muted)}
 .tr-slot{fill:var(--sheet);stroke:var(--ink);stroke-width:.35;stroke-dasharray:1.5 1}
 .tr-slot.j2{fill:#ece5d8}
 .tr-n{font:400 9px "IM Fell English",Georgia,serif;fill:#b9ae9c;text-anchor:middle;dominant-baseline:central}
-.tr-l{font:600 3.2px system-ui,sans-serif;fill:var(--ink);text-anchor:middle}
 .tr-s{font:italic 3.6px "IM Fell English",Georgia,serif;fill:var(--muted);text-anchor:middle}
 .tr-h{font:400 6.5px "IM Fell English SC",Georgia,serif;fill:var(--ink)}
 .aid{width:190mm;border:.5mm solid var(--ink);border-radius:3mm;background:var(--tile);padding:6mm 7mm;margin-top:6mm;font-size:10pt;line-height:1.4}
@@ -226,7 +225,7 @@ const CARDS = [
     rule:"Inspecte la pièce où se trouve le groupe : permet de révéler des détails non visibles jusque-là."},
   {n:5, name:"Scrappy", icon:"bolt", q:"« Puppy Power ! »",
     rule:"Force une porte fermée à clé."},
-  {n:6, name:"Fred", icon:"plan", q:"« Les gars, j'ai un plan ! »",
+  {n:6, name:"Fred", icon:"plan", q:"« Les amis, j'ai un plan ! »",
     rule:"Permet de réinitialiser la capacité d'un autre joueur si elle a déjà été utilisée."}
 ];
 const FOOT = "Une seule fois dans la partie, à tout moment de la journée. Retourner la carte après usage.";
@@ -412,12 +411,10 @@ function trackSVG(){
     return `<circle class="tr-slot${j2 ? " j2" : ""}" cx="${x}" cy="28" r="${r}"/><text class="tr-n" x="${x}" y="28">${n}</text>
       <text class="tr-s" x="${x}" y="50">${j2 ? "jour 2 seulement" : ""}</text>`;
   }).join("");
-  const xLast = x0 + r + 5*gap;
   return `<svg class="track" viewBox="0 0 ${W} ${H}" style="width:${W}mm" role="img" aria-label="Piste du sablier">
     <rect class="tr-board" x=".5" y=".5" width="${W-1}" height="${H-1}" rx="4"/>
     <text class="tr-h" x="6" y="9">Le sablier</text>
     ${slots}
-    <text class="tr-l" x="${xLast}" y="48">Jour 1 : 21h</text><text class="tr-l" x="${W - 4}" y="52.5" style="text-anchor:end">Jour 2 : Dernière chance !</text>
     <text class="tr-s" x="${W/2}" y="${H-2.5}">Jour 1 : 4 jetons (cases 4 à 1) · Jour 2 : 6 jetons. Plus de jeton : derniers gestes gratuits, puis la nuit tombe.</text>
   </svg>`;
 }
@@ -434,15 +431,15 @@ document.getElementById("v-aid").innerHTML = sheet("Aide de jeu", `${trackSVG()}
         </ol>
         <h5>Les capacités</h5>
         <ul>
-          <li>Chacune sert une seule fois dans toute la partie.</li>
-          <li>Elles se jouent à tout moment de la journée et se cumulent. Retournez la carte après usage.</li>
+          <li>Chacune sert une seule fois dans toute la partie (sauf si Fred réinitialise une des capacités).</li>
+          <li>Elles se jouent à tout moment de la journée et peuvent se cumuler. Retournez la carte après usage.</li>
           <li>La partie dure deux jours : réfléchissez bien.</li>
         </ul>
       </div>
       <div>
         <h5>Coûte 1 cran</h5>
         <ul>
-          <li>Une action payante : examiner, fouiller, arroser…</li>
+          <li>Une action payante.</li>
           <li>Aller dans une autre pièce, quelle qu'elle soit.</li>
         </ul>
         <h5>Gratuit</h5>
@@ -457,7 +454,6 @@ document.getElementById("v-aid").innerHTML = sheet("Aide de jeu", `${trackSVG()}
           <li>Le groupe reste ensemble. Chaque journée commence dans le Hall.</li>
           <li>Une action payante déjà faite ne se refait pas.</li>
           <li>À 0 cran : plus de déplacement (même vers le Hall), plus d'action payante ni de capacité. Seules les actions gratuites de la pièce restent possibles.</li>
-          <li>On ne peut pas perdre.</li>
         </ul>
       </div>
     </div>

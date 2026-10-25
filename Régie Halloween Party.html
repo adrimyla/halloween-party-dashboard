@@ -493,7 +493,7 @@ const ACTIONS = [
 const ACT = Object.fromEntries(ACTIONS.map(a=>[a.id,a]));
 
 const CAPS = [
-  {k:"meneur", role:"Fred", q:"« Les gars, j'ai un plan ! »", rule:"Rend son usage à la capacité déjà utilisée d'un autre joueur (pas la sienne)."},
+  {k:"meneur", role:"Fred", q:"« Les amis, j'ai un plan ! »", rule:"Rend son usage à la capacité déjà utilisée d'un autre joueur (pas la sienne)."},
   {k:"elegante", role:"Daphné", q:"« Un jeu d'enfant ! »", rule:"Au choix : un déplacement gratuit, ou une action payante gratuite."},
   {k:"enquetrice", role:"Véra", q:"« Œil de lynx »", rule:"Sur la pièce où se trouve le groupe. Utile dans la Chambre et la Bibliothèque."},
   {k:"gourmand", role:"Sammy", q:"« Donner un Scooby-Snack »", rule:"À Pazu (Salon) : pièce cachée. À Amaya (Bibliothèque) : le journal. Rechargeable avec le Scooby-Snack de la Cuisine."},
@@ -1769,7 +1769,7 @@ function renderRoom(){
   if(capOk("enquetrice")) roomCaps.push(capRow("enquetrice", `Œil de lynx sur ${ROOMS[r].name}`, loupeRes(r), capBtn("enquetrice","Utiliser")));
   if(capOk("meneur")){
     const targets=CAPS.filter(x=>x.k!=="meneur" && S.caps[x.k].used);
-    if(targets.length) roomCaps.push(capRow("meneur", "« Les gars, j'ai un plan ! »", "Rend son usage à une capacité déjà utilisée.", targets.map(x=>capBtn("meneur",`Rendre à ${x.role}`,x.k)).join("")));
+    if(targets.length) roomCaps.push(capRow("meneur", "« Les amis, j'ai un plan ! »", "Rend son usage à une capacité déjà utilisée.", targets.map(x=>capBtn("meneur",`Rendre à ${x.role}`,x.k)).join("")));
   }
   const doneRow = (t, res, sub) => `<div class="act done"><span class="t">${t}</span><span class="btns">${sub?readBtn(sub, `Lire ${sub}`):""}<span class="cost free">fait</span></span><span class="r">${res}</span></div>`;
   const els = ELEMENTS[r].map(([code,name])=>{
