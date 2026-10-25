@@ -5,7 +5,8 @@ La régie trouve toute seule les fichiers de ce dossier, une fois poussés sur G
 | Dossier | Ce qu'on y met | Dans la régie |
 |---|---|---|
 | `ambiance/` | musiques d'ambiance | jouées en boucle, une seule à la fois, avec un fondu |
-| `musiques/` | musiques courtes (générique, vinyle…) | l'ambiance s'efface en fondu le temps du morceau, puis revient |
+| `musiques/` | musiques courtes (générique…) | l'ambiance s'efface en fondu le temps du morceau, puis revient |
+| `vinyles/` | morceaux des vinyles | comme `musiques/`, avec un craquement de vinyle au début et à la fin |
 | `sons/` | bruitages | joués par-dessus l'ambiance, qui baisse un peu pendant ce temps |
 | `videos/` | extraits vidéo | en plein écran ; coupent l'ambiance et les bruitages, l'ambiance reprend à la fin |
 
@@ -18,6 +19,7 @@ GitHub refuse les fichiers de plus de 100 Mo : compresser les vidéos (moins de 
 **Dans le livret (Google Sheets)**, une ligne de type `Ambiance`, `Musique`, `Son` ou `Vidéo`,
 avec le nom du fichier dans la colonne Texte, affiche un bouton au bon endroit du script.
 Exemples : `N2-2 | | Son | carillon` joue `medias/sons/carillon.mp3` ;
-`N1-0 | | Musique | generique` joue `medias/musiques/generique.mp3`.
+`N1-0 | | Musique | generique` joue `medias/musiques/generique.mp3` ;
+`E1 | | Musique | dune` joue `medias/vinyles/dune.mp3`, avec le craquement.
 
 Le dépôt est public : tout ce qui est déposé ici est visible par tous.

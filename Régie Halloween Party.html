@@ -1156,14 +1156,14 @@ const linkDone = l => l.cap ? l.cap.done() : !!S.done[l.a.id];
 const linkBtns = l => l.cap ? bookCapBtns(l.cap) : bookActBtns(l.a);
 
 /* ================= Son et vidéo =================
-   Les fichiers sont dans le dossier medias/ du dépôt : ambiance, musiques, sons, videos.
+   Les fichiers sont dans le dossier medias/ du dépôt : ambiance, musiques, vinyles, sons, videos.
    La liste vient de l'API GitHub (le dépôt est public) et reste en mémoire pour les ouvertures sans réseau ;
    les fichiers eux-mêmes sont servis à côté de la page.
    Une musique courte coupe l'ambiance en fondu ; l'ambiance reste choisie mais muette, et revient à la fin. */
 const MEDIA_REPO = "adrimyla/halloween-party-dashboard";
 const MEDIA_KEY = "regie-halloween-medias";
-const MEDIA_DIRS = {ambiance:"ambiance", musiques:"musique", sons:"son", videos:"video"};
-const MEDIA_DIR_OF = {ambiance:"ambiance", musique:"musiques", son:"sons", video:"videos"};
+const MEDIA_DIRS = {ambiance:"ambiance", musiques:"musique", vinyles:"musique", sons:"son", videos:"video"};
+const MEDIA_DIR_OF = {ambiance:"ambiance", musique:"musiques ou medias/vinyles", son:"sons", video:"videos"};
 const MEDIA_EXT = /\.(mp3|ogg|oga|wav|m4a|aac|opus|webm|mp4|m4v|mov)$/i;
 const MEDIA_LABEL = {ambiance:"Ambiance", musique:"Musique", son:"Son", video:"Vidéo"};
 const media = {list:[], loaded:false, err:null, amb:null, ambKey:null, ambVol:.6,
@@ -1178,10 +1178,10 @@ async function loadMedia(){
     const res=await fetch(`https://api.github.com/repos/${MEDIA_REPO}/git/trees/main?recursive=1`, {cache:"no-store"});
     if(!res.ok) throw new Error(`GitHub répond ${res.status}`);
     const tree=(await res.json()).tree || [];
-    media.list = tree.filter(f=>f.type==="blob" && /^medias\/(ambiance|musiques|sons|videos)\/[^/]+$/.test(f.path) && MEDIA_EXT.test(f.path))
+    media.list = tree.filter(f=>f.type==="blob" && /^medias\/(ambiance|musiques|vinyles|sons|videos)\/[^/]+$/.test(f.path) && MEDIA_EXT.test(f.path))
       .map(f=>{
         const [, dir, file]=f.path.split("/"), name=file.replace(MEDIA_EXT, "");
-        return {kind:MEDIA_DIRS[dir], name, key:mediaKey(name), url:f.path.split("/").map(encodeURIComponent).join("/")};
+        return {kind:MEDIA_DIRS[dir], vinyl:dir==="vinyles", name, key:mediaKey(name), url:f.path.split("/").map(encodeURIComponent).join("/")};
       })
       .sort((a,b)=>a.name.localeCompare(b.name, "fr"));
     media.err=null;
@@ -1227,22 +1227,76 @@ function ambToggle(name){
   if(ambHeld()){ toast("Ambiance choisie : elle démarrera à la fin de la musique."); return; }
   a.play().then(()=>fadeTo(a, ambTarget(), 900)).catch(e=>{ toast(`Lecture impossible : ${e.message}`); if(media.amb===a){ media.amb=null; media.ambKey=null; render(); } });
 }
-/* Musique courte : l'ambiance part en fondu pendant que la musique arrive, puis revient à la fin. */
+/* Craquement de vinyle, fabriqué par le navigateur (aucun fichier) : le « toc » de l'aiguille qui se pose,
+   un souffle plein de petits craquements, puis à la fin le clic du sillon de sortie, une fois par tour (1,8 s à 33 tours). */
+const VINYL = {lead:1.8, under:.15, tail:5.4, turn:1.8};   // secondes avant le morceau, craquement sous la musique, sillon de fin
+let audioCtx=null, vinylBufs=null;
+function vinylMake(ctx){
+  const sr=ctx.sampleRate;
+  const buffer=(secs, fill)=>{ const b=ctx.createBuffer(1, Math.round(sr*secs), sr); fill(b.getChannelData(0)); return b; };
+  const pop=(d, at, amp, ms)=>{ const n=Math.round(sr*ms/1000); for(let j=0;j<n && at+j<d.length;j++) d[at+j]+=(Math.random()*2-1)*amp*Math.exp(-6*j/n); };
+  const thump=(d, at, amp, hz)=>{ for(let j=0;j<sr*.15 && at+j<d.length;j++) d[at+j]+=amp*Math.sin(2*Math.PI*hz*j/sr)*Math.exp(-j/(sr*.03)); };
+  return {
+    crackle: buffer(8, d=>{
+      let lp=0;
+      for(let i=0;i<d.length;i++){ lp+=(Math.random()*2-1-lp)*.2; d[i]=lp*.06; }
+      for(let k=0;k<8*8;k++) pop(d, Math.floor(Math.random()*d.length), .05+.6*Math.random()**4, .3+Math.random()*2);
+    }),
+    groove: buffer(VINYL.turn, d=>{ thump(d, 0, .35, 70); pop(d, 0, .4, 4); }),
+    drop: buffer(.5, d=>{ thump(d, 0, .7, 55); pop(d, 0, .8, 6); pop(d, Math.round(sr*.08), .4, 3); }),
+  };
+}
+function vinylStart(){
+  try{ audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ return null; }
+  const ctx=audioCtx; ctx.resume().catch(()=>{});
+  vinylBufs = vinylBufs || vinylMake(ctx);
+  const now=ctx.currentTime, out=ctx.createGain();
+  out.gain.value=media.trackVol; out.connect(ctx.destination);
+  const layer=(buf, vol, loop)=>{ const s=ctx.createBufferSource(), g=ctx.createGain(); s.buffer=buf; s.loop=loop; g.gain.value=vol; s.connect(g).connect(out); s.start(); return {s, g}; };
+  const crackle=layer(vinylBufs.crackle, 1, true), groove=layer(vinylBufs.groove, 0, true);
+  layer(vinylBufs.drop, 1, false);
+  crackle.g.gain.setValueAtTime(1, now+VINYL.lead);
+  crackle.g.gain.linearRampToValueAtTime(VINYL.under, now+VINYL.lead+2);
+  const rampTo=(p, vol, secs)=>{ const t=ctx.currentTime; p.cancelScheduledValues(t); p.setValueAtTime(p.value, t); p.linearRampToValueAtTime(vol, t+secs); };
+  const v={out, timer:null,
+    // Le morceau est fini : le disque tourne encore un peu dans le sillon de sortie, puis tout s'efface.
+    end(done){
+      rampTo(crackle.g.gain, 1, .3); groove.g.gain.value=1;
+      v.timer=setTimeout(()=>{ v.stop(1.5); v.timer=setTimeout(done, 1500); }, VINYL.tail*1000);
+    },
+    stop(secs){
+      clearTimeout(v.timer); rampTo(out.gain, 0, secs);
+      [crackle, groove].forEach(l=>l.s.stop(ctx.currentTime+secs+.05));
+    }};
+  return v;
+}
+/* Musique courte : l'ambiance part en fondu pendant que la musique arrive, puis revient à la fin.
+   Un morceau du dossier vinyles craque d'abord un moment, puis tourne encore un peu dans le sillon de sortie. */
 function playTrack(name){
   const m=findMedia("musique", name); if(!m){ missing("musique", name); return; }
   if(media.trackKey===m.key){ stopTrack(); return; }
-  if(media.track){ const old=media.track; old.onended=null; fadeTo(old, 0, 300, ()=>old.pause()); }
+  if(media.track) dropTrack(media.track, 300);
   const t=new Audio(m.url); t.volume=0;
   media.track=t; media.trackKey=m.key;
   if(media.amb && !media.amb.paused){ const a=media.amb; fadeTo(a, 0, 1200, ()=>{ if(ambHeld()) a.pause(); }); }
-  t.onended=()=>{ if(media.track!==t) return; media.track=null; media.trackKey=null; render(); ambResume(); };
-  t.play().then(()=>fadeTo(t, media.trackVol, 1200)).catch(e=>{ toast(`Lecture impossible : ${e.message}`); if(media.track===t){ media.track=null; media.trackKey=null; render(); ambResume(); } });
+  const free=()=>{ if(media.track!==t) return; media.track=null; media.trackKey=null; render(); ambResume(); };
+  t._vinyl = m.vinyl ? vinylStart() : null;
+  t.onended=()=>{ if(media.track!==t) return; t._vinyl ? t._vinyl.end(free) : free(); };
+  const go=()=>t.play().then(()=>fadeTo(t, media.trackVol, t._vinyl?300:1200))
+    .catch(e=>{ toast(`Lecture impossible : ${e.message}`); if(media.track===t){ if(t._vinyl) t._vinyl.stop(.3); free(); } });
+  if(t._vinyl) t._lead=setTimeout(go, VINYL.lead*1000); else go();
   render();
+}
+// Coupe un morceau en fondu, avec son craquement de vinyle s'il en a un.
+function dropTrack(t, ms){
+  t.onended=null; clearTimeout(t._lead);
+  if(t._vinyl) t._vinyl.stop(ms/1000);
+  fadeTo(t, 0, ms, ()=>t.pause());
 }
 function stopTrack(quick){
   const t=media.track; if(!t) return;
-  t.onended=null; media.track=null; media.trackKey=null;
-  fadeTo(t, 0, quick?150:700, ()=>t.pause());
+  media.track=null; media.trackKey=null;
+  dropTrack(t, quick?150:700);
   render();
   ambResume();
 }
@@ -1283,7 +1337,7 @@ $("video").addEventListener("ended", closeVideo);
 function mediaBtn(m){
   const act = {son:"sfx", ambiance:"amb", musique:"track", video:"video"}[m.kind];
   const on = (m.kind==="ambiance" && media.ambKey===m.key) || (m.kind==="musique" && media.trackKey===m.key);
-  const icon = m.kind==="video" ? "▶" : m.kind==="ambiance" ? (on?"❚❚":"♫") : m.kind==="musique" ? (on?"■":"♬") : "♪";
+  const icon = m.kind==="video" ? "▶" : m.kind==="ambiance" ? (on?"❚❚":"♫") : m.kind==="musique" ? (on?"■":m.vinyl?"◉":"♬") : "♪";
   return `<button class="media-btn ${on?"on":""} ${m.kind==="video"?"video":""}" data-act="${act}" data-n="${esc(m.name)}">${icon} ${esc(mediaName(m.name))}</button>`;
 }
 function renderSound(){
@@ -1465,7 +1519,7 @@ document.addEventListener("input", e=>{
     const v=+e.target.value/100;
     const k=e.target.dataset.mediaVol;
     if(k==="amb"){ media.ambVol=v; if(media.amb && !ambHeld()){ clearInterval(media.amb._fade); media.amb.volume=ambTarget(); } }
-    else if(k==="track"){ media.trackVol=v; if(media.track){ clearInterval(media.track._fade); media.track.volume=v; } }
+    else if(k==="track"){ media.trackVol=v; if(media.track){ clearInterval(media.track._fade); media.track.volume=v; if(media.track._vinyl) media.track._vinyl.out.gain.value=v; } }
     else { media.sfxVol=v; media.sfx.forEach(s=>s.volume=v); }
   }
 });
