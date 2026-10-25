@@ -54,6 +54,13 @@ header p{margin:.3rem 0 0;color:var(--muted)}
   display:grid;place-items:center;font:700 8.5pt/1 Cambria,"Times New Roman",serif}
 .card.back .big{width:30mm;height:30mm;border-radius:50%;background:var(--sheet);border:.6mm solid var(--ink);outline:.3mm solid var(--ink);outline-offset:1mm;
   display:grid;place-items:center;font:400 54pt/1 Cambria,"Times New Roman",serif}
+/* Carte de règle : même format que les cartes personnage, texte aligné à gauche. */
+.card.rules .in{align-items:stretch;text-align:left;padding:2.4mm 3mm 1.8mm;font-size:7.3pt;line-height:1.24}
+.card.rules .title{font:400 12.5pt/1 "IM Fell English SC",Georgia,serif;text-align:center;margin:0 0 .8mm}
+.card.rules h5{margin:1.3mm 0 .6mm;font:400 10pt/1.1 "IM Fell English SC",Georgia,serif;border-bottom:.25mm solid var(--ink)}
+.card.rules ul,.card.rules ol{margin:0;padding-left:3.6mm}
+.card.rules li{margin-bottom:.5mm}
+.card.rules .code{display:inline-grid;place-items:center;min-width:5.5mm;height:3.6mm;padding:0 .8mm;border-radius:1.8mm;background:var(--ink);color:var(--sheet);font:700 6pt/1 system-ui,sans-serif}
 
 /* ---------- Jetons ---------- */
 .token{display:block;width:28mm;height:28mm}
@@ -131,13 +138,6 @@ header p{margin:.3rem 0 0;color:var(--muted)}
 .tr-n{font:400 9px "IM Fell English",Georgia,serif;fill:#b9ae9c;text-anchor:middle;dominant-baseline:central}
 .tr-s{font:italic 3.6px "IM Fell English",Georgia,serif;fill:var(--muted);text-anchor:middle}
 .tr-h{font:400 6.5px "IM Fell English SC",Georgia,serif;fill:var(--ink)}
-.aid{width:190mm;border:.5mm solid var(--ink);border-radius:3mm;background:var(--tile);padding:6mm 7mm;margin-top:6mm;font-size:10pt;line-height:1.4}
-.aid h4{margin:0 0 3mm;font:400 17pt/1 "IM Fell English SC",Georgia,serif;text-align:center}
-.aid .cols{display:grid;grid-template-columns:1fr 1fr;gap:6mm}
-.aid h5{margin:0 0 1.5mm;font:400 12.5pt "IM Fell English SC",Georgia,serif;border-bottom:.3mm solid var(--ink)}
-.aid ul,.aid ol{margin:0 0 3mm;padding-left:5mm}
-.aid li{margin-bottom:.8mm}
-.aid .code{display:inline-grid;place-items:center;min-width:7mm;height:5mm;padding:0 1.2mm;border-radius:2.5mm;background:var(--ink);color:var(--sheet);font:700 7.5pt/1 system-ui,sans-serif}
 
 /* Les quatre vues */
 .view{display:none}
@@ -160,7 +160,7 @@ body[data-view="cards"] .v-cards, body[data-view="tokens"] .v-tokens, body[data-
 <div class="wrap">
   <header>
     <h1>Matériel à imprimer</h1>
-    <p>Tout ce qui se pose sur la table en plus du plan : les cartes, les jetons, les documents que le MJ remet, et l'aide de jeu.</p>
+    <p>Tout ce qui se pose sur la table en plus du plan : les cartes, les jetons, les documents que le MJ remet, et la règle du jeu.</p>
   </header>
 
   <div class="bar">
@@ -168,7 +168,7 @@ body[data-view="cards"] .v-cards, body[data-view="tokens"] .v-tokens, body[data-
       <button type="button" data-view="cards" aria-pressed="true">Cartes personnage</button>
       <button type="button" data-view="tokens" aria-pressed="false">Jetons</button>
       <button type="button" data-view="docs" aria-pressed="false">Documents</button>
-      <button type="button" data-view="aid" aria-pressed="false">Aide de jeu</button>
+      <button type="button" data-view="aid" aria-pressed="false">Règle du jeu</button>
     </span>
     <button type="button" class="print" onclick="window.print()">Imprimer cette vue</button>
   </div>
@@ -189,7 +189,7 @@ const HINTS = {
   cards:"Recto-verso, retourner sur le bord long : les versos sont rangés en miroir pour tomber pile derrière leur recto. Sans recto-verso, imprimer les deux pages et les coller dos à dos.",
   tokens:"Imprimer à 100 % (taille réelle) : les jetons de 28 mm entrent dans les cases de la piste du sablier. Sur papier épais, ou collés sur du carton.",
   docs:"Imprimer à 100 %, découper au ras du papier. La légende sous chaque document dit quand le remettre : elle part à la découpe.",
-  aid:"Imprimer à 100 % : les cases de la piste font la taille des jetons."
+  aid:"Règle du jeu (pages 1 et 2) : recto-verso, retourner sur le bord long, une carte par joueur. Piste du sablier (page 3) : à 100 %, les cases font la taille des jetons."
 };
 
 /* ---------- Emblèmes des personnages (60 × 60) ---------- */
@@ -402,7 +402,7 @@ document.getElementById("v-docs").innerHTML =
   `<div class="todo"><b>Textes provisoires</b>, encore entre crochets dans les scripts :<ul>${TODO.map(t => `<li>${esc(t)}</li>`).join("")}</ul></div>`
   + sheet("Documents à remettre", `<div class="cut">${PACKED.join("")}</div>`);
 
-/* ---------- Aide de jeu ----------
+/* ---------- Règle du jeu et piste du sablier ----------
    La piste : 6 cases de 30 mm pour des jetons de 28 mm. On retire un jeton à chaque cran, de gauche à droite. */
 function trackSVG(){
   const W = 190, H = 64, r = 15, gap = 31, x0 = 2.5;   // en millimètres
@@ -419,45 +419,48 @@ function trackSVG(){
   </svg>`;
 }
 
-document.getElementById("v-aid").innerHTML = sheet("Aide de jeu", `${trackSVG()}
-  <div class="aid"><h4>Comment on joue</h4>
-    <div class="cols">
-      <div>
-        <h5>Explorer une pièce</h5>
-        <ol>
-          <li>À la première visite, le MJ lit l'entrée et pose la tuile de la pièce sur le plan.</li>
-          <li>Annoncez le code d'un élément (<span class="code">C2</span>) : le MJ le décrit et lit les actions possibles, avec leur coût.</li>
-          <li>Choisissez une action. Elle donne son résultat, ou mène plus loin.</li>
-        </ol>
-        <h5>Les capacités</h5>
-        <ul>
-          <li>Chacune sert une seule fois dans toute la partie (sauf si Fred réinitialise une des capacités).</li>
-          <li>Elles se jouent à tout moment de la journée et peuvent se cumuler. Retournez la carte après usage.</li>
-          <li>La partie dure deux jours : réfléchissez bien.</li>
-        </ul>
-      </div>
-      <div>
-        <h5>Coûte 1 cran</h5>
-        <ul>
-          <li>Une action payante.</li>
-          <li>Aller dans une autre pièce, quelle qu'elle soit.</li>
-        </ul>
-        <h5>Gratuit</h5>
-        <ul>
-          <li>Revenir au Hall.</li>
-          <li>Choisir un élément et écouter sa description.</li>
-          <li>Certaines actions, et les énigmes.</li>
-          <li>Les capacités.</li>
-        </ul>
-        <h5>À retenir</h5>
-        <ul>
-          <li>Le groupe reste ensemble. Chaque journée commence dans le Hall.</li>
-          <li>Une action payante déjà faite ne se refait pas.</li>
-          <li>À 0 cran : plus de déplacement (même vers le Hall), plus d'action payante ni de capacité. Seules les actions gratuites de la pièce restent possibles.</li>
-        </ul>
-      </div>
-    </div>
-  </div>`);
+/* La règle du jeu : une carte par joueur, au format des cartes personnage, imprimée recto-verso.
+   Recto : jouer une pièce et le temps. Verso : les capacités et ce qu'il faut retenir. */
+const RULES_FRONT = `<div class="card rules"><div class="in">
+  <div class="title">Règle du jeu</div>
+  <h5>Explorer une pièce</h5>
+  <ol>
+    <li>À la première visite, le MJ lit l'entrée et pose la tuile de la pièce sur le plan.</li>
+    <li>Annoncez le code d'un élément (<span class="code">C2</span>) : le MJ le décrit et lit les actions possibles, avec leur coût.</li>
+    <li>Choisissez une action. Elle donne son résultat, ou mène plus loin.</li>
+  </ol>
+  <h5>Coûte 1 cran</h5>
+  <ul>
+    <li>Une action payante.</li>
+    <li>Aller dans une autre pièce, quelle qu'elle soit.</li>
+  </ul>
+  <h5>Gratuit</h5>
+  <ul>
+    <li>Revenir au Hall.</li>
+    <li>Choisir un élément et écouter sa description.</li>
+    <li>Certaines actions, et les énigmes.</li>
+    <li>Les capacités.</li>
+  </ul>
+  </div></div>`;
+const RULES_BACK = `<div class="card rules"><div class="in">
+  <div class="title">Règle du jeu</div>
+  <h5>Les capacités</h5>
+  <ul>
+    <li>Chacune sert une seule fois dans toute la partie (sauf si Fred réinitialise une des capacités).</li>
+    <li>Elles se jouent à tout moment de la journée et peuvent se cumuler. Retournez la carte après usage.</li>
+    <li>La partie dure deux jours : réfléchissez bien.</li>
+  </ul>
+  <h5>À retenir</h5>
+  <ul>
+    <li>Le groupe reste ensemble. Chaque journée commence dans le Hall.</li>
+    <li>Une action payante déjà faite ne se refait pas.</li>
+    <li>À 0 cran : plus de déplacement (même vers le Hall), plus d'action payante ni de capacité. Seules les actions gratuites de la pièce restent possibles.</li>
+  </ul></div></div>`;
+
+document.getElementById("v-aid").innerHTML =
+  sheet("Règle du jeu · recto", `<div class="cards">${RULES_FRONT.repeat(6)}</div>`)
+  + sheet("Règle du jeu · verso", `<div class="cards">${RULES_BACK.repeat(6)}</div>`)
+  + sheet("Piste du sablier", trackSVG());
 
 function show(view){
   document.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", x.dataset.view === view));
