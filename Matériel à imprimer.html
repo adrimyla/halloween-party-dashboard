@@ -126,7 +126,8 @@ header p{margin:.3rem 0 0;color:var(--muted)}
 
 .d-napkin{width:68mm;height:68mm;display:grid;place-items:center;background:#fff;
   box-shadow:0 0 0 .3mm #b9ae9c,inset 0 0 0 3mm #fff,inset 0 0 0 3.4mm #e3dccd}
-.d-napkin p{margin:0;font:600 20pt/1 "Caveat",cursive;transform:rotate(-6deg)}
+.d-napkin p{margin:0;max-width:54mm;text-align:center;font:600 19pt/1.1 "Caveat",cursive;transform:rotate(-6deg)}
+.d-napkin .sig{display:block;margin-top:3mm;text-align:right;font-size:17pt}
 
 /* ---------- Aide de jeu ---------- */
 .track{display:block;width:190mm;height:auto}
@@ -287,21 +288,19 @@ document.getElementById("v-tokens").innerHTML = sheet("Jetons à découper", `
 
 /* ---------- Documents à remettre ----------
    Les textes sont ceux du livret (Google Sheets), mot pour mot. Ce que le livret ne fixe pas est listé dans TODO. */
-const TODO = [
-  "Devis et bon de commande (B1b) : le nom de l'entreprise et les prix"
-];
+const TODO = [];
 
 const scribble = `<svg width="90" height="26" viewBox="0 0 90 26" aria-hidden="true"><path d="M4,18 C14,2 18,24 26,12 S36,4 40,16 S54,22 58,8 S72,18 86,10" fill="none" stroke="#2c4a7a" stroke-width="1.6"/></svg>`;
 
 const DOCS = [
-  fig(`<div class="doc d-note hand"><p>Monsieur,</p>
+  fig(`<div class="doc d-note hand"><p>Monsieur Deoux,</p>
     <p>Tous les matins, je suis obligé de couper des lianes dans la serre. Je les coupe mais elles reviennent dès le lendemain&nbsp;! C'est à n'y rien comprendre…</p>
     <p class="sig">Votre voisin</p></div>`,
     "<b>A3 · Lire le courrier</b> (gratuit) · la note du voisin, parmi les factures"),
 
   fig(`<div class="doc d-type type"><div class="head"><b>Établissements Poulie &amp; Fils</b><span>Monte-charges · Ascenseurs · Mécanismes sur mesure</span></div>
     <h4>DEVIS N° 1313</h4>
-    <p>Client : le propriétaire du manoir.</p>
+    <p>Client : A. Deoux.</p>
     <p>Objet : installation d'un monte-charge vertical dans les conduits de cheminée du manoir.</p>
     <table>
       <tr><td>Relevé et étude des conduits</td><td>1 200 F</td></tr>
@@ -317,6 +316,7 @@ const DOCS = [
   fig(`<div class="doc d-type type"><div class="head"><b>Établissements Poulie &amp; Fils</b><span>Monte-charges · Ascenseurs · Mécanismes sur mesure</span></div>
     <h4>BON DE COMMANDE N° 1314</h4>
     <p>Suite au devis n° 1313.</p>
+    <p>Client : A. Deoux.</p>
     <table>
       <tr><td>Désignation</td><td>Quantité</td></tr>
       <tr><td>Mécanisme de monte-charge pour conduit de cheminée</td><td>2</td></tr>
@@ -345,7 +345,8 @@ const DOCS = [
   fig(`<div class="doc d-tech">${techPlan()}</div>`,
     "<b>H1 · Le plan technique</b> (gratuit) · au mur du sous-sol"),
 
-  fig(`<div class="doc d-napkin"><p>7/10, manque de sel.</p></div>`,
+  // Le seul endroit où le prénom de la propriétaire apparaît avant le démasquage.
+  fig(`<div class="doc d-napkin"><p>7/10, manque de crème.<span class="sig">— Alyse</span></p></div>`,
     "<b>F2 · Soulever l'assiette</b> (1 cran) · bonus")
 ];
 
@@ -372,7 +373,7 @@ function liftPlan(){
     <path class="bl-thin" d="M290,128 v-30 l-4,6 m4,-6 l4,6 M290,154 v14 l-4,-6 m4,6 l4,-6"/>
     ${fire(228,118)}${fire(228,170)}
     <path class="bl-thin" d="M196,92 h-40 M196,144 h-40"/><text class="bl-t" x="96" y="88">mécanisme n° 1</text><text class="bl-t" x="96" y="140">mécanisme n° 2</text>
-    <text class="madame" x="200" y="22">À l'attention de Madame.</text>
+    <text class="madame" x="346" y="22" text-anchor="end">À l'attention de A. Deoux.</text>
   </svg>`;
 }
 
@@ -399,7 +400,7 @@ function techPlan(){
 }
 
 document.getElementById("v-docs").innerHTML =
-  `<div class="todo"><b>Textes provisoires</b>, encore entre crochets dans les scripts :<ul>${TODO.map(t => `<li>${esc(t)}</li>`).join("")}</ul></div>`
+  (TODO.length ? `<div class="todo"><b>Textes provisoires</b>, encore entre crochets dans les scripts :<ul>${TODO.map(t => `<li>${esc(t)}</li>`).join("")}</ul></div>` : "")
   + sheet("Documents à remettre", `<div class="cut">${PACKED.join("")}</div>`);
 
 /* ---------- Règle du jeu et piste du sablier ----------
