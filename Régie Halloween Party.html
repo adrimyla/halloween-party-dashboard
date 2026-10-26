@@ -162,12 +162,6 @@ h2{font-family:var(--f-display);font-weight:400;font-size:1.35rem;letter-spacing
 .alert b{font-size:.98rem}
 .joker{border:1px dashed var(--lamp);border-radius:8px;padding:8px 12px;font-size:.88rem;display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
 
-.timeline{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
-.timeline li{display:grid;grid-template-columns:62px minmax(0,1fr);gap:10px;padding:8px 0;border-top:1px solid var(--line)}
-.timeline li:first-child{border-top:0}
-.timeline .when{font-family:var(--f-code);font-size:.78rem;color:var(--muted);padding-top:2px}
-.timeline li.past{opacity:.5}
-.timeline li.now .when{color:var(--lamp)}
 
 /* ---------- Plan ---------- */
 .plan{display:grid;grid-template-columns:44px repeat(5,minmax(0,1fr));gap:6px;align-items:stretch}
@@ -330,11 +324,6 @@ mark.todo{background:var(--warn-soft);color:var(--warn);border:1px dashed var(--
 .log li:first-child{border-top:0}
 .log .w{font-family:var(--f-code);font-size:.7rem;color:var(--muted);padding-top:2px}
 
-/* ---------- Chrono ---------- */
-.chrono{border:1px solid var(--fog);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--fog-soft)}
-.chrono .disp{font-family:var(--f-code);font-size:2.4rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
-.chrono .disp.low{color:var(--warn)}
-.chrono select{background:var(--panel-2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:5px 6px;font:inherit;font-size:.85rem}
 
 .toast{
   position:fixed;left:50%;transform:translateX(-50%);
@@ -847,7 +836,6 @@ function fresh(){
     names:{}, joker:null, done:{}, gave:{z1:false,z2:false},
     facts:{1:[],2:[],3:[]}, hints1:[], loupe:null,
     liane:{found:null, placed:null},
-    chase:{n2:0, n3:0}, chaseOk:{n2:false, n3:false},
     checks:{}, read:{}, log:[]
   };
 }
@@ -1102,7 +1090,7 @@ function readBtn(code, label){
   const r=!!S.read[code];
   return `<button class="read-btn ${r?"read":""}" data-act="read" data-c="${esc(code)}" title="${r?"Déjà lu. ":""}Ouvrir ${esc(code)} dans le livret">📖 ${esc(label||code)}</button>`;
 }
-/* Liste de scripts à lire dans l'ordre ; un élément qui commence par "<" est du HTML déjà rendu (le chrono). */
+/* Liste de scripts à lire dans l'ordre ; un élément qui commence par "<" est du HTML déjà rendu. */
 function scriptList(items){
   return `<div class="scripts">${items.map(x=>{
     if(x.startsWith("<")) return x;
@@ -1447,10 +1435,10 @@ const handlers = {
   cancelReset(){ $("confirm").hidden=true; },
   reset(){
     hist.push(JSON.stringify(S));
-    S=fresh(); log("Nouvelle partie."); save(); $("confirm").hidden=true; stopChrono(true); render();
+    S=fresh(); log("Nouvelle partie."); save(); $("confirm").hidden=true; render();
   },
-  phase(d){ const i=+d.i; if(i===S.phase) return; commit(()=>setPhase(i)); stopChrono(true); },
-  next(){ if(S.phase<PHASES.length-1){ commit(()=>setPhase(S.phase+1)); stopChrono(true); } },
+  phase(d){ const i=+d.i; if(i===S.phase) return; commit(()=>setPhase(i)); },
+  next(){ if(S.phase<PHASES.length-1) commit(()=>setPhase(S.phase+1)); },
   tick(){ if(S.crans>0) commit(()=>{ spend(1); log("Le temps avance (−1 cran)."); }); },
   untick(){ const max=P().crans||0; if(S.crans<max) commit(()=>{ S.crans++; log("Un cran rendu (+1)."); }); },
   nightfall(){ commit(()=>{ S.crans=0; log("Le MJ fait tomber la nuit plus tôt."); }); },
@@ -1566,13 +1554,7 @@ const handlers = {
     try{ if(link===DEFAULT_LINK) localStorage.removeItem(LINK_KEY); else localStorage.setItem(LINK_KEY, link); }catch(e){}
     $("book-url").blur();
     loadFromLink(link);
-  },
-  chaseFail(d){ commit(()=>{ S.chase[d.n]++; log(`Course-poursuite ratée (essai ${S.chase[d.n]}).`); }); stopChrono(true); },
-  chaseWin(d){ commit(()=>{ S.chaseOk[d.n]=true; log("Course-poursuite réussie."); }); stopChrono(false); },
-  chaseRefuge(d){ commit(()=>{ S.chaseOk[d.n]=true; log("Deuxième échec : le groupe se réfugie quelque part malgré tout."); }); stopChrono(false); },
-  chronoStart(){ startChrono(); },
-  chronoPause(){ pauseChrono(); },
-  chronoReset(){ stopChrono(true); }
+  }
 };
 
 document.addEventListener("click", e=>{
@@ -1594,9 +1576,6 @@ document.addEventListener("input", e=>{
     else { media.sfxVol=v; media.sfx.forEach(s=>s.volume=v); }
   }
 });
-document.addEventListener("change", e=>{
-  if(e.target.id==="chrono-dur"){ chrono.dur=+e.target.value; if(!chrono.running){ chrono.left=chrono.dur; paintChrono(); } }
-});
 $("book-file").addEventListener("change", e=>{
   const f=e.target.files[0]; if(f) importFile(f);
   e.target.value="";
@@ -1614,29 +1593,6 @@ function wake(){
   if(wakeAsked) return; wakeAsked=true;
   try{ navigator.wakeLock && navigator.wakeLock.request("screen").catch(()=>{}); }catch(e){}
 }
-
-/* ================= Chrono de la course-poursuite ================= */
-const chrono={dur:60, left:60, running:false, timer:null};
-function paintChrono(){
-  const el=$("chrono-disp"); if(!el) return;
-  const m=Math.floor(chrono.left/60), s=chrono.left%60;
-  el.textContent=`${m}:${String(s).padStart(2,"0")}`;
-  el.classList.toggle("low", chrono.left<=10);
-  const st=$("chrono-start"); if(st) st.textContent = chrono.running ? "En cours…" : (chrono.left<chrono.dur && chrono.left>0 ? "Reprendre" : "Lancer");
-}
-function startChrono(){
-  if(chrono.running) return;
-  if(chrono.left<=0) chrono.left=chrono.dur;
-  chrono.running=true;
-  chrono.timer=setInterval(()=>{
-    chrono.left--;
-    if(chrono.left<=0){ chrono.left=0; clearInterval(chrono.timer); chrono.running=false; toast("Temps écoulé !"); }
-    paintChrono();
-  },1000);
-  paintChrono();
-}
-function pauseChrono(){ clearInterval(chrono.timer); chrono.running=false; paintChrono(); }
-function stopChrono(resetTime){ clearInterval(chrono.timer); chrono.running=false; if(resetTime) chrono.left=chrono.dur; paintChrono(); }
 
 /* ================= Rendu ================= */
 /* Livret ouvert en permanence à droite sur les écrans larges (même seuil que le CSS). */
@@ -1667,7 +1623,6 @@ function render(){
   $("stack").className = `stack ${isDay()?"day":"night"}`;
   renderRail(); renderTime(); renderSound(); renderPhase(); renderPlan(); renderRoom(); renderCaps(); renderInquiry(); renderJournal(); renderBook();
   $("undo").disabled=!hist.length;
-  paintChrono();
 }
 
 function renderRail(){
@@ -1786,71 +1741,32 @@ function renderBook(){
   </div>`).join("");
   $("book-body").innerHTML = [...BOOK.values()].map(scriptCard).join("");
 }
-function chronoBlock(n){
-  const fails=S.chase[n], ok=S.chaseOk[n];
-  if(ok) return `<div class="alert night"><b>Course-poursuite terminée.</b><span class="muted">${fails?`${fails} échec${fails>1?"s":""} avant de s'en sortir.`:"Réussie du premier coup."}</span></div>`;
-  const durs=[30,45,60,90,120].map(v=>`<option value="${v}" ${v===chrono.dur?"selected":""}>${v} s</option>`).join("");
-  return `<div class="chrono">
-    <div class="panel-head"><b>Course-poursuite</b><span class="eyebrow">Essai ${fails+1}</span></div>
-    <div class="row" style="align-items:center;gap:14px">
-      <span class="disp" id="chrono-disp">1:00</span>
-      <label class="muted" style="font-size:.8rem">Temps imparti <select id="chrono-dur">${durs}</select></label>
-    </div>
-    <div class="row">
-      <button class="btn fog sm" id="chrono-start" data-act="chronoStart">Lancer</button>
-      <button class="btn sm" data-act="chronoPause">Pause</button>
-      <button class="btn ghost sm" data-act="chronoReset">Remettre à zéro</button>
-    </div>
-    <div class="row">
-      <button class="btn lamp sm" data-act="chaseWin" data-n="${n}">Réussi</button>
-      ${fails>=1
-        ? `<button class="btn sm" data-act="chaseRefuge" data-n="${n}">Deuxième échec : ils se réfugient</button>`
-        : `<button class="btn sm" data-act="chaseFail" data-n="${n}">Raté : on recommence</button>`}
-    </div>
-    <span class="muted" style="font-size:.78rem">Le mini-jeu exact reste à choisir. On ne peut pas perdre : au deuxième échec, le groupe se réfugie quelque part malgré tout.</span>
-  </div>`;
-}
 
 function renderPhase(){
   const p=P(), el=$("phase");
   let body="";
   if(p.id==="j1"||p.id==="j2"){
-    const c=S.crans, max=p.crans;
-    const ev = p.id==="j1" ? [
-      [max,"Début","Le voisin à la porte du Hall (J1, A1) : quelque chose rôde la nuit, il réparera le van. « Si on savait par où ça entre… »"],
-      [1,"1 cran","L'horloge sonne 21h, le soleil va bientôt se coucher."],
-      [0,"0 cran","Actions gratuites de la pièce seulement, puis la nuit tombe : Nuit 2."]
-    ] : [
-      [max,"Début","Le voisin revient (J2). L'équipe lui raconte la nuit et le plan de Fred. Il parle des lianes de la serre."],
-      [1,"1 cran","« Dernière chance ! » Dernier moment pour les capacités. Liane apportée si besoin."],
-      [0,"0 cran","Actions gratuites de la pièce seulement, puis la nuit tombe : Nuit 3."]
-    ];
+    // Les moments clés (21h, Dernière chance, nuit) sont annoncés par les alertes du sablier.
     body = `
       <div class="panel-head"><h2>${p.label}</h2><span class="eyebrow">Objectif</span></div>
       <p style="margin:0">${p.id==="j1"?"Découvrir d'où vient l'Ombre.":"Trouver la liane et finir de trouver où la tendre."}</p>
-      ${scriptList(codesFrom(p.id==="j1"?"J1":"J2"))}
-      <ul class="timeline">${ev.map(([at,w,t])=>{
-        const st = c<at ? "past" : c===at ? "now" : "";
-        return `<li class="${st}"><span class="when">${w}</span><span>${esc(t)}</span></li>`;
-      }).join("")}</ul>
-      ${scriptList(["JR"])}`;
+      ${scriptList([...codesFrom(p.id==="j1"?"J1":"J2"), "JR"])}`;
   } else if(p.id==="n1"){
     body = `<div class="panel-head"><h2>Nuit 1 : l'arrivée</h2><span class="eyebrow">Racontée</span></div>
       <span class="muted" style="font-size:.85rem">Aucune action, aucun indice sur le chemin de l'Ombre.</span>
       ${scriptList(codesFrom("N1-"))}
       <div class="row"><button class="btn lamp" data-act="next">Le jour se lève : Jour 1</button></div>`;
   } else if(p.id==="n2"){
-    const codes=codesFrom("N2-"), at=codes.indexOf("N2-3")+1 || codes.length;
-    body = `<div class="panel-head"><h2>Nuit 2 : la première apparition</h2><span class="eyebrow">Salon</span></div>
-      ${scriptList([...codes.slice(0,at), chronoBlock("n2"), ...codes.slice(at)])}
+    body = `<div class="panel-head"><h2>Nuit 2 : la première apparition</h2><span class="eyebrow">Racontée</span></div>
+      ${scriptList(codesFrom("N2-"))}
       <div class="row"><button class="btn lamp" data-act="next">Le jour se lève : Jour 2</button></div>`;
   } else if(p.id==="n3"){
     const pl=S.liane.placed;
     let res=`<div class="alert night"><b>« Où tendez-vous la liane ? »</b><span>Touchez la pièce choisie.</span>${S.liane.found?"":`<span class="muted">Attention : le journal dit que le groupe n'a pas encore la liane.</span>`}</div>`;
     if(pl==="E") res=`<div class="alert"><b>Bon endroit : la Chambre.</b><span>L'Ombre sort du conduit et trébuche dans la liane : capturée directement.</span></div>`;
-    else if(pl) res=`<div class="alert warn"><b>Mauvais endroit : ${ROOMS[pl].name}.</b><span>Elle enjambe la liane si elle la croise et trouve le groupe. Course-poursuite, puis les joueurs l'attirent vers la liane : capturée.</span></div>`;
+    else if(pl) res=`<div class="alert warn"><b>Mauvais endroit : ${ROOMS[pl].name}.</b><span>Elle enjambe la liane si elle la croise et trouve le groupe. Course-poursuite racontée, puis les joueurs l'attirent vers la liane : capturée.</span></div>`;
     res+=`<div class="go-row">${roomChips()}</div>`;
-    const after = pl==="E" ? ["N3-2A"] : pl ? ["N3-2B", chronoBlock("n3"), "N3-3B"] : [];
+    const after = pl==="E" ? ["N3-2A"] : pl ? ["N3-2B", "N3-3B"] : [];
     body = `<div class="panel-head"><h2>Nuit 3 : le piège</h2><span class="eyebrow">Le final</span></div>
       ${res}${scriptList(["N3-1", ...after])}
       <div class="row"><button class="btn lamp" data-act="next" ${pl?"":"disabled"}>Démasquer l'Ombre</button></div>`;
