@@ -1,1 +1,1 @@
-Morceaux des vinyles (`.mp3`) : comme les musiques courtes, avec en plus un craquement de vinyle fabriqué par la régie, au début (l'aiguille se pose) et à la fin (le sillon de sortie). Les fichiers eux-mêmes restent sans craquement. Dans le livret, type `Musique`. Voir `../LISEZMOI.md`.
+Morceaux des vinyles (`.mp3`) : comme les musiques courtes, mais entourés d'un craquement de vinyle (`../freesound_community-vinyl-dust2-96633.mp3`), en fondu enchaîné au début et à la fin. Les fichiers eux-mêmes restent sans craquement. Dans le livret, type `Musique`. Voir `../LISEZMOI.md`.

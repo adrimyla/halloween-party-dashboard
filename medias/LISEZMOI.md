@@ -6,7 +6,7 @@ La régie trouve toute seule les fichiers de ce dossier, une fois poussés sur G
 |---|---|---|
 | `ambiance/` | musiques d'ambiance | jouées en boucle, une seule à la fois, avec un fondu |
 | `musiques/` | musiques courtes (générique…) | l'ambiance s'efface en fondu le temps du morceau, puis revient |
-| `vinyles/` | morceaux des vinyles | comme `musiques/`, avec un craquement de vinyle au début et à la fin |
+| `vinyles/` | morceaux des vinyles | comme `musiques/`, avec un craquement de vinyle en fondu enchaîné au début et à la fin |
 | `sons/` | bruitages | joués par-dessus l'ambiance, qui baisse un peu pendant ce temps |
 | `videos/` | extraits vidéo | en plein écran ; coupent l'ambiance et les bruitages, l'ambiance reprend à la fin |
 
