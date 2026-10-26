@@ -1180,8 +1180,8 @@ const MEDIA_DIRS = {ambiance:"ambiance", musiques:"musique", vinyles:"musique", 
 const MEDIA_DIR_OF = {ambiance:"ambiance", musique:"musiques ou medias/vinyles", son:"sons", video:"videos"};
 const MEDIA_EXT = /\.(mp3|ogg|oga|wav|m4a|aac|opus|webm|mp4|m4v|mov)$/i;
 const MEDIA_LABEL = {ambiance:"Ambiance", musique:"Musique", son:"Son", video:"Vidéo"};
-const media = {list:[], loaded:false, err:null, amb:null, ambKey:null, ambVol:.6,
-  track:null, trackKey:null, trackVol:1, sfxVol:1, sfx:new Set()};
+const media = {list:[], loaded:false, err:null, amb:null, ambKey:null, ambVol:.25,
+  track:null, trackKey:null, trackVol:.8, sfxVol:.6, sfx:new Set()};
 const mediaKey = s => norm(String(s).replace(MEDIA_EXT, "")).replace(/[-_\s]+/g, " ").trim();
 const mediaName = n => { const t=n.replace(/[-_]+/g, " ").trim(); return t.charAt(0).toUpperCase()+t.slice(1); };
 const findMedia = (kind, name) => media.list.find(m=>m.kind===kind && m.key===mediaKey(name));
