@@ -234,6 +234,11 @@ details.opt[open]>.opt-h::before{content:"▾"}
 .opt-body{display:flex;flex-direction:column;gap:5px;margin:2px 0 8px}
 .opt-btns{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding-top:2px}
 .opt-btns .muted{font-size:.8rem}
+.opt-plain{padding:4px 0 4px 12px;border-left:2px solid var(--line);font-size:.92rem;display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.opt-plain .n{font-family:var(--f-code);color:var(--muted)}
+.note-plus{display:flex;gap:6px 10px;align-items:center;flex-wrap:wrap}
+.note-plus > span:not(.note-btns){flex:1 1 12em;min-width:0}
+.note-btns{display:flex;gap:6px;flex-wrap:wrap;font-style:normal}
 .opt-rest{display:flex;flex-direction:column;gap:6px;border-top:1px dashed var(--line);padding-top:8px}
 .opt-rest .row{align-items:center;font-size:.88rem}
 .say{margin:0;font-size:.98rem;line-height:1.5;padding:6px 10px;border-left:3px solid var(--lamp);background:rgba(243,177,74,.07);border-radius:0 6px 6px 0}
@@ -405,13 +410,13 @@ const journalFree = () => S.gave.z2 || S.done.c1p;
 const ACTIONS = [
   {id:"a1f", el:"A1", t:"Fouiller sa caisse à outils", cost:1, r:"Rien", sniff:BAILLE},
   {id:"a1c", el:"A1", t:"Demander ce qu'il y a au sous-sol", cost:0, r:"Piste du double de la clé"},
-  {id:"a2k", el:"A2", t:"Utiliser le double de la clé", cost:0, r:"Ouvre le sous-sol (H) ; y descendre coûte 1 cran", needKey:true},
+  {id:"a2k", el:"A2", t:"Utiliser le double de la clé", cost:0, r:"Ouvre le sous-sol (H) ; y descendre coûte 1 cran", needKey:true, btn:"Ouvrir la porte"},
   {id:"a3c", el:"A3", t:"Lire le courrier", cost:0, r:"Indice anodin : la liane"},
   {id:"a3e", el:"A3", t:"Examiner la cheminée", cost:1, r:"Fait 3 : cheminée normale, aucune trace", sniff:REMUE, fact:[3,"A3"]},
   {id:"b1f", el:"B1", t:"Regarder derrière le rideau", cost:1, r:"Rien : un mur de pierre", sniff:REMUE},
   {id:"b2o", el:"B2", t:"Regarder derrière le balancier", cost:1, r:"Rien (toiles d'araignées)", sniff:BAILLE},
   {id:"b3t", el:"B3", t:"Allumer et regarder la télé", cost:0, r:"Clé de l'énigme du Scrabble (extrait vidéo)"},
-  {id:"b3d", el:"B3", t:"Regarder derrière la télé", cost:1, r:"Cassette Protocole Fantôme (indice sur la propriétaire, pas un fait)", sniff:BAILLE},
+  {id:"b3d", el:"B3", t:"Regarder derrière la télé", cost:1, r:"Rien : Scrappy s'entortille dans les câbles", sniff:BAILLE},
   {id:"c1p", el:"C1", t:"La prendre dans les bras", cost:1, r:"Amaya libère le journal → C1b", sniff:REMUE, sub:"C1b",
     lock:()=>S.gave.z2 && "Amaya a déjà laissé le journal (Scooby-Snack)."},
   {id:"c1l", el:"C1b", t:"Lire la première page", cost:0, r:"Clé des Sylvains : arroser les fait sortir",
@@ -422,13 +427,12 @@ const ACTIONS = [
   {id:"c4e", el:"C4", t:"Examiner la cheminée", cost:1, r:"Fait 3 : trace en arc au sol", sniff:REMUE, fact:[3,"C4"], hint:"C4"},
   {id:"d1a", el:"D1", t:"Arroser les plantes", cost:1, r:"→ D1b : les Sylvains donnent la liane", sniff:REMUE, liane:true, sub:"D1b"},
   {id:"d2f", el:"D2", t:"Fouiller l'établi", cost:1, r:"Double de la clé de la cave", sniff:REMUE, key:true},
-  {id:"d3f", el:"D3", t:"Fouiller son pot", cost:1, r:"Rien (mouche morte)", sniff:BAILLE},
-  {id:"e1r", el:"E1", t:"Retourner les pochettes une par une", cost:1, r:"Rien", sniff:BAILLE},
+  {id:"d3f", el:"D3", t:"Fouiller son pot", cost:1, r:"Rien", sniff:BAILLE},
   {id:"e2e", el:"E2", t:"Examiner la cheminée", cost:1, r:"Fait 3 : trace en arc au sol", sniff:REMUE, fact:[3,"E2"], hint:"E2"},
-  {id:"e3f", el:"E3", t:"Fouiller derrière Nolad", cost:1, r:"Rien", sniff:BAILLE},
-  {id:"f1t", el:"F1", t:"Récupérer un Scooby-Snack", cost:0, r:"Sammy retourne sa carte, ou le groupe reçoit le jeton Scooby-Snack", box:true},
+  {id:"e3f", el:"E3", t:"Fouiller derrière le chat", cost:1, r:"Le second vinyle, à écouter sur la platine (E1)", sniff:REMUE},
+  {id:"f1t", el:"F", t:"Récupérer un Scooby-Snack", cost:0, r:"Sammy retourne sa carte, ou le groupe reçoit le jeton Scooby-Snack", box:true, btn:"Récupérer"},
   {id:"f1b", el:"F1", t:"Fouiller derrière les bocaux", cost:1, r:"Rien", sniff:BAILLE},
-  {id:"f2s", el:"F2", t:"Soulever l'assiette", cost:1, r:"Serviette « 7/10, manque de crème. — Alyse » (seul indice du prénom)", sniff:BAILLE},
+  {id:"f2s", el:"F2", t:"Lire le mot", cost:1, r:"Mot signé « Alyse » (seul indice du prénom)", sniff:REMUE},
   {id:"h1p", el:"H1", t:"Regarder ce qui est écrit", cost:0, r:"Fait 2 : croix rouge sur la cheminée de la Bibliothèque, « Hors service »", fact:[2,"H1"]},
   {id:"h1n", el:"H1", t:"Noter l'emplacement des différentes pièces", cost:1, r:"Le MJ pose toutes les tuiles sur le plan", sniff:REMUE},
   {id:"h2c", el:"H2", t:"Tenter de couper le courant", cost:1, r:"Rien : Daphné prend un coup de jus", sniff:BAILLE}
@@ -473,7 +477,7 @@ const BOOK_DEFAULT = [
   ["A2","","Action","Frapper","gratuit"],
   ["A2","","Lire","Daphné s'approche et frappe à la porte. Le groupe tend l'oreille... mais personne ne répond.",""],
   ["A2","","Action","Écouter","gratuit"],
-  ["A2","","Lire","Scooby colle son oreille contre la porte. Un bruit sourd semble venir du sous-sol, comme une sorte de ventilateur.",""],
+  ["A2","","Lire","Scooby colle son oreille contre la porte. Mais il n'y aucun bruit.",""],
   ["A2","","Action","Forcer la porte avec Scrappy","capacité de Scrappy + 1 cran"],
   ["A2","","Lire","Scrappy recule de trois pas en arrière et crie \"PUPPY POWER\". Il s'élance de toutes ses forces et traverse la porte.",""],
   ["A2","","MJ","Actionner le bruit de Scrappy qui déboule les escaliers",""],
@@ -593,11 +597,9 @@ const BOOK_DEFAULT = [
   ["","","Lire","**Résultat** : le temps avance et vous pouvez désormais ouvrir la porte menant au sous-sol.",""],
   ["","","Action","Continuer l'exploration",""],
   ["D3","La plante carnivore","Lire","Une plante carnivore géante, haute comme un homme. Sa mâchoire s'ouvre et se referme lentement. Elle a l'air d'avoir faim.",""],
-  ["D3","","Action","La caresser","gratuit"],
-  ["D3","","Lire","Elle ronronne. Les plantes ne devraient pas ronronner.",""],
   ["D3","","Action","Fouiller son pot","1 cran"],
-  ["D3","","Texte","**Rien.**",""],
-  ["D3","","Lire","Vous trouvez… une mouche morte. C'est tout.",""],
+  ["","","Lire","Sammy plonge doucement la main dans le pot de la plante... Il ne trouve rien du tout et manque de se faire manger la main.",""],
+  ["","","Lire","**Résultat :** vous ne trouverez rien et le temps avance d'un cran.",""],
   ["","","Action","Continuer l'exploration",""],
   ["E","Chambre : l'entrée","Lire","Vous entrez dans la chambre. Un grande cheminée se trouve au fond de la pièce. Dans un coin, un tourne-disque entouré de pochettes de vinyles. Sur votre gauche, un drôle de bruit provient du placard, comme une respiration inquiétante.",""],
   ["E1","Le tourne-disque","Lire","Vous approchez du tourne-disque, un vinyle y est posé.",""],
@@ -622,9 +624,7 @@ const BOOK_DEFAULT = [
   ["E3","","Action","Regarder la pile de linge","gratuit"],
   ["E3","","Lire","Sous elle, au milieu des draps, dépassent des morceaux de tissu noir et violet, découpés grossièrement… comme pour coudre une cape.",""],
   ["E3","","Action","Fouiller derrière le chat","1 cran"],
-  ["E3","","Texte","**Objet : le vinyle No Time to Die** (indice). Il s'écoute sur le tourne-disque de la Chambre (E1).",""],
-  ["E3","","Lire","Vous essayez de glisser la main derrière Nolad. Elle vous fixe. Longtemps. Puis, en respirant très fort, elle se décale enfin… d'un centimètre. Juste assez pour attraper ce qu'elle couvait : un vinyle tout chaud. Sur l'étiquette : *Ma playlist secrète*.",""],
-  ["E3","","Texte","**Objet : le second vinyle** (face A Poisson Steve, face B No Time to Die). Il s'écoute sur le tourne-disque de la Chambre (E1).",""],
+  ["E3","","Lire","Vous essayez de glisser la main derrière elle. Elle vous fixe. Longtemps. Puis, en respirant très fort, elle se décale enfin… d'un centimètre. Juste assez pour attraper ce qu'elle couvait : un vinyle tout chaud. Vouss devriez pouvoir l'écouter sur la platine.",""],
   ["","","Action","Continuer l'exploration",""],
   ["F","Cuisine : l'entrée","Lire","Une cuisine à l'abandon. Des casseroles pendent au plafond. Au fond, la porte entrouverte d'un garde-manger. Sur la table, les restes d'un repas à moitié mangé.",""],
   ["","","MJ","Si la carte de Sammy est déjà utilisée, il la retourne face visible. Sinon, le groupe reçoit le jeton Scooby-Snack, qui s'utilise comme sa capacité.",""],
@@ -632,13 +632,9 @@ const BOOK_DEFAULT = [
   ["","","Lire","Véra fouille entre les bocaux, mais il n'y a que de la nourriture périmée.",""],
   ["F1","","Lire","**Résultat :** le temps avance et vous ne trouvez rien.",""],
   ["","","Action","Continuer l'exploration",""],
-  ["F2","Le repas abandonné","Lire","Une part de strudel encore tiède, et un grand verre de lait à moitié bu. Quelqu'un a mangé ici il y a peu…",""],
-  ["F2","","MJ","Ambiance : un fantôme qui mange ? Le strudel et le verre de lait sont un clin d'œil à Hans Landa dans *Inglourious Basterds* : fausse piste Christoph Waltz (Léa Seydoux joue aussi dans le film).",""],
-  ["F2","","Action","Goûter","gratuit"],
-  ["F2","","Lire","Sammy en avale une bouchée. \"Attendez… il manque la crème !\"",""],
-  ["F2","","Action","Soulever l'assiette","1 cran"],
-  ["F2","","Texte","**Le prénom :** c'est le seul endroit où « Alyse » apparaît avant le démasquage.",""],
-  ["F2","","Lire","Une serviette en papier où quelqu'un a griffonné : \"7/10, manque de crème.\" Elle est signée : Alyse.",""],
+  ["F2","Liste de courses","Lire","Une liste de courses posée sur la table, avec un mot épinglé dessus.",""],
+  ["F2","","Action","Lire le mot","1 cran"],
+  ["","","Lire","\"Pensez à garder les épluchures de légumes et les restes. Merci.\" C'est signé \"Alyse\".",""],
   ["","","Action","Continuer l'exploration",""],
   ["H","Entrée dans le sous-sol","MJ","Si Scrappy-Doo a ouvert la porte, lire à partir d'ici",""],
   ["H","","Lire","En bas de l'escalier, vous retrouvez Scrappy-Doo coincé la tête la première dans une caisse en bois. Véra le sort de là et le remet sur pieds. Il est déboussolé, mais rien de cassé.",""],
@@ -648,7 +644,7 @@ const BOOK_DEFAULT = [
   ["H1","Le plan technique","Lire","Un plan des circuits électriques du manoir. Il semble avoir été mis à jour récemment, des annotations sont visibles, écrites en rouge.",""],
   ["","","Lire","Que souhaitez-vous faire ?",""],
   ["H1","","Action","Regarder ce qui est écrit","gratuit"],
-  ["H1","","Lire","(FAIT 2) : Vous remarquez un détail dans la bibliothèque : une croix rouge se trouve à l'emplacement de la cheminée et une note l'accompagne. Il est écrit \"Hors service, à réparer au plus vite\".",""],
+  ["H1","","Lire","Vous remarquez un détail dans la bibliothèque : une croix rouge se trouve à l'emplacement de la cheminée et une note l'accompagne. Il est écrit \"Hors service, à réparer au plus vite\".",""],
   ["H1","","MJ","**Fait 2** : la cheminée de la bibliothèque est éliminée",""],
   ["H1","","Action","Noter l'emplacement des différentes pièces","1 cran"],
   ["H1","","Lire","Vous regardez plus précisément l'emplacement des différentes pièces.",""],
@@ -659,50 +655,41 @@ const BOOK_DEFAULT = [
   ["H2","","Action","Regarder le compteur ","gratuit"],
   ["H2","","Lire","Le compteur défile à toute vitesse. On dirait que quelque chose demande une grande source d'énergie. Pourtant, rien ne semble fonctionner dans le manoir, à part la télévision et le tourne-disque.",""],
   ["H2","","Action","Tenter de couper le courant","1 cran"],
-  ["H2","","Lire","Daphné s'approche du disjoncteur et pose la main sur la poignée. PAF ! Elle se prend un coup de jus. Sa coiffure est complètement détruite maintenant...",""],
+  ["H2","","Lire","Daphné s'approche du disjoncteur et pose la main sur la poignée.",""],
+  ["","","MJ","Jouer le son du choc électrique",""],
+  ["","","Lire","PAF ! Elle se prend un coup de jus. Sa coiffure est complètement détruite maintenant...",""],
+  ["","","Lire","**Résultat:** cela ne change rien et le temps avance.",""],
   ["","","Action","Continuer l'exploration",""],
   ["H3","La porte du Laboratoire","Lire","Une porte en métal, aucune poignée apparente. Elle semble verrouillée de l'intérieur. Vous ne pouvez rien faire.",""],
   ["","","Action","Continuer l'exploration",""],
-  ["J1","Jour 1 · Matin : le voisin","Lire","Au petit matin, l'orage est toujours là. Il fait sombre et le tonnerre gronde toujours. Tout le groupe est exténué.",""],
-  ["","","Lire","Soudain, on frappe à la porte d'entrée. Véra entrouvre la porte. Sur le perron, un vieil homme en ciré jaune avec un sécateur à la main. Il se tient assez loin de la porte et demande : \"Vous avez dormi ICI ? Vous êtes fous ! Je suis le voisin. Je m'occupais du jardin et de la serre de ce manoir. Mais il y a quelques mois, alors que j'arrosais les plantes de la serre avec mon petit-fils, nous avons été surpris par un cri terrifiant. Nous avons pris nos jambes à notre cou et je ne suis jamais revenu ici depuis. Je vous conseille de partir au plus vite !\"",""],
+  ["J1","Jour 1 · Matin : le voisin","Lire","Au petit matin, la pluie est toujours là. Il fait sombre et le tonnerre gronde. Personne n'a fermé l'oeil de la nuit.",""],
+  ["","","MJ","Jouer le son du toc toc",""],
+  ["","","Lire","Soudain, on frappe à l'entrée. Véra entrouvre la porte. Sur le perron, un vieil homme en ciré jaune avec un sécateur à la main. Il se tient assez loin de la porte et demande : \"Vous avez dormi ICI ? Vous êtes fous ! Je suis le voisin. Je m'occupais du jardin et de la serre de ce manoir. Mais il y a quelques mois, alors que je venais d'arroser les plantes de la serre avec mon petit-fils, nous avons été surpris par un cri terrifiant dans le hall. Un immense spectre violet se trouvait derrière nous. Nous avons pris nos jambes à notre cou et je ne suis jamais revenu ici depuis. Je vous conseille de partir au plus vite !\"",""],
   ["J1","","Lire","Vous expliquez au voisin que votre van est en panne. Il vous propose de le réparer, mais cela risque de prendre du temps. Vous n'avez pas le choix : vous devez rester ici le temps que le van soit réparé.",""],
-  ["J1","","Lire","Le voisin plisse les yeux. \"Attendez… Ce van, ces foulards… Mais je vous reconnais ! Vous êtes le Scooby Gang ! Vous allez pouvoir attraper ce fantôme de malheur !\" Scooby et Sammy se cachent derrière Fred : \"Un f-f-fantôme ?!\" Mais Fred, Daphné, Véra et Scrappy échangent un regard : il y a un mystère à éclaircir.",""],
-  ["J1","","Lire","\"Le plus étrange, c'est que ce jour-là, la porte d'entrée était fermée à clé. Personne n'était entré, j'en suis certain. Et pourtant, elle était là, juste derrière les vitres de la serre ! D'où a-t-elle pu sortir ? Si on savait par où elle entre, on pourrait peut-être l'arrêter…\"",""],
+  ["J1","","Lire","Le voisin plisse les yeux. \"Attendez… Ce van, ces foulards… Mais je vous reconnais ! Vous êtes le Scooby Gang ! Vous allez pouvoir attraper ce fantôme de malheur !\" Scooby et Sammy se cachent derrière Fred. Mais les autres memebres du groupe échangent un regard : il y a un mystère à éclaircir.",""],
+  ["J1","","Lire","\"Le plus étrange, c'est que ce jour-là, la porte d'entrée était fermée à clé. Personne n'était entré, j'en suis certain. D'où a-t-elle pu sortir ?\"",""],
   ["J1R","Jour 1 · Les règles (hors histoire)","MJ","Donner le plan vierge du manoir et poser les tuiles du Hall (A) et du Salon (B). Le groupe commence dans le Hall.",""],
-  ["","","Puce","**Le sablier :** 4 crans le jour 1, 6 crans le jour 2. Une action payante (examiner, fouiller, arroser…) ou aller dans une autre pièce fait avancer le temps d'un cran. Seul le fait de revenir au hall est gratuit. Choisir un élément, certaines actions, les énigmes et les capacités sont gratuits. **À 0 cran,** le groupe peut encore faire les actions gratuites de la pièce où il se trouve, mais il ne peut plus se déplacer (même vers le Hall), faire une action payante ou utiliser une capacité. Quand il choisit « Continuer l'exploration », la nuit tombe.",""],
+  ["","","Puce","**Le sablier :** 4 crans le jour 1, 6 crans le jour 2. Une action payante ou aller dans une autre pièce fait avancer le temps d'un cran. Seul le fait de revenir au hall est gratuit. Choisir un élément, certaines actions, les énigmes et les capacités sont gratuits. **À 0 cran,** le groupe peut encore faire les actions gratuites de la pièce où il se trouve, mais il ne peut plus se déplacer (même vers le Hall), faire une action payante ou utiliser une capacité.",""],
   ["J1R","","Puce","**Les codes :** sur chaque tuile, les éléments ont un code (A1, A2…). Les joueurs annoncent le code, le MJ lit le script. Chaque action annonce son coût.",""],
-  ["J1R","","Puce","**Les capacités :** chacune s'utilise une seule fois dans toute la partie. Elles peuvent être jouées n'importe quand pendant une journée et se cumulent (par exemple, Daphné peut annuler le cran d'une porte forcée par Scrappy). On retourne la carte après usage. **Insister :** La partie dure deux jours : réfléchissez bien avant d'utiliser vos capacités à usage unique.",""],
+  ["J1R","","Puce","**Les capacités :** chacune s'utilise une seule fois dans toute la partie. Elles peuvent être jouées n'importe quand pendant une journée et sont cumulables. On retourne la carte après usage. **Insister :** La partie dure deux jours : réfléchissez bien avant d'utiliser vos capacités à usage unique.",""],
   ["J1R","","MJ","Lire le script du Grand Hall (A)",""],
-  ["J2","Jour 2 · Matin du jour 2","Lire","Le voisin est de retour sur le perron. \"Alors, vous l'avez vue ? … Et vous êtes encore vivants ?!\" Vous lui expliquez le plan de Fred : une liane tendue en travers de son chemin. \"Une liane ? Celles de la serre sont solides comme des câbles, je passe mes journées à les couper… Enfin, je passais. Elles doivent mourir de soif, depuis que je n'ose plus y entrer.\"",""],
-  ["JR","Les répliques du voisin","Action","Jour 1, 1 cran",""],
-  ["JR","","MJ","Il tapote à une fenêtre. L'horloge du Salon sonne 21h.",""],
-  ["JR","","Lire","Le soleil va bientôt se coucher ! Toujours vivants ? Bien, bien.",""],
-  ["JR","","Action","Fin du jour 1",""],
-  ["JR","","Lire","Le soleil se couche ! Je rentre chez moi. Bonne chance… vous en aurez besoin.",""],
-  ["JR","","Action","Dernière chance (jour 2, 1 cran)",""],
-  ["JR","","Lire","Le soleil se couche ! Si vous avez encore un tour dans votre sac, c'est maintenant ou jamais !",""],
-  ["JR","","Texte","Si le groupe n'a pas la liane : toc toc à la fenêtre du Hall. Les Sylvains y passent une longue liane : Ça pourra vous servir ! Puis le voisin rentre chez lui.",""],
-  ["JR","","Action","Indice gratuit (groupe bloqué)",""],
-  ["JR","","Lire","Je ne suis sûr de rien, mais… [indice adapté à ce qui manque au groupe].",""],
-  ["JR","","Action","Le lendemain (fin)",""],
-  ["JR","","Texte","Il répare le van.",""],
-  ["JR","","Lire","Vous nous avez débarrassés de ce fantôme… C'est cadeau !",""],
+  ["J2","Jour 2 · Matin du jour 2","Lire","Le voisin est de retour sur le perron. \"Alors, vous l'avez vue ? … Et vous êtes encore vivants ?!\" Vous lui expliquez le plan de Fred : un câble tendue en travers de son chemin. \"Un câble ? Je n'ai pas ça sous la main. Mais vous trouverez certainement quelque chose d'utile dans le manoir. En tout cas, ne comptez pas sur moi pour vous accompagner !\"",""],
   ["N1-0","Introduction","MJ","Faire piocher les cartes personnages aux joueurs face cachée (avec les numéros visibles). Indiquez aux joueurs qu'ils devront retourner leur carte quand leur numéro sera annoncé.",""],
   ["N1-0","","MJ","Lancer la musique d'ambiance joyeuse",""],
   ["N1-0","","Lire","Vous êtes une bande d'amis préparant un voyage. C'est enfin les vacances et vous partez tous les six avec votre bon vieux van. L'année a été riche en émotions, vous travaillez tous ensemble et le téléphone n'a pas arrêté de sonner. Les gens s'arrachent vos services pour résoudre des mystères : fantômes, maisons hantées, temples maudits... vous trouvez toujours une explication rationnelle et logique. Vous êtes tellement populaires, que vous avez même votre propre musique pour vous annoncer...",""],
   ["N1-0","","MJ","Jouer la musique d'introduction",""],
   ["N1-0","","Lire","Parmi vous, que des personnalités uniques. Celles-ci se complètent et chacune de vos capacités apporte une force redoutable à votre équipe.",""],
-  ["N1-0","","Lire","Le numéro 1, c'est Scooby. Malgré une trouille absolue pour le moindre bruit étrange, son flair incomparable lui permet de vous éviter bien des ennuis. Juste à son comportement, vous savez toujours si ce qui se cache derrière un objet en vaut la peine... ou non !",""],
+  ["N1-0","","Lire","En premier, c'est Scooby. Malgré une trouille absolue pour le moindre bruit étrange, son flair incomparable lui permet de vous éviter bien des ennuis. Juste à son comportement, vous savez toujours si ce qui se cache derrière un objet en vaut la peine... ou non !",""],
   ["N1-0","","MJ","Le joueur n°1 retourne sa carte : Scooby.",""],
-  ["N1-0","","Lire","Le numéro 2, c'est Sammy, le meilleur ami de Scooby. Toujours affamé, toujours le premier à prendre ses jambes à son cou… et souvent le premier à trouver le frigo. Mais ne vous y trompez pas : avec ses Scooby-Snacks, il sait amadouer n'importe quel animal, même le plus grincheux.",""],
+  ["N1-0","","Lire","En deuxième, c'est Sammy, le meilleur ami de Scooby. Toujours affamé, toujours le premier à prendre ses jambes à son cou… et souvent le premier à trouver le frigo. Mais ne vous y trompez pas : avec ses Scooby-Snacks, il sait amadouer n'importe quel animal, même le plus grincheux.",""],
   ["N1-0","","MJ","Le joueur n°2 retourne sa carte : Sammy.",""],
-  ["N1-0","","Lire","Le numéro 3, c'est Daphné. Toujours élégante, même au fond d'une crypte, elle a le chic pour se fourrer dans les ennuis… et le talent pour en sortir sans une mèche de travers. Avec elle, ce qui semblait compliqué devient un jeu d'enfant… en un rien de temps !",""],
+  ["N1-0","","Lire","La troisième, c'est Daphné. Toujours élégante, même au fond d'une crypte, elle a le chic pour se fourrer dans les ennuis… et le talent pour en sortir sans une mèche de travers. Avec elle, ce qui semblait compliqué devient un jeu d'enfant… en un rien de temps !",""],
   ["N1-0","","MJ","Le joueur n°3 retourne sa carte : Daphné.",""],
-  ["N1-0","","Lire","Le numéro 4, c'est Véra, le cerveau de l'équipe. Elle remarque ce que personne d'autre ne voit. Un seul coup d'œil dans une pièce lui suffit pour savoir si quelque chose cloche. C'est souvent elle qui élimine les pistes pour n'en garder qu'une seule.",""],
+  ["N1-0","","Lire","La quatrième, c'est Véra, le cerveau de l'équipe. Elle remarque ce que personne d'autre ne voit. Un seul coup d'œil dans une pièce lui suffit pour savoir si quelque chose cloche. C'est souvent elle qui élimine les pistes pour n'en garder qu'une seule.",""],
   ["N1-0","","MJ","Le joueur n°4 retourne sa carte : Véra.",""],
-  ["N1-0","","Lire","Le numéro 5, c'est Scrappy, le neveu de Scooby. Petit par la taille mais immense par le courage, il ne recule devant rien, et surtout pas devant une porte fermée. Quand il crie \"Puppy Power !\", mieux vaut s'écarter de son chemin.",""],
+  ["N1-0","","Lire","Le cinquième, c'est Scrappy, le neveu de Scooby. Petit par la taille mais immense par le courage, il ne recule devant rien, et surtout pas devant une porte fermée. Quand il crie \"Puppy Power !\", mieux vaut s'écarter de son chemin.",""],
   ["N1-0","","MJ","Le joueur n°5 retourne sa carte : Scrappy.",""],
-  ["N1-0","","Lire","Le numéro 6, c'est Fred, le chef de la bande. Foulard impeccable et brushing parfait, il a toujours un plan… et presque toujours un piège. Il sait toujours comment remotiver son équipe dans les moments difficiles.",""],
+  ["N1-0","","Lire","Le dernier, c'est Fred, le chef de la bande. Foulard impeccable et brushing parfait, il a toujours un plan… et presque toujours un piège. Il sait toujours comment remotiver son équipe dans les moments difficiles.",""],
   ["N1-0","","MJ","Le joueur n°6 retourne sa carte : Fred.",""],
   ["N1-0","","Lire","Mais bien sûr, toutes ces capacités indispensables seront complètement inutiles durant vos vacances ! Le soleil brille pour un mois d'octobre et même si l'air est frais, rien ne pourra vous empêcher de profiter de vos vacances. Vous prenez la route en ce début de soirée.",""],
   ["N1-1","Nuit 1 - Arrivée","MJ","Lancer la musique d'ambiance lugubre",""],
@@ -714,64 +701,110 @@ const BOOK_DEFAULT = [
   ["N1-2","Nuit 1 · Minuit","Lire","Vous vous êtes installés sur les canapés du salon. Scooby et Sammy grelottent sur leur couverture. Pendant la nuit, toutes sortes de bruits étranges vous empêchent de fermer l'oeil. Une porte grince, des pas, lents, dans le couloir… puis un rire étrange. Vous ne fermez plus l'œil de la nuit.",""],
   ["N1-2","","MJ","Jouer les divers sons",""],
   ["N2-1","Nuit 2 · La tombée de la nuit","Lire","Le soleil disparaît derrière les arbres. Le voisin est rentré chez lui. Vous vous barricadez dans le salon, les couvertures jusqu'au menton. Scooby et Sammy ont poussé un fauteuil contre la porte.",""],
-  ["N2-2","Nuit 2 · Minuit","MJ","Son : carillon de l'horloge (douze coups).",""],
-  ["N2-2","","Lire","L'horloge sonne les douze coups. Au douzième, un raclement résonne dans les murs, quelque part au-dessus de vous… comme quelque chose qui glisse dans un conduit. Puis des pas dans l'escalier. Le fauteuil glisse tout seul. La porte s'ouvre. Pour la première fois, vous la voyez : l'Ombre est là. \"PARTEZ D'ICI !\"",""],
-  ["N2-2","","MJ","Visuel : l'Ombre (première apparition). Son : rire. Le raclement à l'étage est une petite piste vers la Chambre.",""],
-  ["N2-3","Nuit 2 · Cachez-vous !","MJ","Musique : tension (battements de cœur, pas lents).",""],
+  ["N2-2","Nuit 2 · Minuit","Lire","L'horloge sonne les douze coups. Au douzième, un raclement résonne dans les murs, quelque part au-dessus de vous… comme quelque chose qui glisse dans un conduit. Puis des pas dans l'escalier. Le fauteuil glisse tout seul. La porte s'ouvre. Pour la première fois, vous la voyez : une ombre violette. Elle est là et pousse un cri terrifiant.",""],
+  ["N2-3","Nuit 2 · Cachez-vous !","MJ","Jouer la musique de tension",""],
   ["N2-3","","Lire","Panique générale ! Les couvertures volent, le fauteuil se renverse et tout le monde détale dans le noir, chacun de son côté. Bientôt, le manoir redevient silencieux… Seuls résonnent les pas de l'Ombre. Elle vous cherche.",""],
-  ["N2-3","","MJ","Pour chaque personnage, à tour de rôle : choisir une pièce déjà visitée (tuile posée sur le plan). Plusieurs personnages peuvent se retrouver dans la même pièce. Le Hall et le Salon sont toujours possibles. Garder Sammy ou Scooby pour la fin : c'est lui que l'Ombre va trouver (→ N2-4).",""],
-  ["N2-3","","Lire","[Personnage] se réfugie dans [la pièce]. [Il/Elle] hésite entre [cachette 1] et [cachette 2]… Les pas approchent, de plus en plus près. Vite, il faut se cacher !",""],
-  ["N2-3","","MJ","Compter 5 secondes à voix haute. Sans réponse, le personnage prend la première cachette. Lire la phrase de la cachette choisie (ci-dessous), puis conclure : « [Personnage] n'est pas repéré(e). » Passer au suivant.",""],
-  ["N2-3","","Texte","**Les cachettes** : deux par pièce, chacune avec sa phrase.",""],
-  ["N2-3","","Puce","**Hall (A)** · *Derrière la porte d'entrée :* collé contre le bois, vous retenez votre souffle. L'Ombre s'arrête juste de l'autre côté… puis repart. · *Dans l'âtre de la cheminée :* une pluie de suie vous tombe sur la tête. L'Ombre passe devant la cheminée sans se pencher.",""],
-  ["N2-3","","Puce","**Salon (B)** · *Derrière le rideau :* vous sentez l'Ombre passer juste à côté de vous, de l'autre côté du velours. Pazu vient s'asseoir devant le rideau et ne bouge plus d'un poil. · *Sous le canapé :* une vieille chaussette vous chatouille le nez. Les pas s'arrêtent juste devant le canapé… puis s'éloignent.",""],
-  ["N2-3","","Puce","**Pièce cachée (B1b, si elle a été ouverte)** · *Sous le bureau :* la poussière vous pique les yeux. L'Ombre passe devant le rideau sans le soulever. · *Dans le panier du chat :* vous vous roulez en boule dans le panier. Pazu vous fixe d'un air très vexé, mais ne dit rien.",""],
-  ["N2-3","","Puce","**Bibliothèque (C)** · *Derrière une étagère :* vous vous glissez entre deux rangées de livres. Un livre tombe à vos pieds : *Transhumanisme pour les débutants*. L'Ombre ne se retourne pas. · *Sous la table du Scrabble :* une lettre tombe du plateau et roule jusqu'à vous. Un W. L'Ombre passe sans la voir.",""],
-  ["N2-3","","Puce","**Serre (D)** · *Parmi les feuilles qui bougent :* des petits rires étouffés autour de vous, puis un « chut ! ». Quelque chose vous recouvre de feuilles. L'Ombre passe sans rien remarquer. · *Derrière la plante carnivore :* la plante se penche au-dessus de vous comme un parapluie et claque des mâchoires. L'Ombre recule d'un pas… et préfère faire demi-tour.",""],
-  ["N2-3","","Puce","**Chambre (E)** · *Dans le placard de Nolad :* Nolad respire fort. Très fort. L'Ombre s'arrête devant le placard… puis repart. · *Sous le lit :* les pieds de l'Ombre passent à quelques centimètres de votre visage. Vous ne respirez plus.",""],
-  ["N2-3","","Puce","**Cuisine (F)** · *Dans le garde-manger :* entre deux bocaux périmés, l'odeur est insoutenable. L'Ombre passe devant la porte entrouverte sans s'arrêter. · *Sous la table :* juste au-dessus de vous, une main gantée attrape la part de strudel… puis s'éloigne en mâchant.",""],
-  ["N2-3","","Puce","**Sous-sol (H)** · *Dans une caisse en bois :* ça sent le moisi et quelque chose vous chatouille la jambe. Vous ne bougez pas. L'Ombre non plus… puis elle repart. · *Derrière l'établi :* la pince robotique vous pique les côtes. Vous serrez les dents pendant que l'Ombre passe sans vous voir.",""],
-  ["N2-4","Nuit 2 · Repéré !","MJ","Le dernier personnage (Sammy ou Scooby, au choix du MJ) choisit sa cachette comme les autres, parmi les deux de sa pièce. Au lieu de la phrase habituelle, lire sa réplique :",""],
-  ["N2-4","","Puce","**Sammy :** Sammy se fait tout petit dans sa cachette. Tout est silencieux… sauf ses dents. Clac. Clac-clac-clac. Les pas s'arrêtent. L'Ombre se retourne lentement…",""],
-  ["N2-4","","Puce","**Scooby :** Scooby se fait tout petit dans sa cachette. Il retient sa respiration… mais son ventre, lui, se met à gargouiller. Très fort. Les pas s'arrêtent. L'Ombre se retourne lentement…",""],
-  ["N2-4","","MJ","Musique : panique.",""],
-  ["N2-4","","Lire","… et lui saute dessus ! « AU SECOUUURS ! » Le cri résonne dans tout le manoir. L'Ombre attrape [Sammy/Scooby] par le col et le traîne dans le couloir.",""],
-  ["N2-5","Nuit 2 · Le sauvetage","Lire","Dans leurs cachettes, les autres ont tout entendu. Pas question d'abandonner un ami ! Un par un, ils sortent de leur cachette… et foncent droit sur l'Ombre.",""],
-  ["N2-5","","Lire","« PUPPY POWER ! » Scrappy s'accroche à sa jambe. Daphné lui jette une couverture sur la tête, Véra lui fait un croche-pied et Fred tire sur sa cape de toutes ses forces. Même [Scooby/Sammy], les yeux fermés, se jette dans la mêlée en hurlant.",""],
+  ["N2-3","","MJ","Pour chaque personnage, à tour de rôle : choisir où se cacher dans le manoir.",""],
+  ["N2-3","","MJ","Ordre : Fred, Véra, Daphné, Scrappy, Scooby, puis Sammy en dernier : c'est toujours lui que l'Ombre repère. Pour chaque personnage : lire son intro, compter 5 secondes à voix haute (sans réponse : première cachette), puis lire la phrase de la cachette choisie.",""],
+  ["N2-3","","Lire","Fred se réfugie dans le Hall. Il hésite entre derrière la porte d'entrée et dans l'âtre de la cheminée… Les pas approchent, de plus en plus près. Vite, il faut se cacher !",""],
+  ["N2-3","","MJ","Si la cachette est « derrière la porte d'entrée », lire ceci :",""],
+  ["N2-3","","Lire","Fred se plaque contre la porte d'entrée et retient son souffle.",""],
+  ["N2-3","","MJ","Son : l'Ombre qui passe. Laisser une pause.",""],
+  ["N2-3","","Lire","L'Ombre s'arrête juste de l'autre côté du battant… puis repart. Fred n'est pas repéré.",""],
+  ["N2-3","","MJ","Si la cachette est « dans l'âtre de la cheminée », lire ceci :",""],
+  ["N2-3","","Lire","Fred se glisse dans l'âtre de la cheminée. Une pluie de suie lui tombe sur la tête. Il ferme les yeux et retient son souffle.",""],
+  ["N2-3","","MJ","Son : l'Ombre qui passe. Laisser une pause.",""],
+  ["N2-3","","Lire","L'Ombre passe devant la cheminée sans se pencher. Fred n'est pas repéré.",""],
+  ["N2-3","","Lire","Véra se réfugie dans le Salon. Elle hésite entre derrière le rideau et sous le canapé… Les pas approchent, de plus en plus près. Vite, il faut se cacher !",""],
+  ["N2-3","","MJ","Si la cachette est « derrière le rideau », lire ceci :",""],
+  ["N2-3","","Lire","Véra se glisse derrière le rideau et retient son souffle.",""],
+  ["N2-3","","MJ","Son : l'Ombre qui passe. Laisser une pause.",""],
+  ["N2-3","","Lire","Elle a senti l'Ombre passer juste à côté d'elle, de l'autre côté du velours. Mais elle n'a pas été repérée.",""],
+  ["N2-3","","MJ","Si la cachette est « sous le canapé », lire ceci :",""],
+  ["N2-3","","Lire","Véra se faufile sous le canapé… et ses lunettes tombent juste devant, sur le tapis.",""],
+  ["N2-3","","MJ","Son : l'Ombre qui passe. Laisser une pause.",""],
+  ["N2-3","","Lire","Les pas s'arrêtent. Une main gantée ramasse les lunettes, les observe… mais un bruit l'attire à l'étage. L'Ombre s'éloigne. Véra n'est pas repérée.",""],
+  ["N2-3","","Lire","Daphné se réfugie dans la Chambre. Elle hésite entre dans le placard et sous le lit… Les pas approchent, de plus en plus près. Vite, il faut se cacher !",""],
+  ["N2-3","","MJ","Si la cachette est « dans le placard», lire ceci :",""],
+  ["N2-3","","Lire","Daphné s'enferme dans le placard… avec Nolad. Elle respire fort. Très fort. Daphné retient son souffle.",""],
+  ["N2-3","","MJ","Son : l'Ombre qui passe. Laisser une pause.",""],
+  ["N2-3","","Lire","L'Ombre s'arrête devant le placard… puis repart. Daphné n'est pas repérée.",""],
+  ["N2-3","","MJ","Si la cachette est « sous le lit », lire ceci :",""],
+  ["N2-3","","Lire","Daphné se glisse sous le lit juste avant que l'ombre n'entre dans la pièce.",""],
+  ["N2-3","","MJ","Son : l'Ombre qui passe. Laisser une pause.",""],
+  ["N2-3","","Lire","L'Ombre passe à quelques centimètres de son visage, elle sent la fumée violette qu'elle dégage. Elle retient son souffle et un bruit attire l'ombre dans la serre.",""],
+  ["N2-3","","Lire","Scrappy se réfugie dans la Serre. Il hésite entre les feuilles des plants de courges et derrière la plante carnivore… Les pas approchent, de plus en plus près. Vite, il faut se cacher !",""],
+  ["N2-3","","MJ","Si la cachette est « parmi les feuilles qui bougent », lire ceci :",""],
+  ["N2-3","","Lire","Scrappy plonge dans un massif de feuilles. Autour de lui, des petits rires étouffés, puis un « chut ! ». Quelque chose le recouvre de feuilles.",""],
+  ["N2-3","","MJ","Son : l'Ombre qui passe. Laisser une pause.",""],
+  ["N2-3","","Lire","L'Ombre passe sans rien remarquer. Scrappy n'est pas repéré.",""],
+  ["N2-3","","MJ","Si la cachette est « derrière la plante carnivore », lire ceci :",""],
+  ["N2-3","","Lire","Scrappy se cache derrière la plante carnivore. Elle se penche au-dessus de lui et claque des mâchoires. Mais elle le laisse tranquille.",""],
+  ["N2-3","","MJ","Son : l'Ombre qui passe. Laisser une pause.",""],
+  ["N2-3","","Lire","L'Ombre recule d'un pas… et préfère faire demi-tour. Scrappy n'est pas repéré. Elle se dirige vers le salon.",""],
+  ["N2-3","","Lire","Scooby n'a pas osé quitter le Salon. Il hésite entre sous le tas de couvertures et derrière le fauteuil renversé… Les pas approchent, de plus en plus près. Vite, il faut se cacher !",""],
+  ["N2-3","","MJ","Si la cachette est « sous le tas de couvertures », lire ceci :",""],
+  ["N2-3","","Lire","Scooby plonge sous le tas de couvertures. Seul le bout de sa queue dépasse…",""],
+  ["N2-3","","MJ","Son : l'Ombre qui passe. Laisser une pause.",""],
+  ["N2-3","","Lire","Scooby ramène sa queue sous le fauteuil juste à temps. L'Ombre passe sans le voir. Scooby n'est pas repéré.",""],
+  ["N2-3","","MJ","Si la cachette est « derrière le fauteuil renversé », lire ceci :",""],
+  ["N2-3","","Lire","Scooby se recroqueville derrière le fauteuil renversé, mais il est dans une position très inconfortable et ne va pas tenir longtemps...",""],
+  ["N2-3","","MJ","Son : l'Ombre qui passe. Laisser une pause.",""],
+  ["N2-3","","Lire","L'Ombre passe sans le voir. Scooby n'est pas repéré.",""],
+  ["N2-3","","Lire","Sammy se réfugie dans la Bibliothèque. Il hésite entre derrière une étagère et sous la table du Scrabble… Les pas approchent, de plus en plus près. Vite, il faut se cacher !",""],
+  ["N2-3","","MJ","Si la cachette est « derrière une étagère », lire ceci (puis → N2-4) :",""],
+  ["N2-3","","Lire","Sammy se glisse derrière l'étagère mais elle n'est pas très grande.",""],
+  ["N2-3","","MJ","Son : l'Ombre qui passe. Laisser une pause.",""],
+  ["N2-3","","Lire","Sammy claque des dents et tremble si fort que le livre qui se trouve sur l'étagère glisse… et tombe par terre. L'ombre se retourne d'un seul coup et lui saute dessus !",""],
+  ["N2-3","","MJ","Si la cachette est « sous la table du Scrabble », lire ceci (puis → N2-4) :",""],
+  ["N2-3","","Lire","Sammy se recroqueville sous la table du Scrabble.",""],
+  ["N2-3","","MJ","Son : l'Ombre qui passe. Laisser une pause.",""],
+  ["N2-3","","Lire","Sammy claque des dents et tremble si fort que le livre qui se trouve sur la table glisse… et tombe par terre. L'ombre se retourne d'un seul coup et lui saute dessus !",""],
+  ["","","MJ","Jouer la musique de panique",""],
+  ["","","Lire","L'Ombre attrape Sammy par le col et le traîne dans le couloir.",""],
+  ["","","MJ","Aller au script N2-5",""],
+  ["N2-5","Nuit 2 · Le sauvetage","Lire","Dans leurs cachettes, les autres ont tout entendu. Il faut venir en aide à Sammy. Un par un, ils sortent de leur cachette… et foncent droit sur l'Ombre.",""],
+  ["N2-5","","Lire","Scrappy s'accroche à sa jambe. Daphné lui jette une couverture sur la tête, Véra lui fait un croche-pied et Fred tire sur sa cape de toutes ses forces. Quant à Scooby, bien qu'il tremble comme une feuille, il ferme les yeux et bondit sur le dos de l'Ombre !",""],
   ["N2-5","","MJ","Son : tissu qui se déchire.",""],
-  ["N2-5","","Lire","CRAAAC ! La cape se déchire. L'Ombre pousse un cri de rage, recule… et jette quelque chose au sol. PSCHHHH ! Un épais nuage de fumée violette envahit le couloir. Quand il se dissipe, l'Ombre a disparu. « Vous ne m'aurez pas ! » résonne au loin.",""],
-  ["N2-5","","MJ","Son : fumigène. La fumée violette rappelle la caisse de fumigènes de la pièce cachée (B1b) : les joueurs qui l'ont trouvée peuvent faire le lien.",""],
-  ["N2-5","","Lire","Dans la main de Fred, il reste un morceau de cape noir et violet. Véra le retourne entre ses doigts : « Depuis quand les fantômes perdent des morceaux de leur costume ? » [Option : une étiquette de costumier de cinéma cousue à l'intérieur]",""],
-  ["N2-5","","MJ","Le morceau de cape correspond aux tissus du placard de Nolad (E3). L'Ombre est affaiblie : elle a eu peur, elle n'est pas invincible. Elle fuit parce qu'elle ne doit surtout pas être démasquée.",""],
-  ["N2-6","Nuit 2 · Le plan de Fred","MJ","Si possible, le joueur de Fred lit sa réplique, et celui de Véra la sienne.",""],
-  ["N2-6","","Lire","**Fred :** Les amis, j'ai un plan ! Vous avez vu ? Elle a eu peur de nous ! Mais elle est trop rapide pour qu'on l'attrape… alors on va la faire tomber. Une liane tendue en travers de son chemin, elle trébuche… et on la ficelle !",""],
-  ["N2-6","","Lire","**Véra :** Encore faut-il savoir par où elle passe…",""],
-  ["N3-1","Nuit 3 · La tombée de la nuit","Lire","Le soleil se couche. Le voisin vous a souhaité bonne chance de loin. Cette fois, vous êtes prêts.",""],
-  ["N3-1","","Puce","**Le MJ :** Où tendez-vous la liane ? Le groupe choisit une pièce du plan (même jamais visitée) et y pose le jeton liane.",""],
-  ["N3-1","","Puce","**Le groupe se cache** dans cette pièce (dans la Chambre : le placard de Nolad).",""],
-  ["N3-1","","Lire","Vous tendez la liane en travers de la pièce, à hauteur de cheville. Puis vous vous cachez… et vous attendez.",""],
-  ["N3-1","","MJ","Son : carillon. L'horloge sonne les douze coups. Au douzième…",""],
-  ["N3-1","","Texte","**Règle :** la liane ne l'arrête que si elle est devant la sortie, ou si le groupe l'y attire pendant une poursuite.",""],
-  ["N3-2A","Nuit 3 · Capture directe (la Chambre)","Lire","Dans le placard, vous êtes serrés comme des sardines. Nolad respire fort. Très fort. \"Chut, Nolad !\"",""],
-  ["N3-2A","","Lire","Un raclement dans la cheminée. Un pan de pierre pivote dans un grincement. L'Ombre sort du conduit à quatre pattes, toussant, aveuglée par la suie… Elle se relève, fait un pas… et se prend les pieds dans la liane ! Elle s'étale de tout son long. Vous jaillissez du placard et la ficelez avant qu'elle se relève.",""],
-  ["N3-2A","","Texte","→ **Capture.** Passer au démasquage.",""],
+  ["N2-5","","Lire","La cape se déchire. L'Ombre pousse un cri de rage, recule… et jette quelque chose au sol.",""],
+  ["N2-5","","MJ","Son : fumigène.",""],
+  ["","","Lire","Un épais nuage de fumée violette envahit le couloir. Quand il se dissipe, l'Ombre a disparu.",""],
+  ["N2-5","","Lire","Dans la main de Fred, il reste un morceau de cape noir et violet. Véra le retourne entre ses doigts : « Depuis quand les fantômes perdent des morceaux de leur costume ? »",""],
+  ["","","MJ","Aller au script N2-6",""],
+  ["N2-6","Nuit 2 · Le plan de Fred","Lire","Le groupe d'amis a désormais la preuve qu'il ne s'agit pas d'un vrai fantôme. Mais comment peuvent-ils faire pour l'arrêter ?",""],
+  ["","","MJ","Si les joueurs ont déjà trouvé la liane, lire ici :",""],
+  ["N2-6","","Lire","Fred propose de poser un piège. La liane donnée par les petits êtres pourraît être tendu dans le noir lorsque l'ombre sortira de nouveau de sa cachette.",""],
+  ["N2-6","","Lire","Vera souligne qu'elle doit être tendue à l'endroit où l'ombre accède aux pièces. L'une des pièces doit contenir un passage secret et si l'on sait où se trouve ce passage, alors on sait où tendre le piège.",""],
+  ["","","MJ","Si les joueurs n'ont pas trouvé la liane, lire ici :",""],
+  ["","","Lire","Fred propose de poser un piège. L'idéal serait une sorte que l'on pourraît tendre dans le noir lorsque l'ombre sortira de nouveau de sa cachette.",""],
+  ["","","Lire","Vera souligne qu'elle doit être tendue à l'endroit où l'ombre accède aux pièces. L'une des pièces doit contenir un passage secret et si l'on sait où se trouve ce passage, alors on sait où tendre le piège.",""],
+  ["N3-1","Nuit 3 · La tombée de la nuit","Lire","Le soleil se couche, vous savez ce qui vous attend cette nuit. Vous êtes quasiment prêts, il ne reste plus qu'à décider où placer le piège.",""],
+  ["N3-1","","MJ","Si les joueurs n'ont pas la liane : les Sylvains la déposent devant la porte du Salon à la tombée de la nuit. Lire : « Devant la porte du salon, quelqu'un a déposé une longue liane verte… Des petits rires s'éloignent dans le couloir. » Puis demander aux joueurs de placer le piège sur la carte.",""],
+  ["N3-1","","Lire","Vous tendez la liane en travers de la pièce, à hauteur de cheville. Il faut maintenant vous cacher, mais un membre de l'équipe doit servir d'appât pour l'attirer dans le piège !",""],
+  ["","","MJ","Un joueur doit être désigné par les autres pour servir d'appât.",""],
+  ["","","Lire","[Joueur désigné] reste dans la pièce pendant que les autres vont se cacher.",""],
+  ["","","MJ","Si la liane est bon endroit, aller au script N3-2A",""],
+  ["","","MJ","Si la liane n'est pas au bon endroit, aller au script N3-2B",""],
+  ["N3-2A","Nuit 3 · Capture directe (la Chambre)","Lire","Dans le placard, ceux qui se sont cachés sont serrés comme des sardines. Nolad respire fort. Très fort.",""],
+  ["","","Lire","Soudain, vous entendez un bruit provenant de la cheminée.",""],
+  ["","","MJ","Jouer le son du mécanisme",""],
+  ["","","MJ","Jouer le son de l'ombre",""],
+  ["","","Lire","L'Ombre sort du conduit dans un nuage de fumée violet. Tout à coup, elle voit [joueur désigné] au milieu de la pièce. Elle s'élance sur lui/elle à toute vitesse et se prend les pieds dans le piège. Elle s'étale de tout son long. Ceux qui se sont cachés jaillissent du placard et la ficèle avant qu'elle ne se relève.",""],
+  ["N3-2A","","MJ","Aller au script N3-3B",""],
   ["N3-2B","Nuit 3 · La liane est ailleurs","Lire","Un raclement, quelque part dans les murs. Des pas.",""],
-  ["N3-2B","","Puce","**Si la liane est sur son chemin (Hall, escalier) :** Une silhouette passe, voit la liane… et l'enjambe avec élégance. \"Pas si vite !\"",""],
   ["N3-2B","","Lire","La porte s'ouvre à la volée : l'Ombre vous a trouvés !",""],
   ["N3-2B","","MJ","Musique : poursuite (Scooby-Doo). Course-poursuite racontée (plus de mini-jeu).",""],
-  ["N3-2B","","Lire","Cette fois, pas question de se cacher ! Vous détalez dans les couloirs, l'Ombre sur les talons. Un virage, un escalier, une porte qui claque… Elle gagne du terrain. Fred hurle : « Par ici ! Vers la liane ! »",""],
-  ["N3-3B","Nuit 3 · La capture","Lire","Vous revenez en courant vers votre liane et sautez par-dessus. L'Ombre, lancée à toute vitesse derrière vous, ne regarde pas où elle met les pieds… et se prend les pieds dedans ! Elle s'étale de tout son long. À l'attaque !",""],
-  ["N3-3B","","Lire","Fred noue le dernier nœud. L'Ombre est ficelée comme un saucisson. Vous l'avez eue !",""],
-  ["N4-1","Fin · Le démasquage","Puce","Un joueur retire le masque (au choix du groupe).",""],
-  ["N4-1","","Lire","Vous tirez sur le masque… C'est… Léa Seydoux ?!",""],
-  ["N4-1","","MJ","Tablette : l'image du visage.",""],
-  ["N4-1","","Lire","\"Oui, c'est moi, Alyse Deoux, la propriétaire de ce manoir ! Depuis des années, je mène en secret mes essais sur le transhumanisme. J'ai inventé l'Ombre pour faire fuir les curieux… et j'aurais réussi sans vous et votre fichu chien !\" [Mobile détaillé et inside jokes à compléter]",""],
-  ["N4-1","","Lire","**Véra :** Alyse Deoux… A. Deoux… mais bien sûr ! C'est l'anagramme de Léa Seydoux !",""],
+  ["N3-2B","","Lire","Vous détalez dans les couloirs, l'Ombre sur les talons. Un virage, un escalier, une porte qui claque… Elle gagne du terrain. Fred hurle : « Par ici ! Vers la liane ! »",""],
+  ["","","Lire","Vous revenez en courant vers votre liane et sautez par-dessus. L'Ombre, lancée à toute vitesse derrière vous, ne regarde pas où elle met les pieds… et se prend les pieds dedans ! Elle s'étale de tout son long. À l'attaque !",""],
+  ["N3-3B","Nuit 3 · La capture","Lire","Fred noue le dernier nœud. L'Ombre est ficelée comme un saucisson. Vous l'avez eue !",""],
+  ["N4-1","Fin · Le démasquage","Lire","Véra retire le masque et le groupe pousse un cri de surprise… C'est… Léa Seydoux ?!",""],
+  ["N4-1","","Lire","\"Oui, c'est moi, Alyse Deoux, la propriétaire de ce manoir ! Ou plutôt… Lady Margot Fenring ! Le Bene Gesserit m'a confié une mission sacrée : faire naître l'Élu. J'ai inventé l'Ombre pour faire fuir les curieux… et j'aurais réussi sans vous et votre fichu chien !\"",""],
+  ["N4-1","","Lire","**Véra :** Alyse Deoux… A. Deoux… c'est l'anagramme de Léa Seydoux ! Et Lady Margot, c'est son rôle dans *Dune* ! La dédicace de Hans sur le vinyle… Elle n'est jamais sortie de son personnage !",""],
   ["N4-1","","Lire","Dans sa poche, un trousseau : la clé de la cave… et celle du Laboratoire.",""],
   ["N4-2","Fin · Le Laboratoire","Lire","Vous descendez au sous-sol et ouvrez la lourde porte en métal. Un laboratoire plein d'écrans, de tubes et de câbles. Au plafond, la cabine d'un monte-charge. Sur les murs, des schémas de pattes mécaniques. Dans une cage, une créature équipée d'un bras robotique lève une pince pour vous saluer. C'est Georges.",""],
-  ["N4-2","","Puce","[Répliques de Georges à compléter]",""],
+  ["N4-2","","Lire","Georges pousse un petit grognement joyeux… exactement le ronflement de petit cochon dont parlait le journal. Sammy le regarde, bouche bée : « C'est ça… l'Élu ?! »",""],
   ["N4-2","","Lire","Vous ouvrez la cage. Georges sort… et vous serre la main. Avec sa pince.",""],
-  ["N4-3","Fin · Le lendemain","Lire","Au petit matin, le voisin a réparé votre van. \"Vous nous avez débarrassés de ce fantôme… C'est cadeau !\" Vous montez à bord. Georges est assis sur la banquette arrière. Personne ne sait comment il est arrivé là.",""],
+  ["N4-3","Fin · Le lendemain","Lire","Au petit matin, le voisin arrive en courant. Il découvre la prisonnière ficelée sur le perron et reste bouche bée : \"Mais… c'est Léa Seydoux ! L'actrice ! Ma femme a vu tous ses films !\" Les gendarmes, qu'il avait appelés en entendant les cris de la nuit, embarquent la star, qui exige encore de parler à son agent. Pour vous remercier, le voisin a réparé votre van : \"C'est cadeau !\" Vous montez à bord. Georges est assis sur la banquette arrière. Personne ne sait comment il est arrivé là.",""],
   ["N4-3","","MJ","Musique : générique (Scooby-Doo). **FIN.**",""]
 ];
 
@@ -871,7 +904,7 @@ const XLSX_URL = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.m
 const GROUPS = {A:"Grand Hall", B:"Salon", C:"Bibliothèque", D:"Serre", E:"Chambre", F:"Cuisine", H:"Sous-sol", J:"Journées", N:"Nuits"};
 /* Codes que la régie cherche dans le livret ; signalés s'ils manquent après un import. */
 const EXPECTED = [...Object.keys(ROOMS), ...Object.values(ELEMENTS).flat().map(e=>e[0]), "B1b","C1b","C2b","D1b",
-  "J1","J2","JR","N1-1","N2-1","N3-1","N3-2A","N3-2B","N3-3B","N4-1"];
+  "J1","J2","N1-1","N2-1","N3-1","N3-2A","N3-2B","N3-3B","N4-1"];
 const ui = {book:false, from:null, offline:false, opts:new Set(), toc:false};
 let BOOK = new Map(), bookSrc = {name:null, at:null}, fileHandle = null;
 
@@ -889,7 +922,7 @@ function natCmp(a, b){
 const TYPES = {lire:"say", mj:"mj", note:"mj", puce:"li", action:"action", resultat:"res",
   son:"m-son", ambiance:"m-ambiance", musique:"m-musique", video:"m-video"};
 /* « Résultat : … » en tête du texte vaut le type Résultat, quel que soit le type choisi. */
-const RES_PREFIX = /^\**\s*r[ée]sultat\s*:\s*\**\s*/i;
+const RES_PREFIX = /^\**\s*r[ée]sultat\s*\**\s*:\s*\**\s*/i;
 /* Lignes [code, titre, type, texte, coût] → scripts triés. Un code vide reprend celui du dessus. */
 function buildBook(rows){
   const m=new Map(); let last="";
@@ -1055,7 +1088,7 @@ const codesFrom = prefix => [...BOOK.keys()].filter(c=>c.startsWith(prefix));
    dans le coût, les actions gratuites suivies par leurs mots-clés. Ce qui ne trouve pas sa ligne
    s'affiche en bas du script. */
 const FREE_KEYS = {a1c:/cave|sous-sol/i, a2k:/cl[ée]/i, a3c:/courrier/i, b3t:/t[ée]l[ée]/i,
-  c2w:/^(?!.*mauvais).*(former|mot secret)/i, c1l:/premi[eè]re page/i, f1t:/scooby|bo[iî]te/i, h1p:/plan|[ée]crit/i};
+  c2w:/^(?!.*mauvais).*(former|mot secret)/i, c1l:/premi[eè]re page/i, h1p:/plan|[ée]crit/i};
 const CAP_LINKS = {
   B1:{k:"gourmand", o:"z1", room:"B", t:"Lui donner un Scooby-Snack", btn:"Donner un Scooby-Snack", done:()=>S.gave.z1, sub:"B1b"},
   C1:{k:"gourmand", o:"z2", room:"C", t:"Lui donner un Scooby-Snack", btn:"Donner un Scooby-Snack", done:()=>S.gave.z2, sub:"C1b"},
@@ -1093,7 +1126,7 @@ function bookActBtns(a){
   const free=!a.cost || S.joker==="action";
   return `${a.cost && capOk("flaireur") ? `<button class="btn fog sm" data-act="sniff" data-id="${a.id}" title="Capacité de Scooby">Renifler</button>`:""}
     ${a.cost && capOk("elegante") && !S.joker ? `<button class="btn fog sm" data-act="act" data-id="${a.id}" data-eleg="1" title="Capacité de Daphné : action payante gratuite">Daphné : gratuit</button>`:""}
-    <button class="btn ${a.cost?"lamp":""} sm" data-act="act" data-id="${a.id}" ${a.cost&&S.crans===0?"disabled":""}>${a.cost?(free?"Faire (gratuit)":"Faire · 1 cran"):"Noter"}</button>`;
+    <button class="btn ${a.cost?"lamp":""} sm" data-act="act" data-id="${a.id}" ${a.cost&&S.crans===0?"disabled":""}>${a.cost?(free?"Faire (gratuit)":"Faire · 1 cran"):(a.btn||"Noter")}</button>`;
 }
 function bookCapBtns(c){
   if(c.done()) return `${c.sub?readBtn(c.sub, `Lire ${c.sub}`):""}<span class="cost free">${c.k==="costaud"?"porte ouverte":"fait ✓"}</span>`;
@@ -1432,8 +1465,9 @@ const handlers = {
       // Le dernier Scooby-Snack : Sammy retourne sa carte si elle a servi, sinon le groupe garde le jeton.
       if(a.box){ S.box=true; if(S.caps.gourmand.used) S.caps.gourmand.used=false; else S.snack=true; }
       if(a.needKey) S.unlocked.H=true;
-      log(`${a.el} · ${a.t}${a.cost&&!note?" (1 cran)":""}${note} → ${a.r}`);
-      toast(`${a.el} → ${a.r}`);
+      const res=a.r.replace(/^→\s*/, "");
+      log(`${a.el} · ${a.t}${a.cost&&!note?" (1 cran)":""}${note} → ${res}`);
+      toast(`${a.el} → ${res}`);
     });
   },
   sniff(d){
@@ -1475,7 +1509,6 @@ const handlers = {
     });
   },
   cancelJoker(){ commit(()=>{ S.joker=null; S.caps.elegante.used=false; log("Joker de Daphné annulé."); }); },
-  lianeGift(){ commit(()=>{ S.liane.found="Habitants"; log("« Dernière chance ! » Les Sylvains passent la liane par une fenêtre du Hall."); }); },
   read(d){ openScript(d.c); },
   bookOpen(){ ui.book=true; ui.from=null; render(); },
   bookClose(){ ui.book=false; ui.from=null; render(); },
@@ -1599,7 +1632,7 @@ function renderTime(){
     alert=`<div class="alert"><b>L'horloge sonne 21h.</b><span>Le soleil va bientôt se coucher.</span></div>`;
   } else if(c===1 && dayNum()===2){
     alert=`<div class="alert warn"><b>« Dernière chance ! »</b><span>L'horloge sonne. Dernier moment pour utiliser les capacités.</span>
-      ${S.liane.found?`<span class="muted">Le groupe a déjà la liane.</span>`:`<span>Le groupe n'a pas la liane : les Sylvains la passent par une fenêtre du Hall.</span><div class="row"><button class="btn lamp sm" data-act="lianeGift">Les Sylvains apportent la liane</button></div>`}
+      <span class="muted">${S.liane.found?"Le groupe a déjà la liane.":"Le groupe n'a pas la liane : les Sylvains la déposeront à la tombée de la nuit (N3-1)."}</span>
     </div>`;
   }
   const joker = S.joker ? `<div class="joker"><span><b>Joker de Daphné actif :</b> ${S.joker==="move"?"le prochain déplacement est gratuit":"la prochaine action payante est gratuite"}.</span><button class="btn ghost sm" data-act="cancelJoker">Annuler le joker</button></div>` : "";
@@ -1630,16 +1663,48 @@ function glass(c,max,idle){
   </div>`;
 }
 
+/* Les notes du MJ deviennent utilisables : le son à jouer ou le script à ouvrir a son bouton à côté de la note.
+   Les correspondances ci-dessous couvrent les notes dont les mots ne sont pas le nom du fichier ;
+   sinon, un fichier dont le nom est cité dans la note est retrouvé tout seul. */
+const NOTE_MEDIA = [
+  [/miaul/i, "son", "Miaou"], [/[ée]ternuement/i, "son", "Sneeze"], [/choc [ée]lectrique/i, "son", "Electric Shock"],
+  [/toc toc/i, "son", "Door knock"], [/porte qui grince/i, "son", "Door creak opening"], [/porte qui s'ouvre/i, "son", "Door basement"],
+  [/scrappy qui (d[ée]boule|casse)/i, "son", "Cartoon Crash"], [/cloche|carillon|douze coups/i, "son", "Bell"],
+  [/divers sons/i, "son", "Door creak opening"], [/divers sons/i, "son", "Ombre"],
+  [/ambiance joyeuse/i, "ambiance", "Scooby Gang instru"], [/ambiance lugubre/i, "ambiance", "Ambiance jour 1"],
+  [/musique d'introduction/i, "musique", "Scooby-Doo, où es-tu"], [/g[ée]n[ée]rique/i, "musique", "Quoi dneuf Scooby-Doo"]
+];
+function noteMedia(text){
+  // Une consigne de son, pas n'importe quelle note qui contient le mot « son » : « Jouer… », « Son : … ».
+  if(!/^\s*(jouer|lancer|actionner|son\s*:|musique\s*:)/i.test(text)) return [];
+  const listed=NOTE_MEDIA.filter(([re])=>re.test(text)).map(([,k,n])=>findMedia(k,n)).filter(Boolean);
+  if(listed.length) return listed;
+  const t=mediaKey(text);
+  const named=media.list.filter(m=>new RegExp(`(^|[^a-z])${m.key.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}([^a-z]|$)`).test(t))
+    .sort((a,b)=>b.key.length-a.key.length).slice(0,1);
+  if(named.length) return named;
+  return /vid[ée]o/i.test(text) ? media.list.filter(m=>m.kind==="video").slice(0,1) : [];
+}
+function noteScript(text){
+  const m=text.match(/script\s+\**([A-Z]\d*[a-z]?(?:-\d+[A-Z]?)?)\b/) || text.match(/script\b.*\(([A-Z])\)/);
+  return m && BOOK.has(m[1]) ? readBtn(m[1]) : "";
+}
+const ELEMENT_NAME = Object.fromEntries(Object.values(ELEMENTS).flat());
 function scriptCard(s){
   const read=!!S.read[s.code], from=ui.from===s.code;
   const {links, rest, restCap} = linkActions(s);
   let n=0, body="", close="";
-  for(const r of s.rows){
+  for(const [i,r] of s.rows.entries()){
     if(r.type==="action"){
-      body+=close;
+      body+=close; close="";
       const link=links.get(n), k=`${s.code}#${n}`;
       n++;
       const cls=/gratuit/i.test(r.cost) ? "free" : /capacit/i.test(r.cost) ? "capa" : "";
+      // Une action sans rien à déplier (« Continuer l'exploration ») reste une simple ligne.
+      if(!link && (i+1===s.rows.length || s.rows[i+1].type==="action")){
+        body+=`<div class="opt-plain"><span class="n">${n}.</span><b>${fmt(r.text)}</b>${r.cost?`<span class="cost ${cls}">${esc(r.cost)}</span>`:""}</div>`;
+        continue;
+      }
       body+=`<details class="opt" data-k="${esc(k)}" ${ui.opts.has(k)?"open":""}>
         <summary class="opt-h"><span class="n">${n}.</span><b>${fmt(r.text)}</b>${r.cost?`<span class="cost ${cls}">${esc(r.cost)}</span>`:""}${link&&linkDone(link)?`<span class="cost free">fait ✓</span>`:""}</summary>
         <div class="opt-body">${link?`<div class="opt-btns">${linkBtns(link)}</div>`:""}`;
@@ -1652,15 +1717,19 @@ function scriptCard(s){
       body+= m ? `<div class="media-line">${mediaBtn(m)}</div>`
         : `<div class="media-line missing"><span>${MEDIA_LABEL[kind]} : ${esc(r.text)}</span><span>${media.loaded?`fichier introuvable dans medias/${MEDIA_DIR_OF[kind]}`:"recherche des fichiers…"}</span></div>`;
     }
-    else body+=`<p class="${r.type}">${fmt(r.text)}</p>`;
+    else {
+      const extras = r.type==="mj"||r.type==="txt" ? noteMedia(r.text).map(mediaBtn).join("")+noteScript(r.text) : "";
+      body+= extras ? `<div class="${r.type} note-plus"><span>${fmt(r.text)}</span><span class="note-btns">${extras}</span></div>`
+        : `<p class="${r.type}">${fmt(r.text)}</p>`;
+    }
   }
   body+=close;
-  if(rest.length || restCap) body+=`<div class="opt-rest"><span class="eyebrow">Aussi suivi par la régie</span>
+  if(rest.length || restCap) body+=`<div class="opt-rest"><span class="eyebrow">À noter dans la régie</span>
     ${restCap?`<div class="row"><span>${esc(restCap.t)}</span>${bookCapBtns(restCap)}</div>`:""}
     ${rest.map(a=>`<div class="row"><span>${esc(a.t)}</span>${bookActBtns(a)}</div>`).join("")}</div>`;
   return `<article class="script ${read?"read":""} ${from?"flash":""}" id="sc-${esc(s.code)}">
     <div class="script-h">
-      <span class="chip lamp">${esc(s.code)}</span><h3>${fmt(s.title||s.code)}</h3>
+      <span class="chip lamp">${esc(s.code)}</span><h3>${fmt(s.title||ELEMENT_NAME[s.code]||s.code)}</h3>
       <button class="btn sm ${read?"ghost":from?"lamp":""}" data-act="bookRead" data-c="${esc(s.code)}" aria-pressed="${read}">${read?"Lu ✓":from&&!dock.matches?"Lu, retour à la régie":"Marquer lu"}</button>
     </div>
     ${body}
@@ -1699,7 +1768,7 @@ function renderPhase(){
     body = `
       <div class="panel-head"><h2>${p.label}</h2><span class="eyebrow">Objectif</span></div>
       <p style="margin:0">${p.id==="j1"?"Découvrir d'où vient l'Ombre.":"Trouver la liane et finir de trouver où la tendre."}</p>
-      ${scriptList([...codesFrom(p.id==="j1"?"J1":"J2"), "JR"])}`;
+      ${scriptList(codesFrom(p.id==="j1"?"J1":"J2"))}`;
   } else if(p.id==="n1"){
     body = `<div class="panel-head"><h2>Nuit 1 : l'arrivée</h2><span class="eyebrow">Racontée</span></div>
       <span class="muted" style="font-size:.85rem">Aucune action, aucun indice sur le chemin de l'Ombre.</span>
@@ -1707,15 +1776,16 @@ function renderPhase(){
       <div class="row"><button class="btn lamp" data-act="next">Le jour se lève : Jour 1</button></div>`;
   } else if(p.id==="n2"){
     body = `<div class="panel-head"><h2>Nuit 2 : la première apparition</h2><span class="eyebrow">Racontée</span></div>
+      <span class="chip ${S.liane.found?"ok":""}" style="align-self:flex-start">Liane : ${S.liane.found?"trouvée":"pas trouvée"}</span>
       ${scriptList(codesFrom("N2-"))}
       <div class="row"><button class="btn lamp" data-act="next">Le jour se lève : Jour 2</button></div>`;
   } else if(p.id==="n3"){
     const pl=S.liane.placed;
-    let res=`<div class="alert night"><b>« Où tendez-vous la liane ? »</b><span>Touchez la pièce choisie.</span>${S.liane.found?"":`<span class="muted">Attention : le journal dit que le groupe n'a pas encore la liane.</span>`}</div>`;
+    let res=`<div class="alert night"><b>« Où tendez-vous la liane ? »</b><span>Touchez la pièce choisie.</span>${S.liane.found?"":`<span class="muted">Le groupe n'a pas la liane : les Sylvains la déposent devant le Salon (note de N3-1).</span>`}</div>`;
     if(pl==="E") res=`<div class="alert"><b>Bon endroit : la Chambre.</b><span>L'Ombre sort du conduit et trébuche dans la liane : capturée directement.</span></div>`;
     else if(pl) res=`<div class="alert warn"><b>Mauvais endroit : ${ROOMS[pl].name}.</b><span>Elle enjambe la liane si elle la croise et trouve le groupe. Course-poursuite racontée, puis les joueurs l'attirent vers la liane : capturée.</span></div>`;
     res+=`<div class="go-row">${roomChips()}</div>`;
-    const after = pl==="E" ? ["N3-2A"] : pl ? ["N3-2B", "N3-3B"] : [];
+    const after = pl==="E" ? ["N3-2A", "N3-3B"] : pl ? ["N3-2B", "N3-3B"] : [];
     body = `<div class="panel-head"><h2>Nuit 3 : le piège</h2><span class="eyebrow">Le final</span></div>
       ${res}${scriptList(["N3-1", ...after])}
       <div class="row"><button class="btn lamp" data-act="next" ${pl?"":"disabled"}>Démasquer l'Ombre</button></div>`;
@@ -1763,7 +1833,7 @@ function renderRoom(){
   // Les actions des éléments se font dans le livret ; ici, un raccourci par élément vers son script.
   const els = ELEMENTS[r].map(([code,name])=>{
     const key = (code==="A1" && d===2 && BOOK.has("A1b")) ? "A1b" : code;
-    return readBtn(key, `${key} · ${name}`);
+    return readBtn(key, `${key} · ${(BOOK.get(key)||{}).title||name}`);
   }).join("");
   const capLine = CAPS.map(c=>{
     const used = S.caps[c.k].used && !(c.k==="gourmand" && S.snack);
