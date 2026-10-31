@@ -805,14 +805,16 @@ const BOOK_DEFAULT = [
   ["","","Lire","Le groupe lui saute dessus et commence à la ligoter.",""],
   ["","","MJ","Jouer l'ambiance de nuit",""],
   ["N3-3B","Nuit 3 · La capture","Lire","Fred noue le dernier nœud. L'Ombre est ficelée comme un saucisson. Vous l'avez eue !",""],
-  ["N4-1","Fin · Le démasquage","Lire","Véra retire le masque et le groupe pousse un cri de surprise… C'est… Léa Seydoux ?!",""],
-  ["N4-1","","Lire","\"Oui, c'est moi, Alyse Deoux, la propriétaire de ce manoir ! Ou plutôt… Lady Margot Fenring ! Le Bene Gesserit m'a confié une mission sacrée : faire naître l'Élu. J'ai inventé l'Ombre pour faire fuir les curieux… et j'aurais réussi sans vous et votre fichu chien !\"",""],
-  ["N4-1","","Lire","**Véra :** Alyse Deoux… A. Deoux… c'est l'anagramme de Léa Seydoux ! Et Lady Margot, c'est son rôle dans *Dune* ! La dédicace de Hans sur le vinyle… Elle n'est jamais sortie de son personnage !",""],
-  ["N4-1","","Lire","Dans sa poche, un trousseau : la clé de la cave… et celle du Laboratoire.",""],
-  ["N4-2","Fin · Le Laboratoire","Lire","Vous descendez au sous-sol et ouvrez la lourde porte en métal. Un laboratoire plein d'écrans, de tubes et de câbles. Au plafond, la cabine d'un monte-charge. Sur les murs, des schémas de pattes mécaniques. Dans une cage, une créature équipée d'un bras robotique lève une pince pour vous saluer. C'est Georges.",""],
+  ["N4-1","Fin · Le démasquage","MJ","Jouer la musique de résolution",""],
+  ["","","Lire","Véra retire le masque et le groupe pousse un cri de surprise… C'est… Léa Seydoux ?!",""],
+  ["","","Lire","\"Non ! Je ne m'appelle pas Léa, mon nom est Lady Margot !\"",""],
+  ["N4-1","","Lire","Mais bien sûr ! Alyse Deoux est l'anagramme de Léa Seydoux ! Et Lady Margot Fenring, c'est son rôle dans *Dune* ! La dédicace de Hans sur le vinyle… Elle n'est jamais sortie de son personnage !",""],
+  ["N4-1","","Lire","\"Le Bene Gesserit m'a confié une mission sacrée : faire naître l'Élu. J'ai inventé l'Ombre pour faire fuir les curieux… et j'aurais réussi sans vous et votre fichu chien !\"",""],
+  ["N4-1","","Lire","Dans sa poche, un trousseau : la clé de la cave… et un badge electronique.",""],
+  ["N4-2","Fin · Le Laboratoire","Lire","Vous descendez au sous-sol et posez le badge sur la lourde porte en métal. Celle-ci s'ouvre et vous découvrez un laboratoire plein d'écrans, de tubes et de câbles. Au plafond, la cabine d'un monte-charge. Sur les murs, des schémas de pattes mécaniques. Dans une cage, une créature équipée d'un bras robotique lève une pince pour vous saluer. C'est Georges.",""],
   ["N4-2","","Lire","Georges pousse un petit grognement joyeux… exactement le ronflement de petit cochon dont parlait le journal. Sammy le regarde, bouche bée : « C'est ça… l'Élu ?! »",""],
   ["N4-2","","Lire","Vous ouvrez la cage. Georges sort… et vous serre la main. Avec sa pince.",""],
-  ["N4-3","Fin · Le lendemain","Lire","Au petit matin, le voisin arrive en courant. Il découvre la prisonnière ficelée sur le perron et reste bouche bée : \"Mais… c'est Léa Seydoux ! L'actrice ! Ma femme a vu tous ses films !\" Les gendarmes, qu'il avait appelés en entendant les cris de la nuit, embarquent la star, qui exige encore de parler à son agent. Pour vous remercier, le voisin a réparé votre van : \"C'est cadeau !\" Vous montez à bord. Georges est assis sur la banquette arrière. Personne ne sait comment il est arrivé là.",""],
+  ["N4-3","Fin · Le lendemain","Lire","Au petit matin, le voisin arrive en courant. Il découvre la prisonnière ficelée sur le perron et reste bouche bée : \"Mais… c'est Léa Seydoux ! L'actrice ! Ma femme a vu tous ses films !\" Les gendarmes, qu'il avait appelés en entendant les cris de la nuit, embarquent la star, qui exige encore de parler à son agent. Pour vous remercier, le voisin a réparé votre van : \"C'est cadeau !\" Vous montez à bord. Georges est assis sur la banquette arrière avec vous.",""],
   ["N4-3","","MJ","Musique : générique (Scooby-Doo). **FIN.**",""]
 ];
 
@@ -1742,10 +1744,10 @@ const NOTE_MEDIA = [
   [/toc toc/i, "son", "Door knock"], [/porte qui grince/i, "son", "Door creak opening"], [/porte qui s'ouvre/i, "son", "Door basement"],
   [/scrappy qui (d[ée]boule|casse)/i, "son", "Cartoon Crash"], [/cloche|carillon|douze coups/i, "son", "Bell"],
   [/divers sons/i, "son", "Door creak opening"], [/divers sons/i, "son", "Ombre"],
-  [/ambiance joyeuse/i, "ambiance", "Scooby Gang Intro"], [/ambiance lugubre/i, "ambiance", "EXT Nuit"],
+  [/ambiance joyeuse/i, "ambiance", "Scooby Gang présentation"], [/ambiance lugubre/i, "ambiance", "EXT Nuit"],
   [/musique de tension/i, "ambiance", "INT Nuit"],[/musique (de|:)\s*(panique|poursuite)/i, "ambiance", "INT Poursuite"],
   [/ambiance de nuit/i, "ambiance", "INT Nuit"], [/bruits? de pas/i, "son", "Pas lourds"], [/tissu/i, "son", "Tissu déchire"],
-  [/musique d'introduction/i, "musique", "Scooby-Doo, où es-tu"], [/g[ée]n[ée]rique/i, "musique", "Quoi dneuf Scooby-Doo"]
+  [/musique d'introduction/i, "musique", "Scooby-doo intro"], [/g[ée]n[ée]rique/i, "musique", "Scooby-doo outro"]
 ];
 function noteMedia(text){
   // Une consigne de son, pas n'importe quelle note qui contient le mot « son » : « Jouer… », « Son : … ».
@@ -1834,8 +1836,8 @@ function renderBook(){
 }
 
 /* Les ambiances utiles à chaque phase, à portée de main sous le titre. */
-const PHASE_AMB = {n1:["Scooby Gang Intro","EXT Nuit","INT Nuit"], j1:["INT Jour"], n2:["INT Nuit","INT Poursuite"],
-  j2:["INT Jour"], n3:["INT Nuit","INT Poursuite"], fin:["INT Nuit"]};
+const PHASE_AMB = {n1:["Scooby Gang présentation","EXT Nuit","INT Nuit"], j1:["INT Jour"], n2:["INT Nuit","INT Poursuite"],
+  j2:["INT Jour"], n3:["INT Nuit","INT Poursuite"], fin:["Resolution"]};
 function renderPhase(){
   const p=P(), el=$("phase");
   let body="";
