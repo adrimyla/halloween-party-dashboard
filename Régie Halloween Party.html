@@ -1728,7 +1728,7 @@ const NOTE_MEDIA = [
   [/scrappy qui (d[ée]boule|casse)/i, "son", "Cartoon Crash"], [/cloche|carillon|douze coups/i, "son", "Bell"],
   [/divers sons/i, "son", "Door creak opening"], [/divers sons/i, "son", "Ombre"],
   [/ambiance joyeuse/i, "ambiance", "Scooby Gang Intro"], [/ambiance lugubre/i, "ambiance", "EXT Nuit"],
-  [/musique de tension/i, "ambiance", "INT Hiding"], [/musique de panique|musique\s*:\s*poursuite/i, "ambiance", "INT Poursuite"],
+  [/musique de tension/i, "ambiance", "INT Nuit"],[/musique de panique|musique\s*:\s*poursuite/i, "ambiance", "INT Poursuite"],
   [/musique d'introduction/i, "musique", "Scooby-Doo, où es-tu"], [/g[ée]n[ée]rique/i, "musique", "Quoi dneuf Scooby-Doo"]
 ];
 function noteMedia(text){
@@ -1818,7 +1818,7 @@ function renderBook(){
 }
 
 /* Les ambiances utiles à chaque phase, à portée de main sous le titre. */
-const PHASE_AMB = {n1:["Scooby Gang Intro","EXT Nuit","INT Nuit"], j1:["INT Jour"], n2:["INT Nuit","INT Hiding","INT Poursuite"],
+const PHASE_AMB = {n1:["Scooby Gang Intro","EXT Nuit","INT Nuit"], j1:["INT Jour"], n2:["INT Nuit","INT Poursuite"],
   j2:["INT Jour"], n3:["INT Nuit","INT Poursuite"], fin:["INT Nuit"]};
 function renderPhase(){
   const p=P(), el=$("phase");
