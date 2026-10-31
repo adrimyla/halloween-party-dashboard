@@ -104,6 +104,7 @@ h2{font-family:var(--f-display);font-weight:400;font-size:1.35rem;letter-spacing
 }
 .media-btn:hover{border-color:var(--muted)}
 .media-btn.on{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+.media-btn.on:disabled{opacity:1;cursor:default}
 .media-btn.video{border-color:var(--fog)}
 .media-vol{display:flex;gap:10px;align-items:center;font-size:.8rem;color:var(--muted)}
 .media-vol span{min-width:6.5em}
@@ -790,12 +791,19 @@ const BOOK_DEFAULT = [
   ["","","MJ","Jouer le son du mécanisme",""],
   ["","","MJ","Jouer le son de l'ombre",""],
   ["","","Lire","L'Ombre sort du conduit dans un nuage de fumée violet. Tout à coup, elle voit [joueur désigné] au milieu de la pièce. Elle s'élance sur lui/elle à toute vitesse et se prend les pieds dans le piège. Elle s'étale de tout son long. Ceux qui se sont cachés jaillissent du placard et la ficèle avant qu'elle ne se relève.",""],
+  ["","","MJ","Jouer l'ambiance de nuit",""],
   ["N3-2A","","MJ","Aller au script N3-3B",""],
-  ["N3-2B","Nuit 3 · La liane est ailleurs","Lire","Un raclement, quelque part dans les murs. Des pas.",""],
-  ["N3-2B","","Lire","La porte s'ouvre à la volée : l'Ombre vous a trouvés !",""],
-  ["N3-2B","","MJ","Musique : poursuite (Scooby-Doo). Course-poursuite racontée (plus de mini-jeu).",""],
-  ["N3-2B","","Lire","Vous détalez dans les couloirs, l'Ombre sur les talons. Un virage, un escalier, une porte qui claque… Elle gagne du terrain. Fred hurle : « Par ici ! Vers la liane ! »",""],
-  ["","","Lire","Vous revenez en courant vers votre liane et sautez par-dessus. L'Ombre, lancée à toute vitesse derrière vous, ne regarde pas où elle met les pieds… et se prend les pieds dedans ! Elle s'étale de tout son long. À l'attaque !",""],
+  ["N3-2B","Nuit 3 · La liane est ailleurs","Lire","Ceux qui se sont cachés sont serrés comme des sardines.",""],
+  ["N3-2B","","Lire","Soudain, vous entendez un bruit de mécanisme.",""],
+  ["N3-2B","","MJ","Jouer le son du mécanisme",""],
+  ["N3-2B","","Lire","Mais aucune présence dans la pièce. Vous tendez l'oreille et entendez des bruits de pas à l'étage.",""],
+  ["N3-2B","","MJ","Jouer le son des bruits de pas",""],
+  ["","","","Un grand silence... puis la porte s'ouvre : elle est là et vous saute dessus.",""],
+  ["N3-2B","","MJ","Jouer la musique de poursuite",""],
+  ["N3-2B","","Lire","Vous détalez dans les couloirs, l'Ombre sur les talons. Un virage, un escalier, une porte qui claque… Elle gagne du terrain. Fred hurle à son équipe de se diriger vers la liane.",""],
+  ["","","Lire","Vous revenez en courant vers votre liane et sautez par-dessus. L'Ombre, lancée à toute vitesse derrière vous, ne regarde pas où elle met les pieds… et se prend les pieds dedans ! Elle s'étale de tout son long.",""],
+  ["","","Lire","Le groupe lui saute dessus et commence à la ligoter.",""],
+  ["","","MJ","Jouer l'ambiance de nuit",""],
   ["N3-3B","Nuit 3 · La capture","Lire","Fred noue le dernier nœud. L'Ombre est ficelée comme un saucisson. Vous l'avez eue !",""],
   ["N4-1","Fin · Le démasquage","Lire","Véra retire le masque et le groupe pousse un cri de surprise… C'est… Léa Seydoux ?!",""],
   ["N4-1","","Lire","\"Oui, c'est moi, Alyse Deoux, la propriétaire de ce manoir ! Ou plutôt… Lady Margot Fenring ! Le Bene Gesserit m'a confié une mission sacrée : faire naître l'Élu. J'ai inventé l'Ombre pour faire fuir les curieux… et j'aurais réussi sans vous et votre fichu chien !\"",""],
@@ -1437,6 +1445,13 @@ function mediaBtn(m){
   const icon = m.kind==="video" ? "▶" : m.kind==="ambiance" ? (on?"❚❚":"♫") : m.kind==="musique" ? (on?"■":m.vinyl?"◉":"♬") : "♪";
   return `<button class="media-btn ${on?"on":""} ${m.kind==="video"?"video":""}" data-act="${act}" data-n="${esc(m.name)}">${icon} ${esc(mediaName(m.name))}</button>`;
 }
+/* Bouton d'une note du script : une ambiance se lance, elle ne se coupe jamais ici (déjà en cours, elle continue).
+   La couper reste possible depuis le panneau Son et la rangée Ambiance. */
+function noteBtn(m){
+  if(m.kind!=="ambiance") return mediaBtn(m);
+  const on=media.ambKey===m.key;
+  return `<button class="media-btn ${on?"on":""}" ${on?"disabled":""} data-act="amb" data-n="${esc(m.name)}">♫ ${esc(mediaName(m.name))}${on?" · en cours":""}</button>`;
+}
 function renderSound(){
   const playing = media.ambKey ? media.list.find(m=>m.key===media.ambKey && m.kind==="ambiance") : null;
   const track = media.trackKey ? media.list.find(m=>m.key===media.trackKey && m.kind==="musique") : null;
@@ -1728,7 +1743,8 @@ const NOTE_MEDIA = [
   [/scrappy qui (d[ée]boule|casse)/i, "son", "Cartoon Crash"], [/cloche|carillon|douze coups/i, "son", "Bell"],
   [/divers sons/i, "son", "Door creak opening"], [/divers sons/i, "son", "Ombre"],
   [/ambiance joyeuse/i, "ambiance", "Scooby Gang Intro"], [/ambiance lugubre/i, "ambiance", "EXT Nuit"],
-  [/musique de tension/i, "ambiance", "INT Nuit"],[/musique de panique|musique\s*:\s*poursuite/i, "ambiance", "INT Poursuite"],
+  [/musique de tension/i, "ambiance", "INT Nuit"],[/musique (de|:)\s*(panique|poursuite)/i, "ambiance", "INT Poursuite"],
+  [/ambiance de nuit/i, "ambiance", "INT Nuit"], [/bruits? de pas/i, "son", "Pas lourds"], [/tissu/i, "son", "Tissu déchire"],
   [/musique d'introduction/i, "musique", "Scooby-Doo, où es-tu"], [/g[ée]n[ée]rique/i, "musique", "Quoi dneuf Scooby-Doo"]
 ];
 function noteMedia(text){
@@ -1771,11 +1787,11 @@ function scriptCard(s){
     else if(r.type.startsWith("m-")){
       // Ligne Son / Ambiance / Vidéo : le bouton du fichier du même nom, ou un avertissement s'il manque.
       const kind=r.type.slice(2), m=findMedia(kind, r.text);
-      body+= m ? `<div class="media-line">${mediaBtn(m)}</div>`
+      body+= m ? `<div class="media-line">${noteBtn(m)}</div>`
         : `<div class="media-line missing"><span>${MEDIA_LABEL[kind]} : ${esc(r.text)}</span><span>${media.loaded?`fichier introuvable dans medias/${MEDIA_DIR_OF[kind]}`:"recherche des fichiers…"}</span></div>`;
     }
     else {
-      const extras = r.type==="mj"||r.type==="txt" ? noteMedia(r.text).map(mediaBtn).join("")+noteScript(r.text) : "";
+      const extras = r.type==="mj"||r.type==="txt" ? noteMedia(r.text).map(noteBtn).join("")+noteScript(r.text) : "";
       body+= extras ? `<div class="${r.type} note-plus"><span>${fmt(r.text)}</span><span class="note-btns">${extras}</span></div>`
         : `<p class="${r.type}">${fmt(r.text)}</p>`;
     }
