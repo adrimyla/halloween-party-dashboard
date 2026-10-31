@@ -4,7 +4,7 @@ La régie trouve toute seule les fichiers de ce dossier, une fois poussés sur G
 
 | Dossier | Ce qu'on y met | Dans la régie |
 |---|---|---|
-| `ambiance/` | musiques d'ambiance | jouées en boucle, une seule à la fois, avec un fondu |
+| `ambiance/` | musiques d'ambiance | jouées en boucle, une seule à la fois ; chaque tour s'enchaîne sur le suivant en fondu, sans silence |
 | `musiques/` | musiques courtes (générique…) | l'ambiance s'efface en fondu le temps du morceau, puis revient |
 | `vinyles/` | morceaux des vinyles | comme `musiques/`, avec un craquement de vinyle en fondu enchaîné au début et à la fin |
 | `sons/` | bruitages | joués par-dessus l'ambiance, qui baisse un peu pendant ce temps |

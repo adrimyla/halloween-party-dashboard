@@ -1195,6 +1195,62 @@ function ambResume(){
   a.play().then(()=>fadeTo(a, ambTarget(), 1200)).catch(()=>{});
 }
 
+/* Boucle d'ambiance en fondu enchaîné : quelques secondes avant la fin, une seconde copie du morceau démarre
+   (sans son silence de début) et monte pendant que la première s'efface. Plus de trou entre deux tours, et le
+   saut de niveau entre la fin et le début est masqué. S'utilise comme un lecteur : play, pause, paused, volume. */
+const LOOP = {fade:4, skip:.4, warm:15};   // secondes : fondu enchaîné, début sauté aux tours suivants, préchargement avant le fondu
+class AmbLoop {
+  constructor(url){
+    this.url=url; this.cur=new Audio(url); this.cur.preload="auto";
+    this.next=null; this.mix=0; this.mixing=false; this.vol=0; this.paused=true; this.timer=null;
+    this.cur.addEventListener("ended", ()=>this.ended(this.cur));
+  }
+  get volume(){ return this.vol; }
+  set volume(v){ this.vol=v; this.apply(); }
+  apply(){
+    const m=this.mixing?this.mix:0;
+    this.cur.volume=this.vol*Math.cos(m*Math.PI/2);
+    if(this.next) this.next.volume=this.mixing ? this.vol*Math.sin(m*Math.PI/2) : 0;
+  }
+  play(){
+    this.paused=false;
+    clearInterval(this.timer); this.last=performance.now();
+    this.timer=setInterval(()=>this.tick(), 100);
+    this.apply();
+    if(this.mixing) this.next.play().catch(()=>{});
+    return this.cur.play();
+  }
+  pause(){
+    this.paused=true; clearInterval(this.timer);
+    this.cur.pause(); if(this.next) this.next.pause();
+  }
+  tick(){
+    const now=performance.now(), dt=(now-this.last)/1000; this.last=now;
+    const d=this.cur.duration; if(!isFinite(d)) return;
+    const fade=Math.min(LOOP.fade, d/3), left=d-this.cur.currentTime;
+    if(!this.next && left<=fade+LOOP.warm){
+      const n=new Audio(this.url); n.preload="auto"; n.volume=0;
+      n.addEventListener("loadedmetadata", ()=>{ if(n.duration>LOOP.skip*3) n.currentTime=LOOP.skip; }, {once:true});
+      n.addEventListener("ended", ()=>this.ended(n));
+      this.next=n;
+    }
+    if(this.next && !this.mixing && left<=fade){ this.mixing=true; this.mix=0; this.next.play().catch(()=>{}); }
+    if(this.mixing){
+      this.mix=Math.min(1, this.mix+dt/fade); this.apply();
+      if(this.mix>=1) this.swap();
+    }
+  }
+  swap(){
+    this.cur.pause(); this.cur=this.next; this.next=null; this.mixing=false; this.mix=0; this.apply();
+  }
+  // Filet de sécurité (onglet ralenti, réseau lent) : si le morceau finit avant le fondu, le tour suivant part aussitôt.
+  ended(el){
+    if(el!==this.cur || this.paused) return;
+    if(this.next){ this.mixing=true; this.mix=1; this.next.play().catch(()=>{}); this.swap(); }
+    else { el.currentTime=0; el.play().catch(()=>{}); }
+  }
+}
+
 function ambStop(quick){
   const a=media.amb; if(!a) return;
   media.amb=null; media.ambKey=null;
@@ -1205,7 +1261,7 @@ function ambToggle(name){
   const m=findMedia("ambiance", name); if(!m){ missing("ambiance", name); return; }
   if(media.ambKey===m.key){ ambStop(); return; }
   ambStop(true);
-  const a=new Audio(m.url); a.loop=true; a.volume=0;
+  const a=new AmbLoop(m.url); a.volume=0;
   media.amb=a; media.ambKey=m.key;
   render();
   if(ambHeld()){ toast("Ambiance choisie : elle démarrera à la fin de la musique."); return; }
@@ -1671,7 +1727,8 @@ const NOTE_MEDIA = [
   [/toc toc/i, "son", "Door knock"], [/porte qui grince/i, "son", "Door creak opening"], [/porte qui s'ouvre/i, "son", "Door basement"],
   [/scrappy qui (d[ée]boule|casse)/i, "son", "Cartoon Crash"], [/cloche|carillon|douze coups/i, "son", "Bell"],
   [/divers sons/i, "son", "Door creak opening"], [/divers sons/i, "son", "Ombre"],
-  [/ambiance joyeuse/i, "ambiance", "Scooby Gang instru"], [/ambiance lugubre/i, "ambiance", "Ambiance jour 1"],
+  [/ambiance joyeuse/i, "ambiance", "Scooby Gang Intro"], [/ambiance lugubre/i, "ambiance", "EXT Nuit"],
+  [/musique de tension/i, "ambiance", "INT Hiding"], [/musique de panique|musique\s*:\s*poursuite/i, "ambiance", "INT Poursuite"],
   [/musique d'introduction/i, "musique", "Scooby-Doo, où es-tu"], [/g[ée]n[ée]rique/i, "musique", "Quoi dneuf Scooby-Doo"]
 ];
 function noteMedia(text){
@@ -1760,6 +1817,9 @@ function renderBook(){
   $("book-body").innerHTML = [...BOOK.values()].map(scriptCard).join("");
 }
 
+/* Les ambiances utiles à chaque phase, à portée de main sous le titre. */
+const PHASE_AMB = {n1:["Scooby Gang Intro","EXT Nuit","INT Nuit"], j1:["INT Jour"], n2:["INT Nuit","INT Hiding","INT Poursuite"],
+  j2:["INT Jour"], n3:["INT Nuit","INT Poursuite"], fin:["INT Nuit"]};
 function renderPhase(){
   const p=P(), el=$("phase");
   let body="";
@@ -1801,6 +1861,9 @@ function renderPhase(){
       </dl>`;
   }
   el.innerHTML=body;
+  const ambs=(PHASE_AMB[p.id]||[]).map(n=>findMedia("ambiance", n)).filter(Boolean);
+  if(ambs.length) el.querySelector(".panel-head").insertAdjacentHTML("afterend",
+    `<div class="media-row"><span class="eyebrow">Ambiance</span>${ambs.map(mediaBtn).join("")}</div>`);
 }
 
 /* Les pièces en boutons courts : se déplacer (le jour) ou tendre la liane (nuit 3) sans déplier le manoir. */
